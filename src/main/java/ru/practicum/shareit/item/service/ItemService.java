@@ -12,4 +12,6 @@ public interface ItemService {
     List<Item> getAll();
 
     boolean save(Item item);
+
+    List<Item> search(String text);
 }

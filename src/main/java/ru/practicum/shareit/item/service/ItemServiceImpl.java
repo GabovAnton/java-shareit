@@ -21,7 +21,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public Optional<Item> getItem(int id) {
-        Optional<Item> item = Optional.ofNullable(itemDao.get(id));
+        Optional<Item> item = itemDao.get(id);
         log.debug("item with id: {} requested, returned result: {}", id, item);
         if (item.isEmpty()) {
             throw new EntityNotFoundException("item with id: " + id + " doesn't exists");
@@ -45,6 +45,13 @@ public class ItemServiceImpl implements ItemService {
         itemDao.save(item);
         log.debug("new item created: {}", item);
         return true;
+    }
+
+    @Override
+    public List<Item> search(String text) {
+      return itemDao.search(text).stream()
+              .filter(Objects::nonNull)
+              .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     //TODO realize this!!!!

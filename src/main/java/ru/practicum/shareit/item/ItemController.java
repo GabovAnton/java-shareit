@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -41,6 +42,23 @@ private final ItemService itemService;
 
             return newItem; //TODO temporary solution
         }
+    }
+
+    @PatchMapping()
+    public Item update(@Valid @RequestBody ItemDto itemDto) {
+        Item item = ItemMapper.toItem(itemDto);
+        if (itemService.save(item)) {
+            return item;
+        } else {
+
+            return item; //TODO temporary solution
+        }
+    }
+
+    @GetMapping("/search")
+    @ResponseBody
+    public List<Item> searchByQuery(@RequestParam String text) {
+        return itemService.search(text);
     }
 
 
