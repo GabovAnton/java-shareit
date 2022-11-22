@@ -1,37 +1,43 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
+import ru.practicum.shareit.dao.Dao;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dao.ItemDao;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dao.UserDao;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
     private final ItemDao itemDao;
+    private final UserDao userDao;
 
-    public ItemServiceImpl(ItemDao itemDao) {
-        this.itemDao = itemDao;
-    }
 
-    public Optional<Item> getItem(int id) {
+
+    public Item getItem(long id) {
         Optional<Item> item = itemDao.get(id);
         log.debug("item with id: {} requested, returned result: {}", id, item);
-        if (item.isEmpty()) {
-            throw new EntityNotFoundException("item with id: " + id + " doesn't exists");
-        }
-        return item;
+
+        return  item.orElseThrow(()->new EntityNotFoundException("item with id: " + id + " doesn't exists"));
+
     }
 
-    public List<Item> getAll() {
-        List<Item> itemList = itemDao.getALL().stream()
+    public List<ItemDto> getAll(long userId) {
+        List<ItemDto> itemList = itemDao.getAll(userId).stream()
                 .filter(Objects::nonNull)
+                .map(ItemMapper::toItemDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.debug("all items requested: {}", itemList.size());
 
@@ -40,19 +46,51 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public boolean save(Item item) {
+    public Long save(Item item, long userId) {
+        item.setOwner(userDao.get(userId)
+                .orElseThrow(() -> new EntityNotFoundException("user id: " + userId + " not found")));
         validate(item);
         itemDao.save(item);
         log.debug("new item created: {}", item);
-        return true;
+        return item.getId();
     }
 
     @Override
-    public List<Item> search(String text) {
-      return itemDao.search(text).stream()
-              .filter(Objects::nonNull)
-              .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+    public List<Item> search(String text, long userId) {
+        log.debug("search in items with query: {} requested", text);
+
+        return itemDao.search(text, userId).stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
+
+    @Override
+    public ItemDto update(ItemDto itemDto, long userId) {
+        Item itemToUpdate = itemDao.get(itemDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("item id: " + itemDto.getId() + " not found"));
+
+        Map<String, Object> classProperties = getClassProperties(itemDto, false);
+
+        classProperties.forEach((k,v) -> { //TODO verify !!!
+                    Method method = ReflectionUtils.findMethod(Item.class, "set" + StringUtils.capitalize(k));
+                    if (method != null) {
+                        ReflectionUtils.invokeMethod(method, itemToUpdate, classProperties.get(k));
+                    }
+                });
+        return ItemMapper.toItemDto(itemToUpdate);
+    }
+
+    private Map<String, Object> getClassProperties(Object obj, boolean setAccessible) {
+        Map<String, Object> properties = new HashMap<>();
+        ReflectionUtils.doWithFields(obj.getClass(), field -> {
+            properties.put(field.getName(), field.get(obj));
+            if (setAccessible) {
+                field.setAccessible(true);
+            }
+        });
+        return properties;
+    }
+
 
     //TODO realize this!!!!
     private void validate(Item item) {

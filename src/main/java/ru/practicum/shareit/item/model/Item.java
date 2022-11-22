@@ -5,13 +5,16 @@ import lombok.Data;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * TODO Sprint add-controllers.
  */
 @Data
 @AllArgsConstructor
 public class Item {
-    private int id;
+
+    private long id;
     private String name;
     private String description;
     private boolean available;
