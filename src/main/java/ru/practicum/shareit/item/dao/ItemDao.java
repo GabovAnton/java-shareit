@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.dao;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.dao.Dao;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
@@ -22,7 +21,7 @@ public class ItemDao {
 
 
     public boolean save(Item item) {
-        item.setId(itemId++);
+        item.setId(++itemId);
         if (itemList.stream().anyMatch(x -> x.equals(item))) return false;
         itemList.add(item);
         return true;

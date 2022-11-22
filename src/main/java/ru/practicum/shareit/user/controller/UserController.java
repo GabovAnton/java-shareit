@@ -1,15 +1,14 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * TODO Sprint add-controllers.
@@ -33,4 +32,18 @@ public class UserController {
     }
 
 
+    @JsonView(UserDto.SimpleView.class)
+    @PostMapping()
+    public UserDto create(@Validated(UserDto.New.class) @RequestBody UserDto userDto) {
+        long id = userService.save(UserMapper.toUser(userDto));
+        return UserMapper.toUserDto(userService.getUser(id));
+    }
+
+
+    @JsonView(UserDto.SimpleView.class)
+    @PatchMapping("{userid}")
+    public UserDto update(@PathVariable long userid, @Validated(UserDto.Update.class) @RequestBody UserDto userDto) {
+        userDto.setId(userid);
+        return userService.update(userDto);
+    }
 }

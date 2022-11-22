@@ -1,13 +1,12 @@
 package ru.practicum.shareit.user.dao;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.dao.Dao;
 import ru.practicum.shareit.user.User;
 
+import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class UserDao {
@@ -20,21 +19,22 @@ public class UserDao {
     }
 
     public List<User> getAll() {
-        return  userList;
+        return userList;
     }
 
-    public boolean save(User user) {
-        user.setId(userId++);
-        if (userList.stream().anyMatch(x -> x.equals(user))) return false;
-        userList.add(user);
-        return true;
+    public long save(User user) {
+        user.setId(++userId);
+        validateUser(user);
+        userList.stream().filter(x -> x.equals(user) || x.getEmail().equals(user.getEmail())).findAny().
+                ifPresentOrElse(x -> {
+                            throw new ValidationException("user can't be created because it already exists");
+                        },
+                        () -> userList.add(user));
+        return user.getId();
     }
 
-    public List<User> search(String query,long userId) {
-        //TODO insert correct algorithm
-        return userList.
-                stream().
-                filter(x -> x.getName().contains(query) && x.getId() != userId).
-                collect(Collectors.toList());
+    private void validateUser(User user) {
+
     }
+
 }

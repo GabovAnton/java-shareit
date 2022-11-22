@@ -1,8 +1,7 @@
 package ru.practicum.shareit.request.dao;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.dao.Dao;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.ArrayList;
 import java.util.List;

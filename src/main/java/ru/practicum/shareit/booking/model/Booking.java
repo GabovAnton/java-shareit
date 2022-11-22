@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.model;
 
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;

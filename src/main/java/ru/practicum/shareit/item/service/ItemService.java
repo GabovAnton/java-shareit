@@ -6,7 +6,6 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
-@Service
 public interface ItemService {
     Item getItem(long id);
     List<ItemDto> getAll(long userId);

@@ -12,6 +12,5 @@ public interface UserService {
 
     Long save(User user);
 
-    List<User> search(String text, long userId);
     UserDto update(UserDto userDto);
 }

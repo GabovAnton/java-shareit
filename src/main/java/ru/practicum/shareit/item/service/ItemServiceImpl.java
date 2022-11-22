@@ -2,16 +2,20 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
-import ru.practicum.shareit.dao.Dao;
 import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.exception.EntityNotFoundException;
+import exception.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserDao;
+import ru.practicum.shareit.utils.ClassProperties;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -19,18 +23,19 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
+@Primary
+@Service
 public class ItemServiceImpl implements ItemService {
 
     private final ItemDao itemDao;
     private final UserDao userDao;
 
 
-
     public Item getItem(long id) {
         Optional<Item> item = itemDao.get(id);
         log.debug("item with id: {} requested, returned result: {}", id, item);
 
-        return  item.orElseThrow(()->new EntityNotFoundException("item with id: " + id + " doesn't exists"));
+        return item.orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
 
     }
 
@@ -49,7 +54,6 @@ public class ItemServiceImpl implements ItemService {
     public Long save(Item item, long userId) {
         item.setOwner(userDao.get(userId)
                 .orElseThrow(() -> new EntityNotFoundException("user id: " + userId + " not found")));
-        validate(item);
         itemDao.save(item);
         log.debug("new item created: {}", item);
         return item.getId();
@@ -69,31 +73,16 @@ public class ItemServiceImpl implements ItemService {
         Item itemToUpdate = itemDao.get(itemDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("item id: " + itemDto.getId() + " not found"));
 
-        Map<String, Object> classProperties = getClassProperties(itemDto, false);
+        Map<String, Object> classProperties = ClassProperties.getClassProperties(itemDto, false);
 
-        classProperties.forEach((k,v) -> { //TODO verify !!!
-                    Method method = ReflectionUtils.findMethod(Item.class, "set" + StringUtils.capitalize(k));
-                    if (method != null) {
-                        ReflectionUtils.invokeMethod(method, itemToUpdate, classProperties.get(k));
-                    }
-                });
+        classProperties.forEach((k, v) -> { //TODO verify !!!
+            Method method = ReflectionUtils.findMethod(Item.class, "set" + StringUtils.capitalize(k));
+            if (method != null) {
+                ReflectionUtils.invokeMethod(method, itemToUpdate, classProperties.get(k));
+            }
+        });
         return ItemMapper.toItemDto(itemToUpdate);
     }
 
-    private Map<String, Object> getClassProperties(Object obj, boolean setAccessible) {
-        Map<String, Object> properties = new HashMap<>();
-        ReflectionUtils.doWithFields(obj.getClass(), field -> {
-            properties.put(field.getName(), field.get(obj));
-            if (setAccessible) {
-                field.setAccessible(true);
-            }
-        });
-        return properties;
-    }
 
-
-    //TODO realize this!!!!
-    private void validate(Item item) {
-        // Details omitted
-    }
 }

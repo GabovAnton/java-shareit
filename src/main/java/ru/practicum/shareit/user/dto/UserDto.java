@@ -27,7 +27,7 @@ public class UserDto {
     public interface AdminView extends ItemDto.SimpleView {
     }
 
-    @Null(groups = {New.class})
+   // @Null(groups = {New.class})
     @JsonView({SimpleView.class})
     private long id;
 
