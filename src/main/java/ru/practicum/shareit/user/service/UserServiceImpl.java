@@ -23,7 +23,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(long id) {
-        return userDao.get(id).orElseThrow(() -> new EntityNotFoundException("user with id: " + id + " doesn't exists"));
+        return userDao.get(id)
+                .orElseThrow(() -> new EntityNotFoundException("user with id: " + id + " doesn't exists"));
     }
 
     @Override
@@ -55,9 +56,10 @@ public class UserServiceImpl implements UserService {
         }
         classProperties.forEach((k, v) -> {
             Class<User> clz = User.class;
-            Arrays.stream(clz.getDeclaredMethods()).
-                    filter(x -> x.getName().equals("set" + StringUtils.capitalize(k))).
-                    findAny().ifPresent(y -> ReflectionUtils.invokeMethod((y), userToUpdate, classProperties.get(k)));
+            Arrays.stream(clz.getDeclaredMethods())
+                    .filter(x -> x.getName().equals("set" + StringUtils.capitalize(k)))
+                    .findAny()
+                    .ifPresent(y -> ReflectionUtils.invokeMethod((y), userToUpdate, classProperties.get(k)));
 
         });
 

@@ -80,9 +80,9 @@ public class ItemServiceImpl implements ItemService {
 
         classProperties.forEach((k, v) -> {
             Class<Item> clz = Item.class;
-            Arrays.stream(clz.getDeclaredMethods()).
-                    filter(x -> x.getName().equals("set" + StringUtils.capitalize(k))).
-                    findAny().ifPresent(y -> ReflectionUtils.invokeMethod((y), itemToUpdate, classProperties.get(k)));
+            Arrays.stream(clz.getDeclaredMethods())
+                    .filter(x -> x.getName().equals("set" + StringUtils.capitalize(k)))
+                    .findAny().ifPresent(y -> ReflectionUtils.invokeMethod((y), itemToUpdate, classProperties.get(k)));
 
         });
         return ItemMapper.toItemDto(itemToUpdate);

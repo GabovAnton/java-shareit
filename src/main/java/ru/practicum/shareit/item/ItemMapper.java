@@ -33,7 +33,6 @@ public class ItemMapper {
                 itemDto.getAvailable(),
                 itemDto.getOwner(),
                 itemDto.getRequestId() != null ? requestDao.get(itemDto.getRequestId()).orElseThrow() : null
-                //TODO error handling
         );
     }
 
