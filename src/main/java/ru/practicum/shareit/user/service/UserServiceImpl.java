@@ -1,11 +1,11 @@
 package ru.practicum.shareit.user.service;
 
-import exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dao.UserDao;
@@ -43,7 +43,6 @@ public class UserServiceImpl implements UserService {
         log.debug("new user created: {}", user);
         return id;
     }
-
 
     @Override
     public UserDto update(UserDto userDto) {

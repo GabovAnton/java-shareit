@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.service;
 
-import exception.EntityNotFoundException;
-import exception.ShareItValidationException;
+import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.ShareItValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

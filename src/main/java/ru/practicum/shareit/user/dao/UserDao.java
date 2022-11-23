@@ -1,12 +1,10 @@
 package ru.practicum.shareit.user.dao;
 
-import exception.ConflictException;
-import exception.EntityNotFoundException;
-import exception.ShareItValidationException;
+import ru.practicum.shareit.exception.ConflictException;
+import ru.practicum.shareit.exception.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.User;
 
-import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
