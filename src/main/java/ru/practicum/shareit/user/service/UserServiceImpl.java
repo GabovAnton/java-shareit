@@ -1,11 +1,11 @@
 package ru.practicum.shareit.user.service;
 
+import exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
-import exception.EntityNotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dao.UserDao;
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto) {
-        User userToUpdate =  userDao.get(userDto.getId())
+        User userToUpdate = userDao.get(userDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("user id: " + userDto.getId() + " not found"));
 
         Map<String, Object> classProperties = ClassProperties.getClassProperties(userDto);
@@ -76,9 +76,6 @@ public class UserServiceImpl implements UserService {
         }
 
     }
-
-
-
 
 
 }

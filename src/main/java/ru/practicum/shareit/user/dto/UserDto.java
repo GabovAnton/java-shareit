@@ -9,7 +9,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 
 @Builder
 @Data

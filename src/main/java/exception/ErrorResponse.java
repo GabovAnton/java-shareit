@@ -7,8 +7,5 @@ import lombok.Getter;
 public class ErrorResponse {
     @Getter
     String error;
-    @Getter
-    String description;
-
 }
 

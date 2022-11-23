@@ -1,6 +1,8 @@
 package ru.practicum.shareit.user.dao;
 
+import exception.ConflictException;
 import exception.EntityNotFoundException;
+import exception.ShareItValidationException;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.User;
 
@@ -43,7 +45,7 @@ public class UserDao {
 
     public void checkEmailConstraints(String email) {
         userList.stream().filter(x -> x.getEmail().equals(email)).findAny().ifPresent(x -> {
-            throw new ValidationException("user with email: " + email + " already exists");
+            throw new ConflictException("user with email: " + email + " already exists");
         });
 
     }

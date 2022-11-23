@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class ItemRequestDao  {
+public class ItemRequestDao {
     private final List<ItemRequest> itemRequestList = new ArrayList<>();
 
     public Optional<ItemRequest> get(long id) {
@@ -23,7 +23,7 @@ public class ItemRequestDao  {
         return false;
     }
 
-    public List<ItemRequest> search(String query,long userId) {
+    public List<ItemRequest> search(String query, long userId) {
         return null;
     }
 }

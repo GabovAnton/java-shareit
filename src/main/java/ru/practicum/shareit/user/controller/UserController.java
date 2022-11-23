@@ -50,6 +50,7 @@ public class UserController {
     @JsonView(UserDto.SimpleView.class)
     @DeleteMapping("{userId}")
     public boolean delete(@PathVariable long userId) {
-       return userService.delete(userId);
+        return userService.delete(userId);
     }
+
 }

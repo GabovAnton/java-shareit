@@ -8,6 +8,7 @@ import java.util.List;
 public interface UserService {
 
     User getUser(long id);
+
     List<UserDto> getAll();
 
     Long save(User user);

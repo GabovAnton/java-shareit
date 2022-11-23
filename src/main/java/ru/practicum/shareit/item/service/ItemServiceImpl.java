@@ -1,27 +1,21 @@
 package ru.practicum.shareit.item.service;
 
+import exception.EntityNotFoundException;
 import exception.ShareItValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
-import exception.EntityNotFoundException;
+import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.utils.ClassProperties;
 
-import javax.validation.ValidationException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,12 +58,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> search(String text, long userId) {
+    public List<ItemDto> search(String text, long userId) {
         log.debug("search in items with query: {} requested", text);
-
-        return itemDao.search(text, userId).stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        return StringUtils.isNotEmpty(text) ?
+                itemDao.search(text.toLowerCase(), userId).stream()
+                        .filter(Objects::nonNull)
+                        .map(ItemMapper::toItemDto)
+                        .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) :
+                new ArrayList<>();
     }
 
     @Override

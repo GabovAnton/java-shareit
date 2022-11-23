@@ -1,14 +1,13 @@
 package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import ru.practicum.shareit.user.User;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-/**
- * TODO Sprint add-controllers.
- */
 
 @Data
 @AllArgsConstructor
@@ -22,10 +21,8 @@ public class ItemDto {
     }
 
     @JsonView({SimpleView.class})
-    //@Null
     private long id;
 
-    //@   NotNull
     @NotBlank
     @JsonView({SimpleView.class})
     private String name;

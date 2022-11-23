@@ -3,7 +3,9 @@ package ru.practicum.shareit.item.dao;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,11 +31,11 @@ public class ItemDao {
     }
 
     public List<Item> search(String query, long userId) {
-        //TODO insert correct algorithm
         return itemList.
                 stream().
-                filter(x -> x.getName().contains(query) ||
-                        x.getDescription().contains(query) &&
+                filter(Item::isAvailable).
+                filter(x -> x.getName().toLowerCase().contains(query) ||
+                        x.getDescription().toLowerCase().contains(query) &&
                                 x.getOwner().getId() != userId).
                 collect(Collectors.toList());
 

@@ -10,8 +10,8 @@ import ru.practicum.shareit.request.dao.ItemRequestDao;
 @Component
 @RequiredArgsConstructor
 public class ItemMapper {
-
-    private  static ItemRequestDao requestDao;
+    @Autowired
+    private static ItemRequestDao requestDao;
 
     public static ItemDto toItemDto(Item item) {
         return new ItemDto(
