@@ -20,8 +20,8 @@ public class ItemDao {
     }
 
     public Optional<Item> get(long id) {
-        return itemList.stream().
-                filter(x -> x.getId() == id)
+        return itemList.stream()
+                .filter(x -> x.getId() == id)
                 .findFirst();
     }
 
@@ -37,8 +37,7 @@ public class ItemDao {
     }
 
     public List<Item> search(String query, long userId) {
-        return itemList.
-                stream()
+        return itemList.stream()
                 .filter(Item::isAvailable)
                 .filter(x -> x.getName().toLowerCase().contains(query) ||
                         x.getDescription().toLowerCase().contains(query) &&
