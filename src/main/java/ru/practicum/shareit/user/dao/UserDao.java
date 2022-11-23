@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.dao;
 
+import exception.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.User;
 
@@ -23,17 +24,27 @@ public class UserDao {
     }
 
     public long save(User user) {
+        checkEmailConstraints(user.getEmail());
         user.setId(++userId);
-        validateUser(user);
-        userList.stream().filter(x -> x.equals(user) || x.getEmail().equals(user.getEmail())).findAny().
-                ifPresentOrElse(x -> {
-                            throw new ValidationException("user can't be created because it already exists");
-                        },
-                        () -> userList.add(user));
+        userList.add(user);
+
         return user.getId();
     }
 
-    private void validateUser(User user) {
+
+    public boolean removeUser(long userId) {
+        userList.stream().filter(x -> x.getId() == userId).
+                findAny().
+                ifPresentOrElse(userList::remove, () -> {
+                    throw new EntityNotFoundException("user with id: " + userId + " not found");
+                });
+        return true;
+    }
+
+    public void checkEmailConstraints(String email) {
+        userList.stream().filter(x -> x.getEmail().equals(email)).findAny().ifPresent(x -> {
+            throw new ValidationException("user with email: " + email + " already exists");
+        });
 
     }
 

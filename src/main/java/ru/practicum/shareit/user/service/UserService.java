@@ -13,4 +13,6 @@ public interface UserService {
     Long save(User user);
 
     UserDto update(UserDto userDto);
+
+    boolean delete(long userId);
 }

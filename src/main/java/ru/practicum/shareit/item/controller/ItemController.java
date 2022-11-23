@@ -6,15 +6,16 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
 @RestController
 @RequestMapping("/items")
-//@RequiredArgsConstructor
 public class ItemController {
 
     @Autowired
@@ -38,17 +39,19 @@ public class ItemController {
 
     @JsonView(ItemDto.SimpleView.class)
     @PostMapping()
-    public ItemDto create(@Validated(ItemDto.New.class) @RequestBody ItemDto itemDto,
+    public ItemDto create( @Valid  @RequestBody ItemDto itemDto,
                           @RequestHeader("X-Sharer-User-Id") long userId) {
         long id = itemService.save(ItemMapper.toItem(itemDto), userId);
         return ItemMapper.toItemDto(itemService.getItem(id));
     }
 
+
     @JsonView(ItemDto.SimpleView.class)
-    @PatchMapping()
-    public ItemDto update(@Validated(ItemDto.Update.class) @RequestBody ItemDto itemDto,
+    @PatchMapping("{itemId}")
+    public ItemDto update(@PathVariable long itemId,@Valid @RequestBody ItemPatchDto  itemPatchDto,
                           @RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.update(itemDto, userId);
+        itemPatchDto.setId(itemId);
+        return itemService.update(itemPatchDto, userId);
     }
 
     @JsonView(ItemDto.SimpleView.class)

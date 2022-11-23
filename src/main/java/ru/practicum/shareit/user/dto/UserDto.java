@@ -27,16 +27,15 @@ public class UserDto {
     public interface AdminView extends ItemDto.SimpleView {
     }
 
-   // @Null(groups = {New.class})
     @JsonView({SimpleView.class})
     private long id;
 
-    @NotNull(groups = {New.class, Update.class})
+    @NotNull(groups = {New.class})
     @JsonView({SimpleView.class})
     private String name;
 
-    @NotBlank(groups = {New.class, Update.class})
-    @Email(groups = {New.class, Update.class})
+    @NotBlank(groups = {New.class})
+    @Email(groups = {New.class})
     @JsonView({SimpleView.class})
     private String email;
 }

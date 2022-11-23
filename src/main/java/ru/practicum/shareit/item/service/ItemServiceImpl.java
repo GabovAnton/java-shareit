@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import exception.ShareItValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
 import exception.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.utils.ClassProperties;
 
+import javax.validation.ValidationException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,17 +73,21 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto update(ItemDto itemDto, long userId) {
-        Item itemToUpdate = itemDao.get(itemDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("item id: " + itemDto.getId() + " not found"));
+    public ItemDto update(ItemPatchDto itemPatchDto, long userId) {
+        Item itemToUpdate = itemDao.get(itemPatchDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("item id: " + itemPatchDto.getId() + " not found"));
+        if (itemToUpdate.getOwner().getId() != userId) {
+            throw new ShareItValidationException("error while trying to update item which belongs to another user");
+        }
 
-        Map<String, Object> classProperties = ClassProperties.getClassProperties(itemDto, false);
+        Map<String, Object> classProperties = ClassProperties.getClassProperties(itemPatchDto);
 
-        classProperties.forEach((k, v) -> { //TODO verify !!!
-            Method method = ReflectionUtils.findMethod(Item.class, "set" + StringUtils.capitalize(k));
-            if (method != null) {
-                ReflectionUtils.invokeMethod(method, itemToUpdate, classProperties.get(k));
-            }
+        classProperties.forEach((k, v) -> {
+            Class<Item> clz = Item.class;
+            Arrays.stream(clz.getDeclaredMethods()).
+                    filter(x -> x.getName().equals("set" + StringUtils.capitalize(k))).
+                    findAny().ifPresent(y -> ReflectionUtils.invokeMethod((y), itemToUpdate, classProperties.get(k)));
+
         });
         return ItemMapper.toItemDto(itemToUpdate);
     }

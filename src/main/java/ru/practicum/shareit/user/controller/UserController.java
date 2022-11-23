@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @JsonView(UserDto.SimpleView.class)
-    @GetMapping("{itemId}")
+    @GetMapping("{userId}")
     public UserDto getUserById(@PathVariable long userId) {
         return UserMapper.toUserDto(userService.getUser(userId));
     }
@@ -41,9 +41,15 @@ public class UserController {
 
 
     @JsonView(UserDto.SimpleView.class)
-    @PatchMapping("{userid}")
-    public UserDto update(@PathVariable long userid, @Validated(UserDto.Update.class) @RequestBody UserDto userDto) {
-        userDto.setId(userid);
+    @PatchMapping("{userId}")
+    public UserDto update(@PathVariable long userId, @Validated(UserDto.Update.class) @RequestBody UserDto userDto) {
+        userDto.setId(userId);
         return userService.update(userDto);
+    }
+
+    @JsonView(UserDto.SimpleView.class)
+    @DeleteMapping("{userId}")
+    public boolean delete(@PathVariable long userId) {
+       return userService.delete(userId);
     }
 }

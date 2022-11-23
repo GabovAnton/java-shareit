@@ -6,14 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import exception.EntityNotFoundException;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.utils.ClassProperties;
 
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ public class UserServiceImpl implements UserService {
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.debug("all items requested: {}", userList.size());
-        return null;
+        return userList;
     }
 
     @Override
@@ -48,20 +46,39 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDto update(UserDto userDto)  {
-        User userToUpdate = userDao.get(userDto.getId())
+    public UserDto update(UserDto userDto) {
+        User userToUpdate =  userDao.get(userDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("user id: " + userDto.getId() + " not found"));
 
-        Map<String, Object> classProperties = ClassProperties.getClassProperties(userDto, true);
-
-        classProperties.forEach((k,v) -> {
+        Map<String, Object> classProperties = ClassProperties.getClassProperties(userDto);
+        if (classProperties.containsKey("email")) {
+            userDao.checkEmailConstraints(classProperties.get("email").toString());
+        }
+        classProperties.forEach((k, v) -> {
             Class<User> clz = User.class;
             Arrays.stream(clz.getDeclaredMethods()).
                     filter(x -> x.getName().equals("set" + StringUtils.capitalize(k))).
-                    findAny().ifPresent(y->ReflectionUtils.invokeMethod((y), userToUpdate, classProperties.get(k)));
+                    findAny().ifPresent(y -> ReflectionUtils.invokeMethod((y), userToUpdate, classProperties.get(k)));
 
         });
-        return UserMapper.toUserDto(userToUpdate);    }
+
+        return UserMapper.toUserDto(userToUpdate);
+    }
+
+    @Override
+    public boolean delete(long userId) {
+        if (userDao.removeUser(userId)) {
+            log.debug("user with id: {} deleted", userId);
+            return true;
+        } else {
+            log.debug("user with id: {} can't be deleted", userId);
+            return false;
+        }
+
+    }
+
+
+
 
 
 }

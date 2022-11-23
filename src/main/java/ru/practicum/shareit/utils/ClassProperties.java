@@ -8,16 +8,15 @@ import java.util.Map;
 
 public class ClassProperties {
 
-    public static Map<String, Object> getClassProperties(Object obj, boolean setAccessible) {
+    public static Map<String, Object> getClassProperties(Object obj) {
         Map<String, Object> properties = new HashMap<>();
         ReflectionUtils.doWithFields(obj.getClass(), field -> {
 
-            if (setAccessible) {
                 field.setAccessible(true);
+
+            if (field.get(obj) != null) {
+                properties.put(field.getName(), field.get(obj));
             }
-          /*  Class<?> type = field.getType();
-            Class<? extends Field> aClass = field.getClass();*/
-            properties.put(field.getName(), field.get(obj));
         });
         return properties;
     }

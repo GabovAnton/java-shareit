@@ -11,8 +11,7 @@ import ru.practicum.shareit.request.dao.ItemRequestDao;
 @RequiredArgsConstructor
 public class ItemMapper {
 
-    @Autowired
-    private static ItemRequestDao requestDao;
+    private  static ItemRequestDao requestDao;
 
     public static ItemDto toItemDto(Item item) {
         return new ItemDto(
@@ -31,7 +30,7 @@ public class ItemMapper {
                 itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
-                itemDto.isAvailable(),
+                itemDto.getAvailable(),
                 itemDto.getOwner(),
                 itemDto.getRequestId() != null ? requestDao.get(itemDto.getRequestId()).orElseThrow() : null
                 //TODO error handling
