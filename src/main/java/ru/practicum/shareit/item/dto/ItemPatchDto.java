@@ -5,41 +5,31 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.user.User;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 
 @Data
 @AllArgsConstructor
-public class ItemDto {
-
-
+public class ItemPatchDto {
     public interface SimpleView {
     }
 
-    public interface AdminView extends SimpleView {
+    public interface AdminView extends ItemDto.SimpleView {
     }
 
-    @JsonView({SimpleView.class})
+    @JsonView({ItemDto.SimpleView.class})
     private long id;
 
-    @NotBlank
-    @JsonView({SimpleView.class})
+    @JsonView({ItemDto.SimpleView.class})
     private String name;
 
-    @NotNull
-    @JsonView({SimpleView.class})
+    @JsonView({ItemDto.SimpleView.class})
     private String description;
 
-    @JsonView({SimpleView.class})
-    @NotNull
+    @JsonView({ItemDto.SimpleView.class})
     private Boolean available;
 
-    @JsonView({AdminView.class})
+    @JsonView({ItemDto.AdminView.class})
     private User owner;
 
-    @JsonView({AdminView.class})
+    @JsonView({ItemDto.AdminView.class})
     private Long requestId;
-
 }
-
