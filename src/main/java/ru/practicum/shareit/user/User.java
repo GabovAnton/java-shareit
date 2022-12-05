@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -20,14 +22,25 @@ import java.time.LocalDate;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-   // @Column(name="CUST_ID")
+    @Column(name="id")
     private long id;
 
-    @Column(name="name", length=128, nullable=false, unique=true)
+    @OneToMany(mappedBy = "owner")
+    private Set<Item> items;
+
+    @OneToMany(mappedBy = "booker")
+    private Set<Booking> Bookings;
+
+    @OneToMany(mappedBy = "author")
+    private Set<Comment> Comments;
+
+    @OneToMany(mappedBy = "requestor")
+    private Set<ItemRequest> Requests;
+
+    @Column(name="name", nullable=false)
     private String name;
 
-    @NotBlank
-    @Email
+    @Column(name="email",nullable=false,  length = 512, unique=true)
     private String email;
 
     @Column(name = "registration_date",columnDefinition = "DATE")

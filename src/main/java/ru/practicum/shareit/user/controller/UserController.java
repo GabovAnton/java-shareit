@@ -22,7 +22,8 @@ public class UserController {
     @JsonView(UserDto.SimpleView.class)
     @GetMapping("{userId}")
     public UserDto getUserById(@PathVariable long userId) {
-        return UserMapper.toUserDto(userService.getUser(userId));
+       // return UserMapper.toUserDto(userService.getUser(userId));
+        return null;
     }
 
     @JsonView(UserDto.SimpleView.class)
@@ -35,8 +36,9 @@ public class UserController {
     @JsonView(UserDto.SimpleView.class)
     @PostMapping()
     public UserDto create(@Validated(UserDto.New.class) @RequestBody UserDto userDto) {
-        long id = userService.save(UserMapper.toUser(userDto));
-        return UserMapper.toUserDto(userService.getUser(id));
+       /* long id = userService.save(UserMapper.toUser(userDto));
+        return UserMapper.toUserDto(userService.getUser(id));*/
+        return  null;
     }
 
 

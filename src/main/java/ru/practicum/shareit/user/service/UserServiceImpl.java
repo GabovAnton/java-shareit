@@ -30,12 +30,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAll() {
 
-        List<UserDto> userList = userDao.getAll().stream()
+       /* List<UserDto> userList = userDao.getAll().stream()
                 .filter(Objects::nonNull)
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.debug("all items requested: {}", userList.size());
-        return userList;
+        return userList;*/
+        return  null;
     }
 
     @Override
@@ -63,7 +64,8 @@ public class UserServiceImpl implements UserService {
 
         });
 
-        return UserMapper.toUserDto(userToUpdate);
+       // return UserMapper.toUserDto(userToUpdate);
+        return  null;
     }
 
     @Override

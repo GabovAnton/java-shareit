@@ -20,21 +20,25 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "description", nullable = false)
     private boolean available;
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @OneToOne
+    @OneToOne //TODO check!!!
     @JoinColumn(name = "request_id")
     private ItemRequest request;
 
-    @ElementCollection
-    @CollectionTable(name="tags", joinColumns=@JoinColumn(name="item_id"))
-    @Column(name="name")
-    private Set<String> tags = new HashSet<>();
+
 
 
 }

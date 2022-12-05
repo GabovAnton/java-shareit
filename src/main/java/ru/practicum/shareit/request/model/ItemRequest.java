@@ -18,8 +18,9 @@ public class ItemRequest {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long id;
    private String description;
-   @OneToOne
-   @JoinColumn(name = "requestor_id")
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "requestor_id", nullable = false)
    private User requestor;
+
    private LocalDateTime created;
 }
