@@ -1,7 +1,7 @@
-package ru.practicum.shareit.item.dao;
+package ru.practicum.shareit.item;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +37,13 @@ public class ItemDao {
     }
 
     public List<Item> search(String query, long userId) {
-        return itemList.stream()
+      /*  return itemList.stream()
                 .filter(Item::isAvailable)
                 .filter(x -> x.getName().toLowerCase().contains(query) ||
                         x.getDescription().toLowerCase().contains(query) &&
                                 x.getOwner().getId() != userId)
-                .collect(Collectors.toList());
-
+                .collect(Collectors.toList());*/
+return null;//TODO
     }
 
 }

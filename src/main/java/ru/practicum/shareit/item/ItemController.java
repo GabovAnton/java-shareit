@@ -1,12 +1,8 @@
-package ru.practicum.shareit.item.controller;
+package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -26,7 +22,9 @@ public class ItemController {
     @JsonView(ItemDto.SimpleView.class)
     @GetMapping("{itemId}")
     public ItemDto getItemById(@PathVariable long itemId) {
-        return ItemMapper.toItemDto(itemService.getItem(itemId));
+       /* return ItemMapper.toItemDto(itemService.getItem(itemId));*/
+        return null;//TODO
+
     }
 
     @JsonView(ItemDto.SimpleView.class)

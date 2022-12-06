@@ -1,6 +1,6 @@
 package ru.practicum.shareit.comment;
 
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;

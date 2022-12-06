@@ -1,23 +1,13 @@
-package ru.practicum.shareit.item.service;
+package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.ShareItValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.dao.ItemDao;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserDao;
-import ru.practicum.shareit.utils.ClassProperties;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,14 +28,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public List<ItemDto> getAll(long userId) {
-        List<ItemDto> itemList = itemDao.getAll(userId).stream()
+    /*    List<ItemDto> itemList = itemDao.getAll(userId).stream()
                 .filter(Objects::nonNull)
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.debug("all items requested: {}", itemList.size());
 
         return itemList;
-
+*/return null;//TODO
     }
 
     @Override
@@ -60,17 +50,18 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> search(String text, long userId) {
         log.debug("search in items with query: {} requested", text);
-        return StringUtils.isNotEmpty(text) ?
+/*        return StringUtils.isNotEmpty(text) ?
                 itemDao.search(text.toLowerCase(), userId).stream()
                         .filter(Objects::nonNull)
                         .map(ItemMapper::toItemDto)
                         .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) :
-                new ArrayList<>();
+                new ArrayList<>();*/
+        return null;//TODO
     }
 
     @Override
     public ItemDto update(ItemPatchDto itemPatchDto, long userId) {
-        Item itemToUpdate = itemDao.get(itemPatchDto.getId())
+/*        Item itemToUpdate = itemDao.get(itemPatchDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("item id: " + itemPatchDto.getId() + " not found"));
         if (itemToUpdate.getOwner().getId() != userId) {
             throw new ShareItValidationException("error while trying to update item which belongs to another user");
@@ -85,7 +76,8 @@ public class ItemServiceImpl implements ItemService {
                     .findAny().ifPresent(y -> ReflectionUtils.invokeMethod((y), itemToUpdate, classProperties.get(k)));
 
         });
-        return ItemMapper.toItemDto(itemToUpdate);
+        return ItemMapper.toItemDto(itemToUpdate);*/
+        return null;//TODO
     }
 
 

@@ -1,8 +1,9 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.user.User;
 
 

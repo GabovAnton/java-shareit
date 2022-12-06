@@ -4,10 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.comment.Comment;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.request.ItemRequest;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -28,8 +27,7 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private Set<Item> items;
 
-    @OneToMany(mappedBy = "booker")
-    private Set<Booking> Bookings;
+
 
     @OneToMany(mappedBy = "author")
     private Set<Comment> Comments;
