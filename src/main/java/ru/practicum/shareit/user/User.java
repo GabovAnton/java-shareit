@@ -1,9 +1,6 @@
 package ru.practicum.shareit.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.request.ItemRequest;
@@ -12,17 +9,18 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "users", schema = "public")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
-    private long id;
+    private Long id;
 
     @OneToMany(mappedBy = "owner")
     private Set<Item> items;

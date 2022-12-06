@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 @Entity
 @Getter
 @Setter
+@Table(name = "bookings")
 public class Booking {
 
     @Id
