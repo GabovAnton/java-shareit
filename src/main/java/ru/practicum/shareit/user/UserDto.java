@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.user;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
@@ -16,10 +16,10 @@ import javax.validation.constraints.NotNull;
 public class UserDto {
 
     @JsonView({SimpleView.class})
-    private long id;
+    private Long id;
+
     @NotNull(groups = {New.class})
     @JsonView({SimpleView.class})
-
     private String name;
     @NotBlank(groups = {New.class})
     @Email(groups = {New.class})
@@ -27,7 +27,7 @@ public class UserDto {
     private String email;
 
     //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd, hh:mm:ss");
-    @NotBlank(groups = {New.class})
+    //@NotBlank(groups = {New.class})
     @Email(groups = {New.class})
     @JsonView({SimpleView.class})
     private String registrationDate;

@@ -22,8 +22,7 @@ public class ItemController {
     @JsonView(ItemDto.SimpleView.class)
     @GetMapping("{itemId}")
     public ItemDto getItemById(@PathVariable long itemId) {
-       /* return ItemMapper.toItemDto(itemService.getItem(itemId));*/
-        return null;//TODO
+        return ItemMapper.INSTANCE.itemToItemDto(itemService.getItem(itemId));
 
     }
 
@@ -37,9 +36,8 @@ public class ItemController {
     @PostMapping()
     public ItemDto create(@Valid @RequestBody ItemDto itemDto,
                           @RequestHeader("X-Sharer-User-Id") long userId) {
-/*        long id = itemService.save(ItemMapper.toItem(itemDto), userId);
-        return ItemMapper.toItemDto(itemService.getItem(id));*/
-        return  null;
+        Item savedItem = itemService.save(ItemMapper.INSTANCE.itemDtoToItem(itemDto), userId);
+        return ItemMapper.INSTANCE.itemToItemDto(savedItem);
     }
 
 
@@ -56,7 +54,7 @@ public class ItemController {
     @ResponseBody
     public List<ItemDto> searchByQuery(@RequestParam String text, @RequestHeader("X-Sharer-User-Id") long userId) {
 
-        List<ItemDto> search = (itemService.search(text, userId));
+        List<ItemDto> search = (itemService.search(text));
         return search;
     }
 

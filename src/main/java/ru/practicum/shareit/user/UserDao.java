@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.dao;
+package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.ConflictException;

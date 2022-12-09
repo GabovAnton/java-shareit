@@ -25,10 +25,10 @@ public class Item {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private Boolean isAvailable;
+    @Column(name="is_available", nullable=false)
+    private Boolean available;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer requestId;
 
     @ManyToOne(fetch = FetchType.LAZY)

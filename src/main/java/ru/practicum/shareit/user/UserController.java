@@ -1,13 +1,16 @@
-package ru.practicum.shareit.user.controller;
+package ru.practicum.shareit.user;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.exception.ErrorResponse;
+import ru.practicum.shareit.exception.ShareItValidationException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -22,8 +25,7 @@ public class UserController {
     @JsonView(UserDto.SimpleView.class)
     @GetMapping("{userId}")
     public UserDto getUserById(@PathVariable long userId) {
-       // return UserMapper.toUserDto(userService.getUser(userId));
-        return null;
+        return UserMapper.INSTANCE.userToUserDto(userService.getUser(userId));
     }
 
     @JsonView(UserDto.SimpleView.class)
@@ -36,9 +38,8 @@ public class UserController {
     @JsonView(UserDto.SimpleView.class)
     @PostMapping()
     public UserDto create(@Validated(UserDto.New.class) @RequestBody UserDto userDto) {
-       /* long id = userService.save(UserMapper.toUser(userDto));
-        return UserMapper.toUserDto(userService.getUser(id));*/
-        return  null;
+        User savedUser = userService.save(UserMapper.INSTANCE.userDtoToUser(userDto));
+        return UserMapper.INSTANCE.userToUserDto(savedUser);
     }
 
 
@@ -54,5 +55,10 @@ public class UserController {
     public boolean delete(@PathVariable long userId) {
         return userService.delete(userId);
     }
+
+
+
+
+
 
 }

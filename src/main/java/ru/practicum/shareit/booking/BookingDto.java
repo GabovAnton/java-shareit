@@ -1,37 +1,44 @@
 package ru.practicum.shareit.booking;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.booking.BookingStatus;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
- * A DTO for the {@link Booking} entity
+ * A DTO for the {@link ru.practicum.shareit.booking.Booking} entity
  */
-@Getter
-@Setter
-@AllArgsConstructor
-public class BookingDto {
-
+@Data
+public class BookingDto implements Serializable {
     private final Long id;
-
-    private final OffsetDateTime startDate;
-
-    private final OffsetDateTime endDate;
-
-    @NotNull
-    private final String status;
-
+    private final LocalDateTime start;
+    private final LocalDateTime end;
+    private final BookingStatus status;
     private final ItemDto item;
-
     private final UserDto booker;
 
+    /**
+     * A DTO for the {@link ru.practicum.shareit.item.Item} entity
+     */
+    @Data
+    public static class ItemDto implements Serializable {
+        private final Long id;
+        private final String name;
+        private final String description;
+        private final Boolean available;
+        private final Integer requestId;
+    }
 
+    /**
+     * A DTO for the {@link ru.practicum.shareit.user.User} entity
+     */
+    @Data
+    public static class UserDto implements Serializable {
+        private final Long id;
+        private final String name;
+        private final String email;
+        private final LocalDate registrationDate;
+    }
 }

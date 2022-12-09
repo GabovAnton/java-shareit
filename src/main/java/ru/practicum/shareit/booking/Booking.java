@@ -1,12 +1,13 @@
 package ru.practicum.shareit.booking;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,21 +20,24 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private OffsetDateTime startDate;
+    @Column(name="start_date", nullable = false)
+    private LocalDateTime start;
 
-    @Column(nullable = false)
-    private OffsetDateTime endDate;
+    @Column(name="end_date",  nullable = false)
+    private LocalDateTime end;
 
     @Column(length = 12)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
+    @JsonIgnore
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booker_id", nullable = false)
+    @JsonIgnore
     private User booker;
 
 }

@@ -1,23 +1,19 @@
 package ru.practicum.shareit.user;
 
-import ru.practicum.shareit.user.dto.UserDto;
+
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
 
-public class UserMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
+public interface UserMapper {
 
-/*    public static UserDto toUserDto(User user) {
-        return new UserDto(
-                user.getId(),
-                user.getName(),
-                user.getEmail()
-        );
-    }*/
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+    User userDtoToUser(UserDto userDto);
 
-/*    public static User toUser(UserDto userDto) {
-        return new User(
-                userDto.getId(),
-                userDto.getName(),
-                userDto.getEmail()
-        );
-    }*/
+    UserDto userToUserDto(User user);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User updateUserFromUserDto(UserDto userDto, @MappingTarget User user);
+
 }

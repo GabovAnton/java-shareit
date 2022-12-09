@@ -7,11 +7,12 @@ public interface ItemService {
 
     List<ItemDto> getAll(long userId);
 
-    Long save(Item item, long userId);
+    Item save(Item item, long userId);
 
-    List<ItemDto> search(String text, long userId);
+    List<ItemDto> search(String text );
 
     ItemDto update(ItemPatchDto itemDto, long userId);
+    Boolean isItemAvailable(long itemId);
 
 
 }
