@@ -41,8 +41,7 @@ public class UserDto {
     public interface SimpleView {
     }
 
-    public interface AdminView extends ItemDto.SimpleView {
-    }
+
 
 
 }

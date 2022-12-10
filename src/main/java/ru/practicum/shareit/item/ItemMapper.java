@@ -10,7 +10,7 @@ import ru.practicum.shareit.request.ItemRequestDao;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface ItemMapper {
-   ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
+  // ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
 
     Item itemDtoToItem(ItemDto itemDto);
 

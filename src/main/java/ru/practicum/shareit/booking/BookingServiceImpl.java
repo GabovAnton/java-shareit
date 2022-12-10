@@ -45,8 +45,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Booking save(Booking booking) {
-        checkBookingBasicConstraints(booking);
+    public Booking save(Booking booking, long userId) {
+
+        checkBookingBasicConstraints(booking,userId);
         booking.setStatus(BookingStatus.WAITING);
 
         return bookingRepository.save(booking);
@@ -58,56 +59,83 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking with id " + bookingId + " not found"));
 
-        if (!booking.getBooker().getId().equals(requesterId)) {
-            throw new ForbiddenException("Booking status could be changed only by owner");
+        if (!booking.getItem().getOwner().getId().equals(requesterId)) {
+            throw new EntityNotFoundException("Booking status could be changed only by owner");
         }
-        booking.setStatus(isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        bookingRepository.save(booking);
-        return booking;
+        BookingStatus newStatus = isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
+        if (booking.getStatus().equals(newStatus)) {
+            throw new ForbiddenException("Booking status has already been changed");
+        } else {
+            booking.setStatus(newStatus);
+            bookingRepository.save(booking);
+            return booking;
+        }
     }
 
     @Override
     public Booking getBooking(long requesterId, long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking with id " + bookingId + " not found"));
-        if (booking.getBooker().getId().equals(requesterId) ||
-                booking.getItem().getOwner().getId().equals(requesterId)) {
-            return booking;
-        } else {
-            throw new ForbiddenException("Booking could be retrieved only by items owner or booking author");
-        }
+
+        checkItemOwner(booking, requesterId);
+        return booking;
     }
 
     @Override
     public List<BookingDto> getBookingByState(long ownerId, String state) {
-        BookingSearch bookingSearch = BookingSearchFactory
-                .getSearchMethod(state)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid search method"));
+        if (!userService.existsById(ownerId)) {
+            throw new EntityNotFoundException("user with id: " + ownerId + " not found");
+        } else {
+            BookingSearch bookingSearch = BookingSearchFactory
+                    .getSearchMethod(state)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-      return   bookingSearch.getBookings(ownerId, bookingRepository).stream()
-                .filter(Objects::nonNull)
-                .map(bookingMapper::bookingToBookingDto)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            return bookingSearch.getBookings(ownerId, bookingRepository).stream()
+                    .filter(Objects::nonNull)
+                    .map(bookingMapper::bookingToBookingDto)
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        }
     }
+
     @Override
     public List<BookingDto> getBookingByStateAndOwner(long ownerId, String state) {
-        BookingSearch bookingSearch = BookingSearchFactory
-                .getSearchMethod(state)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid search method"));
 
-        return   bookingSearch.getBookingsByItemsOwner(ownerId, bookingRepository).stream()
-                .filter(Objects::nonNull)
-                .map(bookingMapper::bookingToBookingDto)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        if (!userService.existsById(ownerId)) {
+            throw new EntityNotFoundException("user with id: " + ownerId + " not found");
+        } else {
+            BookingSearch bookingSearch = BookingSearchFactory
+                    .getSearchMethod(state)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
+
+            return bookingSearch.getBookingsByItemsOwner(ownerId, bookingRepository).stream()
+                    .filter(Objects::nonNull)
+                    .map(bookingMapper::bookingToBookingDto)
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        }
     }
 
 
+    private void checkItemOwner(Booking booking, Long requesterId) {
+        if (!booking.getBooker().getId().equals(requesterId) &&
+                !booking.getItem().getOwner().getId().equals(requesterId)) {
+            throw new EntityNotFoundException("Booking could be retrieved only by items owner or booking author");
+        }
+    }
 
-    private void checkBookingBasicConstraints(Booking booking) {
+    private void checkBookingBasicConstraints(Booking booking, Long requesterId) {
         if (booking.getEnd().isBefore(booking.getStart()) || booking.getEnd().isBefore(LocalDateTime.now())
                 || booking.getStart().isBefore(LocalDateTime.now())) {
             throw new ForbiddenException("Booking start should be less than End and not be in past");
         }
+        List<Booking> bookings = bookingRepository.findByIdAndBooker_Id(booking.getItem().getId(), requesterId);
+
+        if (bookings.stream().anyMatch(b->b.getStatus().equals(BookingStatus.WAITING)
+                || b.getStatus().equals(BookingStatus.APPROVED))) {
+            throw  new EntityNotFoundException("Booking can't be made to one item more than one time");
+        }
+
+
+
         itemService.isItemAvailable(booking.getItem().getId());
     }
 

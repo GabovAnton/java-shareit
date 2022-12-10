@@ -3,10 +3,10 @@ package ru.practicum.shareit.item;
 import java.util.List;
 
 public interface ItemService {
-    Item getItem(long id);
+    ItemDto getItemDto(long id, long userId);
 
     List<ItemDto> getAll(long userId);
-
+    Item map(long id);
     Item save(Item item, long userId);
 
     List<ItemDto> search(String text );

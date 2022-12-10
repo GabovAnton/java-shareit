@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.ShareItValidationException;
@@ -24,40 +22,86 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserService userService;
+    private final ItemMapper itemMapper;
+/*
     private final BookingRepository bookingRepository;
+*/
 
-
-    public Item getItem(long id) {
+    public ItemDto getItemDto(long id, long userId) {
         Optional<Item> item = itemRepository.findById(id);
         log.debug("item with id: {} requested, returned result: {}", id, item);
+       /* List<Booking> bookings = bookingRepository
+                .findByItem_Owner_IdAndItem_IdOrderByEndDesc(userId, id,
+                        PageRequest.of(0, 2));*/
+        ItemDto itemDto = itemMapper.itemToItemDto(item
+                        .orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists")));
 
-        return item.orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
+        Comparator<Booking> byDateEnd = Comparator
+                .comparing(Booking::getEnd);
+        List<Booking> bookings = item.get().getItemBookings().stream()
+                .filter(x -> x.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2)
+                .collect(Collectors.toList());
+
+        return getItemDtoWithLastAndNextBookings(itemDto, bookings);
 
     }
 
 
+
+    public Item map(long id) {
+        Optional<Item> item = itemRepository.findById(id);
+        log.debug("item with id: {} requested, returned result: {}", id, item);
+        return item.orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
+    }
+
     public List<ItemDto> getAll(long userId) {
+
         List<ItemDto> itemList = itemRepository.findByOwner_Id(userId).stream()
                 .filter(Objects::nonNull)
-                .map(ItemMapper.INSTANCE::itemToItemDto)
                 .map(x -> {
-                    List<Booking> bookings = bookingRepository
-                            .findByItem_Owner_IdAndItem_IdOrderByStartDesc(userId, x.getId(),
-                                    PageRequest.of(0, 2));
-                    if (bookings.size() > 0) {
-                        x.setNextBooking((bookings.get(0) != null && bookings.get(0).getStart() != null)
-                                ? bookings.get(0).getStart() : null);
-                        x.setLastBooking((bookings.get(1) != null && bookings.get(1).getStart() != null)
-                                ? bookings.get(1).getStart() : null);
 
-                    }
-                    return x;
+                    Comparator<Booking> byDateEnd = Comparator
+                            .comparing(Booking::getEnd);
+
+                    ItemDto itemDto = itemMapper.itemToItemDto(x);
+                    List<Booking> bookings = x.getItemBookings().stream()
+                            .filter(y -> y.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2)
+                            .collect(Collectors.toList());
+                    return getItemDtoWithLastAndNextBookings(itemDto, bookings);
                 })
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
 
         log.debug("all items requested: {}", itemList.size());
 
         return itemList;
+    }
+
+    private ItemDto getItemDtoWithLastAndNextBookings(ItemDto itemDto, List<Booking> bookings) {
+        if (bookings.size() > 1) {
+            Long lastBookingId = getBookingId(bookings, 0);
+            Long lastBookerId = getBookerId(bookings, 0);
+            itemDto.setLastBooking(lastBookingId != null && lastBookerId != null ? new ItemLastBookingDto(lastBookingId,
+                    lastBookerId) : null);
+
+            Long nextBookingId = getBookingId(bookings, 1);
+            Long nextBookerId = getBookerId(bookings, 1);
+            itemDto.setNextBooking(lastBookingId != null && lastBookerId != null ? new ItemNextBookingDto(nextBookingId,
+                    nextBookerId) : null);
+        }
+
+        return itemDto;
+    }
+
+    private Long getBookingId(List<Booking> bookings, int rowNumber) {
+        return (bookings.size()> 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getId() != null)
+                ? bookings.get(rowNumber).getId() : null;
+    }
+
+    private Long getBookerId(List<Booking> bookings, int rowNumber) {
+        return (bookings.size()> 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getBooker() != null
+                && bookings.get(rowNumber).getBooker().getId() != null)
+                ? bookings.get(rowNumber).getBooker().getId() : null;
     }
 
     @Override
@@ -76,7 +120,7 @@ public class ItemServiceImpl implements ItemService {
         return StringUtils.isNotEmpty(text) ?
                 itemRepository.findByNameOrDescription(query).stream()
                         .filter(Objects::nonNull)
-                        .map(ItemMapper.INSTANCE::itemToItemDto)
+                        .map(itemMapper::itemToItemDto)
                         .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) :
                 new ArrayList<>();
 
@@ -93,9 +137,9 @@ public class ItemServiceImpl implements ItemService {
             throw new ShareItValidationException("error while trying to update item which belongs to another user");
         }
 
-        ItemMapper.INSTANCE.updateItemFromItemDto(itemPatchDto, itemToUpdate);
+        itemMapper.updateItemFromItemDto(itemPatchDto, itemToUpdate);
         itemRepository.save(itemToUpdate);
-        return ItemMapper.INSTANCE.itemToItemDto(itemToUpdate);
+        return itemMapper.itemToItemDto(itemToUpdate);
     }
 
     @Override

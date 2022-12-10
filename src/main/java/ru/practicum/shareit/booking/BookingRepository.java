@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
@@ -12,35 +11,46 @@ import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findByBooker_IdAndStatus(@NonNull Long id, @NonNull BookingStatus status,Sort sort);
+    @Query("select b from Booking b where b.booker.id = ?1 and b.status = ?2 order by b.start DESC")
+    List<Booking> findByBooker_IdAndStatus(@NonNull Long id, @NonNull BookingStatus status);
 
-    List<Booking> findByBooker_Id(@NonNull Long id, Sort sort);
-    List<Booking> findByBooker_IdAndEndIsAfter(Long bookerId, LocalDateTime date, Sort sort);
+    @Query("select b from Booking b where b.booker.id = ?1 order by b.start DESC")
+    List<Booking> findByBooker_Id(@NonNull Long id);
+
+    @Query("select b from Booking b where b.booker.id = ?1 and b.end > ?2 order by b.start DESC")
+    List<Booking> findByBooker_IdAndEndIsAfter(Long bookerId, LocalDateTime date);
 
 
-    List<Booking> findByBooker_IdAndEndIsBefore(Long bookerId, LocalDateTime date, Sort sort);
-    List<Booking> findByBooker_IdAndStartIsAfter(Long bookerId, LocalDateTime date, Sort sort);
+    @Query("select b from Booking b where b.booker.id = ?1 and b.end < ?2 order by b.start DESC")
+    List<Booking> findByBooker_IdAndEndIsBefore(Long bookerId, LocalDateTime date);
 
-    @Query("select b from Booking b where b.booker.id = ?1 and b.item.owner.id = ?1 order by b.start DESC")
-    List<Booking> findByBooker_IdAndItem_Owner_IdOrderByStartDesc(@NonNull Long id);
+    @Query("select b from Booking b where b.booker.id = ?1 and b.start > ?2 order by b.start DESC")
+    List<Booking> findByBooker_IdAndStartIsAfter(Long bookerId, LocalDateTime date);
 
-    @Query("select b from Booking b where b.booker.id = ?1 and b.item.owner.id = ?1 and b.end < ?2 order by b.start DESC")
-    List<Booking> findByBooker_IdAndItem_Owner_IdInPastOrderByStartDesc(@NonNull Long id,LocalDateTime date);
+    @Query("select b from Booking b where   b.item.owner.id = ?1 order by b.start DESC")
+    List<Booking> findByItem_Owner_IdOrderByStartDesc(@NonNull Long id);
 
-    @Query("select b from Booking b where b.booker.id = ?1 and b.item.owner.id = ?1 and b.end > ?2 order by b.start DESC")
-    List<Booking> findByBooker_IdAndItem_Owner_IdInFutureOrderByStartDesc(@NonNull Long id,LocalDateTime date);
+    @Query("select b from Booking b where  b.item.owner.id = ?1 and b.end < ?2 order by b.start DESC")
+    List<Booking> findByItem_Owner_IdInPastOrderByStartDesc(@NonNull Long id, LocalDateTime date);
+
+    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start >?2 and b.end > ?2  order by b.start DESC")
+    List<Booking> findByItem_Owner_IdInFutureOrderByStartDesc(@NonNull Long id, LocalDateTime date);
+
+    @Query("select b from Booking b where b.id = ?1 and b.booker.id = ?2 order by b.start DESC")
+    List<Booking> findByIdAndBooker_Id(@NonNull Long itemId, @NonNull Long bookerId);
+
 
     @Query("select b from Booking b " +
-            "where b.booker.id = ?1 and b.item.owner.id = ?1 and b.status = ?2 " +
+            "where b.item.owner.id = ?1 and b.status = ?2 " +
             "order by b.start DESC")
-    List<Booking> findByBooker_IdAndItem_Owner_IdAndStatusOrderByStartDesc(@NonNull Long id,
-                                                                           @NonNull BookingStatus status);
+    List<Booking> findByItem_Owner_IdAndStatusOrderByStartDesc(@NonNull Long id,
+                                                               @NonNull BookingStatus status); ////
 
     List<Booking> findByItem_IdAndItem_Owner_Id(@NonNull Long itemId, @NonNull Long ownerId);
 
-    List<Booking> findByItem_Owner_IdAndItem_IdOrderByStartDesc(@NonNull Long ownerId, @NonNull Long itemId, Pageable pageable);
-
-
+    @Query("select b from Booking b where b.item.owner.id = ?1 and b.item.id = ?2 order by b.end DESC")
+    List<Booking> findByItem_Owner_IdAndItem_IdOrderByEndDesc(@NonNull Long ownerId, @NonNull Long itemId,
+                                                              Pageable pageable);
 
 
 }

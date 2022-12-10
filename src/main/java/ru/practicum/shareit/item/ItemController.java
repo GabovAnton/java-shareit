@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,19 +11,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/items")
+@RequiredArgsConstructor
 public class ItemController {
 
     @Autowired
     private final ItemService itemService;
-
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
+    @Autowired
+    private final ItemMapper itemMapper;
 
     @JsonView(ItemDto.SimpleView.class)
     @GetMapping("{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) {
-        return ItemMapper.INSTANCE.itemToItemDto(itemService.getItem(itemId));
+    public ItemDto getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.getItemDto(itemId, userId);
 
     }
 
@@ -36,8 +36,8 @@ public class ItemController {
     @PostMapping()
     public ItemDto create(@Valid @RequestBody ItemDto itemDto,
                           @RequestHeader("X-Sharer-User-Id") long userId) {
-        Item savedItem = itemService.save(ItemMapper.INSTANCE.itemDtoToItem(itemDto), userId);
-        return ItemMapper.INSTANCE.itemToItemDto(savedItem);
+        Item savedItem = itemService.save(itemMapper.itemDtoToItem(itemDto), userId);
+        return itemMapper.itemToItemDto(savedItem);
     }
 
 

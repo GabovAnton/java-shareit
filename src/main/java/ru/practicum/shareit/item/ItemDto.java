@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -45,9 +50,11 @@ public class ItemDto {
     @JsonView({AdminView.class})
     private Long requestId;
 
-    private LocalDateTime LastBooking;
+    @JsonView({SimpleView.class})
+    private ItemLastBookingDto lastBooking;
 
-    private LocalDateTime NextBooking;
+    @JsonView({SimpleView.class})
+    private ItemNextBookingDto nextBooking;
 
 }
 

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-
+    private final UserMapper userMapper;
     @Override
     public User getUser(long id) {
         return userRepository.findById(id)
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
         List<UserDto> userList = userRepository.findAll().stream()
                 .filter(Objects::nonNull)
-                .map(UserMapper.INSTANCE::userToUserDto)
+                .map(userMapper::userToUserDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.debug("all items requested: {}", userList.size());
         return userList;
@@ -46,10 +46,10 @@ public class UserServiceImpl implements UserService {
 
         User userToUpdate = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("user id: " + userDto.getId() + " not found"));
-        UserMapper.INSTANCE.updateUserFromUserDto(userDto, userToUpdate);
+        userMapper.updateUserFromUserDto(userDto, userToUpdate);
         userRepository.save(userToUpdate);
 
-        return UserMapper.INSTANCE.userToUserDto(userToUpdate);
+        return userMapper.userToUserDto(userToUpdate);
     }
 
     @Override
@@ -57,6 +57,11 @@ public class UserServiceImpl implements UserService {
 
         userRepository.deleteById(userId);
         return true;
+    }
+
+    @Override
+    public Boolean existsById(long userId) {
+        return userRepository.existsById(userId);
     }
 
 

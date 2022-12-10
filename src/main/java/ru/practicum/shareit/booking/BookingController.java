@@ -53,7 +53,7 @@ public class BookingController {
                              @RequestHeader("X-Sharer-User-Id") long userId) {
 
         Booking booking = bookingMapper.bookingDtoToBooking(bookingCreateDto, userId);
-        Booking savedBooking = bookingService.save(booking);
+        Booking savedBooking = bookingService.save(booking, userId);
 
         BookingDto bookingDto = bookingMapper.bookingToBookingDto(savedBooking);
         return bookingDto;
@@ -62,7 +62,7 @@ public class BookingController {
     //  PATCH /bookings/{bookingId}?approved={approved}
 
     @PatchMapping("{bookingId}")
-    public BookingDto update(@PathVariable long bookingId, @RequestParam Boolean approved, @Valid @RequestBody ItemPatchDto itemPatchDto,
+    public BookingDto update(@PathVariable long bookingId, @RequestParam Boolean approved,
                              @RequestHeader("X-Sharer-User-Id") long userId) {
         Booking booking = bookingService.changeBookingStatus(bookingId, approved, userId);
         BookingDto bookingDto = bookingMapper.bookingToBookingDto(booking);
@@ -71,7 +71,7 @@ public class BookingController {
     }
 
     //GET /bookings/{bookingId}
-    @JsonView(ItemDto.SimpleView.class)
+
     @GetMapping("{bookingId}")
     public BookingDto getBookingById(@PathVariable long bookingId, @RequestHeader("X-Sharer-User-Id") long userId) {
         Booking booking = bookingService.getBooking(userId, bookingId);
@@ -82,7 +82,6 @@ public class BookingController {
     }
 
    // GET /bookings?state={state}
-   @JsonView(ItemDto.SimpleView.class)
    @GetMapping("")
    public List<BookingDto> getBookingByState(@RequestParam(defaultValue = "ALL", required = false) String state,
                                        @RequestHeader("X-Sharer-User-Id") long userId) {
@@ -90,11 +89,12 @@ public class BookingController {
 
    }
    ///bookings/owner?state={state}
-   @JsonView(ItemDto.SimpleView.class)
    @GetMapping("/owner")
    public List<BookingDto> getItemsByStateAndOwner(@RequestParam(defaultValue = "ALL", required = false) String state,
                                              @RequestHeader("X-Sharer-User-Id") long userId) {
-       return bookingService.getBookingByStateAndOwner(userId, state);
+
+       List<BookingDto> bookingByStateAndOwner = bookingService.getBookingByStateAndOwner(userId, state);
+       return bookingByStateAndOwner; //
 
    }
 
