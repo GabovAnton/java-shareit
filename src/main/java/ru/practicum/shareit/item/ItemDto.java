@@ -15,6 +15,8 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 
 @Data
@@ -56,5 +58,7 @@ public class ItemDto {
     @JsonView({SimpleView.class})
     private ItemNextBookingDto nextBooking;
 
+    @JsonView({SimpleView.class})
+    private Set<CommentDto> comments;
 }
 

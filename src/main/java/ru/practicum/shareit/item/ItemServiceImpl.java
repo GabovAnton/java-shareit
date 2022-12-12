@@ -6,11 +6,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.ShareItValidationException;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,29 +27,31 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
     private final ItemMapper itemMapper;
-/*
+    private final CommentMapper commentMapper;
+
+    private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
-*/
 
     public ItemDto getItemDto(long id, long userId) {
-        Optional<Item> item = itemRepository.findById(id);
-        log.debug("item with id: {} requested, returned result: {}", id, item);
+
        /* List<Booking> bookings = bookingRepository
                 .findByItem_Owner_IdAndItem_IdOrderByEndDesc(userId, id,
                         PageRequest.of(0, 2));*/
-        ItemDto itemDto = itemMapper.itemToItemDto(item
-                        .orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists")));
+        Item item = itemRepository
+                .findById(id).orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
+        log.debug("item with id: {} requested, returned result: {}", id, item);
+        ItemDto itemDto = itemMapper.itemToItemDto(item);
 
+        itemDto.setComments(commentMapper.map(item.getItemComments()));
         Comparator<Booking> byDateEnd = Comparator
                 .comparing(Booking::getEnd);
-        List<Booking> bookings = item.get().getItemBookings().stream()
+        List<Booking> bookings = item.getItemBookings().stream()
                 .filter(x -> x.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2)
                 .collect(Collectors.toList());
 
         return getItemDtoWithLastAndNextBookings(itemDto, bookings);
 
     }
-
 
 
     public Item map(long id) {
@@ -64,6 +70,7 @@ public class ItemServiceImpl implements ItemService {
                             .comparing(Booking::getEnd);
 
                     ItemDto itemDto = itemMapper.itemToItemDto(x);
+                    itemDto.setComments(commentMapper.map(x.getItemComments()));
                     List<Booking> bookings = x.getItemBookings().stream()
                             .filter(y -> y.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2)
                             .collect(Collectors.toList());
@@ -94,12 +101,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Long getBookingId(List<Booking> bookings, int rowNumber) {
-        return (bookings.size()> 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getId() != null)
+        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getId() != null)
                 ? bookings.get(rowNumber).getId() : null;
     }
 
     private Long getBookerId(List<Booking> bookings, int rowNumber) {
-        return (bookings.size()> 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getBooker() != null
+        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getBooker() != null
                 && bookings.get(rowNumber).getBooker().getId() != null)
                 ? bookings.get(rowNumber).getBooker().getId() : null;
     }
@@ -110,6 +117,31 @@ public class ItemServiceImpl implements ItemService {
         Item savedItem = itemRepository.save(item);
         log.debug("new item created: {}", item);
         return savedItem;
+    }
+
+    @Override
+    public Comment saveComment(Long itemId, Long userId, CommentDto commentDto) {
+        //TODO
+        if (StringUtils.isBlank(commentDto.getText())) {
+            throw new ForbiddenException("Comment should not be empty");
+        }
+        User author = userService.getUser(userId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("item with id: " + itemId + " doesn't exists"));
+
+        if (bookingRepository.existsByItem_IdAndBooker_IdAndStatusAndEndIsBefore(itemId, userId,
+                BookingStatus.APPROVED, LocalDateTime.now())) {
+            Comment comment = commentMapper.commentDtoToComment(commentDto);
+            comment.setAuthor(author);
+            comment.setItem(item);
+            comment.setCreated(LocalDateTime.now());
+            commentRepository.save(comment);
+            return comment;
+        } else {
+            throw new ForbiddenException
+                    ("error while trying to add comment to item which hasn't  finished booking by user");
+        }
+//Отзыв может оставить только тот пользователь, который брал эту вещь в аренду, и только после окончания срока аренды
     }
 
     @Override
@@ -145,9 +177,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Boolean isItemAvailable(long itemId) {
 
-        if (itemRepository.isItemAvailable(itemId)
+        if (Boolean.TRUE.equals(itemRepository.isItemAvailable(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("item id: " + itemId + " not found"))
-                .getAvailable()) {
+                .getAvailable())) {
             return true;
         } else {
             throw new ForbiddenException("item with id: " + itemId + " is unavailable for booking");

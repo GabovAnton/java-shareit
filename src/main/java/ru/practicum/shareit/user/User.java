@@ -1,9 +1,8 @@
 package ru.practicum.shareit.user;
 
 import lombok.*;
-import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.request.ItemRequest;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -29,9 +28,6 @@ public class User {
 
     @OneToMany(mappedBy = "author")
     private Set<Comment> Comments;
-
-    @OneToMany(mappedBy = "requestor")
-    private Set<ItemRequest> Requests;
 
     @Column(name="name", nullable=false)
     private String name;

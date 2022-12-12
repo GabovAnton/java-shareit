@@ -19,6 +19,8 @@ public class ItemController {
     @Autowired
     private final ItemMapper itemMapper;
 
+    private final CommentMapper commentMapper;
+
     @JsonView(ItemDto.SimpleView.class)
     @GetMapping("{itemId}")
     public ItemDto getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
@@ -57,6 +59,16 @@ public class ItemController {
         List<ItemDto> search = (itemService.search(text));
         return search;
     }
+
+   // POST /items/{itemId}/comment
+   @JsonView(ItemDto.SimpleView.class)
+   @PostMapping("{itemId}/comment")
+   public CommentDto postComment(@PathVariable Long itemId,@Valid @RequestBody CommentDto commentDto,
+                         @RequestHeader("X-Sharer-User-Id") Long userId) {
+       Comment comment = itemService.saveComment(itemId, userId, commentDto);
+       CommentDto commentDto1 = commentMapper.commentToCommentDto(comment);
+       return commentDto1;
+   }
 
 
 }

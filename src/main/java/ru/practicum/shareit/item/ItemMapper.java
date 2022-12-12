@@ -1,12 +1,8 @@
 package ru.practicum.shareit.item;
 
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.request.ItemRequestDao;
+
+import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface ItemMapper {

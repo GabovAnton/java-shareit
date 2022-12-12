@@ -9,6 +9,8 @@ public interface ItemService {
     Item map(long id);
     Item save(Item item, long userId);
 
+    Comment saveComment( Long itemId, Long userId, CommentDto commentDto);
+
     List<ItemDto> search(String text );
 
     ItemDto update(ItemPatchDto itemDto, long userId);

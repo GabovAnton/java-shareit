@@ -1,12 +1,19 @@
-package ru.practicum.shareit.comment;
+package ru.practicum.shareit.item;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
+@RequiredArgsConstructor
+@Data
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +30,6 @@ public class Comment {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
+    @Column(name="created_date",  nullable = false)
+    private LocalDateTime created;
 }

@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.*;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
@@ -10,8 +9,7 @@ import java.util.Set;
 
 @Table(name = "items")
 @Entity
-@Getter
-@Setter
+@Data
 public class Item {
 
     @Id
