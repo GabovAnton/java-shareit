@@ -1,7 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import org.springframework.data.domain.Sort;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,13 +36,13 @@ class Current implements BookingSearch {
     @Override
     public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
         return bookingRepository
-                .findByBooker_IdAndEndIsAfter(ownerId, LocalDateTime.now());
+                .findByBooker_IdCurrent(ownerId, LocalDateTime.now());
     }
 
     @Override
     public List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository) {
         return bookingRepository
-                .findByItem_Owner_IdInFutureOrderByStartDesc(ownerId, LocalDateTime.now());
+                .findByItem_Owner_IdCurrent(ownerId, LocalDateTime.now());
     }
 }
 

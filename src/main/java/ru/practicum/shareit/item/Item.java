@@ -9,7 +9,8 @@ import java.util.Set;
 
 @Table(name = "items")
 @Entity
-@Data
+@Getter
+@Setter
 public class Item {
 
     @Id

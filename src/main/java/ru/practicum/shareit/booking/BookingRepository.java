@@ -17,8 +17,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select b from Booking b where b.booker.id = ?1 order by b.start DESC")
     List<Booking> findByBooker_Id(@NonNull Long id);
 
-    @Query("select b from Booking b where b.booker.id = ?1 and b.end > ?2 order by b.start DESC")
-    List<Booking> findByBooker_IdAndEndIsAfter(Long bookerId, LocalDateTime date);
+    @Query("select b from Booking b where b.booker.id = ?1 and b.start < ?2 and b.end > ?2 order by b.start DESC")
+    List<Booking> findByBooker_IdCurrent(Long bookerId, LocalDateTime date);
 
 
     @Query("select b from Booking b where b.booker.id = ?1 and b.end < ?2 order by b.start DESC")
@@ -35,6 +35,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.start >?2 and b.end > ?2  order by b.start DESC")
     List<Booking> findByItem_Owner_IdInFutureOrderByStartDesc(@NonNull Long id, LocalDateTime date);
+
+    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start <?2 and b.end > ?2  order by b.start DESC")
+    List<Booking> findByItem_Owner_IdCurrent(@NonNull Long id, LocalDateTime date);
 
     @Query("select b from Booking b where b.id = ?1 and b.booker.id = ?2 order by b.start DESC")
     List<Booking> findByIdAndBooker_Id(@NonNull Long itemId, @NonNull Long bookerId);
