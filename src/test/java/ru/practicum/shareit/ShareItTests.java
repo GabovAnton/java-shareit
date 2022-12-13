@@ -8,15 +8,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.item.Comment;
+import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,9 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ShareItTests {
 
-    private final UserService userService;
-    private final ItemService itemService;
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final BookingRepository bookingRepository;
+    private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
 
     @Test
     void contextLoads() {
@@ -42,8 +49,12 @@ class ShareItTests {
 
     @Test
     public void testDatabaseIsNotEmpty() {
-        List<UserDto> all = userService.getAll();
-        assertThat(all)
+        List<User> allUsers = userRepository.findAll();
+        assertThat(allUsers)
+                .isNotEmpty();
+
+        List<Item> allItems = itemRepository.findAll();
+        assertThat(allItems)
                 .isNotEmpty();
 
     }
@@ -52,7 +63,7 @@ class ShareItTests {
     public void CreateUserShouldNotThrowExceptionOnSave() {
         UserDto userOne = new UserDto(null, "testName", "test@gmail.com", null);
 
-        assertThat(userService.save(userMapper.userDtoToUser(userOne)))
+        assertThat(userRepository.save(userMapper.userDtoToUser(userOne)))
                 .extracting(User::getName)
                 .isEqualTo("testName");
     }
@@ -63,45 +74,48 @@ class ShareItTests {
         UserDto userOne = new UserDto(null, "testName", "agabov@gmail.com", null);
 
         assertThrows(DataIntegrityViolationException.class, () -> {
-            userService.save(userMapper.userDtoToUser(userOne));
+            userRepository.save(userMapper.userDtoToUser(userOne));
         });
 
     }
 
     @Test
     public void UpdateUserWithDuplicateEmailShouldThrowExceptionOnSave() {
-        User user = userService.getUser(1);
+        User user = userRepository.findById(1L).get();
         user.setEmail("ivan@gmail.com");
 
         assertThrows(DataIntegrityViolationException.class, () -> {
-            userService.save(user);
+            userRepository.save(user);
         });
     }
 
     @Test
     public void UpdateUserShouldNotThrowExceptionOnSave() {
-        User user = userService.getUser(1);
+        User user = userRepository.findById(1L).get();
         user.setEmail("anton2@gmail.com");
 
-        assertThat(userService.save(user))
+        assertThat(userRepository.save(user))
                 .extracting(User::getEmail)
                 .isEqualTo("anton2@gmail.com");
     }
+
     @Test
     public void DeleteUserShouldNotThrowExceptionOnSave() {
+        User user = userRepository.findById(1L).get();
 
-        assertThat(userService.delete(1L));
+        userRepository.delete(user);
 
     }
+
     @Test
     public void CreateItemShouldNotThrowExceptionOnSave() {
         Item item = new Item();
         item.setName("Test item");
         item.setAvailable(true);
         item.setDescription("new interesting item");
-        item.setOwner(userService.getUser(1L));
+        item.setOwner(userRepository.findById(1L).get());
 
-        assertThat(itemService.save(item, 1L)
+        assertThat(itemRepository.save(item)
                 .getName()
                 .equals("Test item"));
     }
@@ -109,24 +123,101 @@ class ShareItTests {
 
     @Test
     public void SearchInDescriptionShouldReturnOneRecord() {
-        List<ItemDto> searchResult = itemService.search("оТверТ");
+        List<Item> searchResult = itemRepository.findByNameOrDescription("%отверт%");
 
         assertThat(searchResult)
                 .isNotEmpty()
                 .hasSize(1)
-                .extracting(ItemDto::getDescription)
+                .extracting(Item::getDescription)
                 .contains("Аккумуляторная отвертка");
     }
 
     @Test
-    public void GetAllItemsForUserOneShouldReturnOneRecord() {
-        List<ItemDto> searchResult = itemService.getAll(1);
+    public void GetAllItemsForUserOneShouldReturnTwoRecords() {
+        List<Item> searchResult = itemRepository.findByOwner_Id(1L);
 
         assertThat(searchResult)
                 .isNotEmpty()
+                .hasSize(2)
+                .extracting(Item::getName)
+                .contains("Отвертка")
+                .contains("Аккумуляторная дрель");
+    }
+
+    @Test
+    public void CreateBookingInFutureOnItem2ByUserShouldNotThrowError() {
+        Booking booking = new Booking();
+        booking.setItem(itemRepository.findByOwner_Id(1L).stream().findFirst().get());
+        booking.setBooker(userRepository.findById(3L).get());
+        booking.setEnd(LocalDateTime.now().plusDays(5));
+        booking.setStart(LocalDateTime.now().plusMinutes(3));
+
+        assertThat(bookingRepository.save(booking)
+                .getItem().getName()
+                .equals("Аккумуляторная дрель"));
+
+        List<Booking> future = bookingRepository.findByBooker_IdAndStartIsAfter(3L, LocalDateTime.now());
+        assertThat(future).isNotEmpty()
                 .hasSize(1)
-                .extracting(ItemDto::getName)
-                .contains("Аккумуляторная отвертка");
+                .extracting(Booking::getId)
+                .contains(1L);
+
+    }
+
+    @Test
+    public void CreateBookingInPastOnItem2ByUserShouldNotThrowError() {
+        Booking booking = new Booking();
+        booking.setItem(itemRepository.findByOwner_Id(1L).stream().findFirst().get());
+        booking.setBooker(userRepository.findById(3L).get());
+        booking.setEnd(LocalDateTime.now().minusDays(30));
+        booking.setStart(LocalDateTime.now().minusDays(35));
+
+        assertThat(bookingRepository.save(booking)
+                .getItem().getName()
+                .equals("Аккумуляторная дрель"));
+
+        List<Booking> future = bookingRepository.findByBooker_IdAndEndIsBefore(3L, LocalDateTime.now());
+        assertThat(future).isNotEmpty()
+                .hasSize(1)
+                .extracting(Booking::getId)
+                .contains(1L);
+    }
+
+    @Test
+    public void CreateBookingInCurrentOnItem2ByUserShouldNotThrowError() {
+        Booking booking = new Booking();
+        booking.setItem(itemRepository.findByOwner_Id(1L).stream().findFirst().get());
+        booking.setBooker(userRepository.findById(3L).get());
+        booking.setStart(LocalDateTime.now().minusSeconds(1));
+        booking.setEnd(LocalDateTime.now().plusSeconds(10));
+
+        assertThat(bookingRepository.save(booking)
+                .getItem().getName()
+                .equals("Аккумуляторная дрель"));
+
+        List<Booking> future = bookingRepository.findByBooker_IdCurrent(3L, LocalDateTime.now());
+        assertThat(future).isNotEmpty()
+                .hasSize(1)
+                .extracting(Booking::getId)
+                .contains(1L);
+    }
+
+    @Test
+    public void CreateCommentOnItem2ByUserShouldNotThrowError() {
+        Comment comment = new Comment();
+        comment.setItem(itemRepository.findByOwner_Id(1L).stream().findFirst().get());
+        comment.setText("test comment");
+        comment.setAuthor(userRepository.findById(3L).get());
+        comment.setCreated(LocalDateTime.now());
+        commentRepository.save(comment);
+        Set<Comment> itemComments = itemRepository
+                .findByOwner_Id(1L).stream().filter(x -> x.getId().equals(1L)).findFirst().get().getItemComments();
+
+        assertThat(itemComments).isNotEmpty()
+                .hasSize(1)
+                .extracting(Comment::getText)
+                .contains("test comment");
+
     }
 
 }

@@ -24,8 +24,7 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private Set<Item> items;
 
-
-    @OneToMany(mappedBy = "author")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Comment> Comments;
 
     @Column(name = "name", nullable = false)

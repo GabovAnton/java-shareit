@@ -37,10 +37,10 @@ public class Item {
     @JsonIgnore
     private User owner;
 
-    @OneToMany(mappedBy = "item")
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "item",cascade = CascadeType.ALL)
     private Set<Booking> itemBookings;
 
-    @OneToMany(mappedBy = "item")
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "item",cascade = CascadeType.ALL)
     private Set<Comment> itemComments;
 
 }
