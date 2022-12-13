@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * A DTO for the {@link Booking} entity
- */
 @Data
 @AllArgsConstructor
 public class BookingCreateDto {

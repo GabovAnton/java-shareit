@@ -1,11 +1,8 @@
 package ru.practicum.shareit.booking;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.ItemPatchDto;
 import ru.practicum.shareit.item.ItemService;
 
 import javax.validation.Valid;
@@ -16,7 +13,6 @@ import java.util.List;
 public class BookingController {
     private final BookingService bookingService;
     private final ItemService itemService;
-
     private final ItemMapper itemMapper;
     private final BookingMapper bookingMapper;
 
@@ -31,22 +27,6 @@ public class BookingController {
         this.bookingMapper = bookingMapper;
     }
 
- /*   @JsonView(ItemDto.SimpleView.class)
-    @GetMapping("{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) {
-        *//* return ItemMapper.toItemDto(itemService.getItem(itemId));*//*
-        return null;//TODO
-
-    }*/
-
-/*
-    @JsonView(ItemDto.SimpleView.class)
-    @GetMapping()
-    public List<BookingCreateDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return bookingService.findAll(userId);
-
-    }
-*/
 
     @PostMapping()
     public BookingDto create(@Valid @RequestBody BookingCreateDto bookingCreateDto,
@@ -59,7 +39,6 @@ public class BookingController {
         return bookingDto;
     }
 
-    //  PATCH /bookings/{bookingId}?approved={approved}
 
     @PatchMapping("{bookingId}")
     public BookingDto update(@PathVariable long bookingId, @RequestParam Boolean approved,
@@ -70,7 +49,6 @@ public class BookingController {
         return bookingDto;
     }
 
-    //GET /bookings/{bookingId}
 
     @GetMapping("{bookingId}")
     public BookingDto getBookingById(@PathVariable long bookingId, @RequestHeader("X-Sharer-User-Id") long userId) {
@@ -81,14 +59,12 @@ public class BookingController {
 
     }
 
-   // GET /bookings?state={state}
    @GetMapping("")
    public List<BookingDto> getBookingByState(@RequestParam(defaultValue = "ALL", required = false) String state,
                                        @RequestHeader("X-Sharer-User-Id") long userId) {
        return bookingService.getBookingByState(userId, state);
 
    }
-   ///bookings/owner?state={state}
    @GetMapping("/owner")
    public List<BookingDto> getItemsByStateAndOwner(@RequestParam(defaultValue = "ALL", required = false) String state,
                                              @RequestHeader("X-Sharer-User-Id") long userId) {

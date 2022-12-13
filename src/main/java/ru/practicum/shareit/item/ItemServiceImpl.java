@@ -34,9 +34,7 @@ public class ItemServiceImpl implements ItemService {
 
     public ItemDto getItemDto(long id, long userId) {
 
-       /* List<Booking> bookings = bookingRepository
-                .findByItem_Owner_IdAndItem_IdOrderByEndDesc(userId, id,
-                        PageRequest.of(0, 2));*/
+
         Item item = itemRepository
                 .findById(id).orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
         log.debug("item with id: {} requested, returned result: {}", id, item);
@@ -121,7 +119,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Comment saveComment(Long itemId, Long userId, CommentDto commentDto) {
-        //TODO
         if (StringUtils.isBlank(commentDto.getText())) {
             throw new ForbiddenException("Comment should not be empty");
         }
@@ -141,7 +138,6 @@ public class ItemServiceImpl implements ItemService {
             throw new ForbiddenException
                     ("error while trying to add comment to item which hasn't  finished booking by user");
         }
-//Отзыв может оставить только тот пользователь, который брал эту вещь в аренду, и только после окончания срока аренды
     }
 
     @Override
@@ -169,9 +165,9 @@ public class ItemServiceImpl implements ItemService {
             throw new ShareItValidationException("error while trying to update item which belongs to another user");
         }
 
-        itemMapper.updateItemFromItemDto(itemPatchDto, itemToUpdate);
-        itemRepository.save(itemToUpdate);
-        return itemMapper.itemToItemDto(itemToUpdate);
+        Item item = itemMapper.updateItemFromItemDto(itemPatchDto, itemToUpdate);
+        Item save = itemRepository.save(item);
+        return itemMapper.itemToItemDto(save);
     }
 
     @Override

@@ -37,11 +37,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingCreateDto> findAll(Long userId) {//TODO useriD ??
 
-        List<BookingCreateDto> bookingCreateDto = bookingRepository.findAll().stream()
+        return bookingRepository.findAll().stream()
                 .filter(Objects::nonNull)
                 .map(bookingMapper::bookingToBookingCreateDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        return bookingCreateDto;
     }
 
     @Override

@@ -1,47 +1,31 @@
 package ru.practicum.shareit.user;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.item.ItemDto;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class UserDto {
 
-    @JsonView({SimpleView.class})
     private Long id;
 
-    @NotNull(groups = {New.class})
-    @JsonView({SimpleView.class})
+    @NotNull
     private String name;
-    @NotBlank(groups = {New.class})
-    @Email(groups = {New.class})
-    @JsonView({SimpleView.class})
+
+    @NotBlank
+    @Email
     private String email;
 
-    //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd, hh:mm:ss");
-    //@NotBlank(groups = {New.class})
-    @Email(groups = {New.class})
-    @JsonView({SimpleView.class})
+    @Email
     private String registrationDate;
-
-    public interface New {
-    }
-
-    public interface Update {
-    }
-
-    public interface SimpleView {
-    }
-
-
 
 
 }

@@ -17,6 +17,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
     @Override
     public User getUser(long id) {
         return userRepository.findById(id)
@@ -36,20 +37,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(User user) {
-            User savedUser = userRepository.save(user);
-            log.debug("new user created: {}", savedUser);
-            return savedUser;
+        User savedUser = userRepository.save(user);
+        log.debug("new user created: {}", savedUser);
+        return savedUser;
     }
 
     @Override
-    public UserDto update(UserDto userDto) {
+    public UserDto update(UserUpdateDto userUpdateDto, Long userId) {
 
-        User userToUpdate = userRepository.findById(userDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("user id: " + userDto.getId() + " not found"));
-        userMapper.updateUserFromUserDto(userDto, userToUpdate);
-        userRepository.save(userToUpdate);
+        User userToUpdate = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
 
-        return userMapper.userToUserDto(userToUpdate);
+        userMapper.updateUserFromUserUpdateDto(userUpdateDto, userToUpdate);
+        User save = userRepository.save(userToUpdate);
+
+        return userMapper.userToUserDto(save);
     }
 
     @Override

@@ -18,23 +18,22 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
     @OneToMany(mappedBy = "owner")
     private Set<Item> items;
 
 
-
     @OneToMany(mappedBy = "author")
     private Set<Comment> Comments;
 
-    @Column(name="name", nullable=false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name="email",nullable=false,  length = 512, unique=true)
+    @Column(name = "email", nullable = false, length = 512, unique = true)
     private String email;
 
-    @Column(name = "registration_date",columnDefinition = "DATE")
-    private LocalDate registrationDate; //yyyy.MM.dd, hh:mm:ss
+    @Column(name = "registration_date", columnDefinition = "DATE")
+    private LocalDate registrationDate;
 }

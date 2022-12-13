@@ -1,13 +1,11 @@
 package ru.practicum.shareit.item;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/items")
@@ -21,20 +19,18 @@ public class ItemController {
 
     private final CommentMapper commentMapper;
 
-    @JsonView(ItemDto.SimpleView.class)
+
     @GetMapping("{itemId}")
     public ItemDto getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getItemDto(itemId, userId);
 
     }
 
-    @JsonView(ItemDto.SimpleView.class)
     @GetMapping()
     public List<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getAll(userId);
     }
 
-    @JsonView(ItemDto.SimpleView.class)
     @PostMapping()
     public ItemDto create(@Valid @RequestBody ItemDto itemDto,
                           @RequestHeader("X-Sharer-User-Id") long userId) {
@@ -43,7 +39,6 @@ public class ItemController {
     }
 
 
-    @JsonView(ItemDto.SimpleView.class)
     @PatchMapping("{itemId}")
     public ItemDto update(@PathVariable long itemId, @Valid @RequestBody ItemPatchDto itemPatchDto,
                           @RequestHeader("X-Sharer-User-Id") long userId) {
@@ -51,7 +46,6 @@ public class ItemController {
         return itemService.update(itemPatchDto, userId);
     }
 
-    @JsonView(ItemDto.SimpleView.class)
     @GetMapping("/search")
     @ResponseBody
     public List<ItemDto> searchByQuery(@RequestParam String text, @RequestHeader("X-Sharer-User-Id") long userId) {
@@ -60,8 +54,6 @@ public class ItemController {
         return search;
     }
 
-   // POST /items/{itemId}/comment
-   @JsonView(ItemDto.SimpleView.class)
    @PostMapping("{itemId}/comment")
    public CommentDto postComment(@PathVariable Long itemId,@Valid @RequestBody CommentDto commentDto,
                          @RequestHeader("X-Sharer-User-Id") Long userId) {

@@ -4,17 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingSearch {
-
- //   List<Booking> getBookings(long ownerId);
-
     List<Booking> getBookings(long ownerId, BookingRepository bookingRepository);
-
- //   List<Booking> getBookingsByItemsOwner(long ownerId);
-
-  List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository);
+    List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository);
 }
-class All implements BookingSearch {
-
+class SearchAll implements BookingSearch {
 
 
     @Override
@@ -30,8 +23,7 @@ class All implements BookingSearch {
     }
 }
 
-class Current implements BookingSearch {
-
+class SearchCurrent implements BookingSearch {
 
     @Override
     public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
@@ -46,14 +38,13 @@ class Current implements BookingSearch {
     }
 }
 
-class Past implements BookingSearch {
+class SearchPast implements BookingSearch {
 
     @Override
     public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
 
         return bookingRepository
                 .findByBooker_IdAndEndIsBefore(ownerId, LocalDateTime.now());
-        //,Sort.by(Sort.Direction.DESC, "start_date"));
     }
 
     @Override
@@ -63,7 +54,7 @@ class Past implements BookingSearch {
     }
 }
 
-class Future implements BookingSearch {
+class SearchFuture implements BookingSearch {
 
 
     @Override
@@ -79,7 +70,7 @@ class Future implements BookingSearch {
     }
 }
 
-class Waiting implements BookingSearch {
+class SearchWaiting implements BookingSearch {
 
 
     @Override
@@ -95,7 +86,7 @@ class Waiting implements BookingSearch {
     }
 }
 
-class Rejected implements BookingSearch {
+class SearchRejected implements BookingSearch {
 
     @Override
     public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {

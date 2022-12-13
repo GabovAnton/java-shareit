@@ -13,7 +13,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleValidateException(final DataIntegrityViolationException e) {
-        //log.warn(e.getMessage());
+        log.warn(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(e.getMessage()));

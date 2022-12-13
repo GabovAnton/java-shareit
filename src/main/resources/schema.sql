@@ -45,28 +45,34 @@ CREATE TABLE IF NOT EXISTS  "comments" (
 
 ALTER TABLE "items" DROP CONSTRAINT IF EXISTS "fk_items_to_users";
 
-ALTER TABLE "items" ADD CONSTRAINT "fk_items_to_users" FOREIGN KEY ("owner_id") REFERENCES "users" ("id");
+ALTER TABLE "items" ADD CONSTRAINT "fk_items_to_users" FOREIGN KEY ("owner_id") REFERENCES "users" ("id")
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "bookings" DROP CONSTRAINT IF EXISTS "fk_bookings_to_items";
 
-ALTER TABLE "bookings" ADD CONSTRAINT "fk_bookings_to_items" FOREIGN KEY ("item_id") REFERENCES "items" ("id");
+ALTER TABLE "bookings" ADD CONSTRAINT "fk_bookings_to_items" FOREIGN KEY ("item_id") REFERENCES "items" ("id")
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 ALTER TABLE "bookings" DROP CONSTRAINT IF EXISTS "fk_bookings_to_users";
 
-ALTER TABLE "bookings" ADD CONSTRAINT "fk_bookings_to_users" FOREIGN KEY ("booker_id") REFERENCES "users" ("id");
+ALTER TABLE "bookings" ADD CONSTRAINT "fk_bookings_to_users" FOREIGN KEY ("booker_id") REFERENCES "users" ("id")
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 ALTER TABLE "comments" DROP CONSTRAINT IF EXISTS "fk_comments_to_items";
 
-ALTER TABLE "comments" ADD CONSTRAINT "fk_comments_to_items" FOREIGN KEY ("item_id") REFERENCES "items" ("id");
+ALTER TABLE "comments" ADD CONSTRAINT "fk_comments_to_items" FOREIGN KEY ("item_id") REFERENCES "items" ("id")
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 ALTER TABLE "comments" DROP CONSTRAINT IF EXISTS "fk_comments_to_users";
 
-ALTER TABLE "comments" ADD CONSTRAINT "fk_comments_to_users" FOREIGN KEY ("author_id") REFERENCES "users" ("id");
+ALTER TABLE "comments" ADD CONSTRAINT "fk_comments_to_users" FOREIGN KEY ("author_id") REFERENCES "users" ("id")
+    ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 ALTER TABLE "requests" DROP CONSTRAINT IF EXISTS "fk_request_to_users";
 
-ALTER TABLE "requests" ADD CONSTRAINT "fk_request_to_users" FOREIGN KEY ("requestor_id") REFERENCES "users" ("id");
+ALTER TABLE "requests" ADD CONSTRAINT "fk_request_to_users" FOREIGN KEY ("requestor_id") REFERENCES "users" ("id")
+    ON DELETE CASCADE ON UPDATE CASCADE;
