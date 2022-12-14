@@ -5,7 +5,6 @@ import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.Item;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -32,7 +31,4 @@ public class User {
 
     @Column(name = "email", nullable = false, length = 512, unique = true)
     private String email;
-
-    @Column(name = "registration_date", columnDefinition = "DATE")
-    private LocalDate registrationDate;
 }

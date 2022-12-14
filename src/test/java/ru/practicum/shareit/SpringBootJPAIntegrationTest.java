@@ -22,15 +22,5 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SpringBootJPAIntegrationTest {
 
- /*   @Autowired
-    private UserRepository userRepository;
 
-    @Test
-    //@Sql({"classpath:/h2datatest.sql", "classpath:/SampleData.sql"})
-    public void givenGenericEntityRepository_whenSaveAndRetreiveEntity_thenOK() {
-        List<User> all = userRepository.findAll();
-        assertThat(all)
-                .isNotEmpty();
-    }
-*/
 }

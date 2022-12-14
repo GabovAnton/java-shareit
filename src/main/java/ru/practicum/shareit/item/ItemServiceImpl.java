@@ -47,7 +47,10 @@ public class ItemServiceImpl implements ItemService {
                 .filter(x -> x.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2)
                 .collect(Collectors.toList());
 
-        return getItemDtoWithLastAndNextBookings(itemDto, bookings);
+        ItemDto itemDtoWithLastAndNextBookings = getItemDtoWithLastAndNextBookings(itemDto, bookings);
+        log.debug("item with id: {}  by user id: {} requested, returned result: {}", id, userId, item);
+
+        return itemDtoWithLastAndNextBookings;
 
     }
 
@@ -77,7 +80,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
 
-        log.debug("all items requested: {}", itemList.size());
+        log.debug("all items requested by user id: {}: returned collection: {}",userId, itemList.size());
 
         return itemList;
     }
@@ -133,6 +136,8 @@ public class ItemServiceImpl implements ItemService {
             comment.setItem(item);
             comment.setCreated(LocalDateTime.now());
             commentRepository.save(comment);
+            log.debug("new comment for item: {} created: {}", itemId, comment);
+
             return comment;
         } else {
             throw new ForbiddenException
@@ -145,12 +150,15 @@ public class ItemServiceImpl implements ItemService {
 
         String query = "%" + StringUtils.toRootLowerCase(text) + "%";
         log.debug("search in items with query: {} requested", query);
-        return StringUtils.isNotEmpty(text) ?
+        List<ItemDto> itemDtos = StringUtils.isNotEmpty(text) ?
                 itemRepository.findByNameOrDescription(query).stream()
                         .filter(Objects::nonNull)
                         .map(itemMapper::itemToItemDto)
                         .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) :
                 new ArrayList<>();
+        log.debug("searh for item with query: {} returned result: {}", text, itemDtos);
+
+        return itemDtos;
 
 
     }
@@ -167,6 +175,8 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = itemMapper.updateItemFromItemDto(itemPatchDto, itemToUpdate);
         Item save = itemRepository.save(item);
+        log.debug("item with id: {}  updated: {}", itemToUpdate.getId(), item);
+
         return itemMapper.itemToItemDto(save);
     }
 

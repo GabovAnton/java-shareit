@@ -20,8 +20,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(long id) {
-        return userRepository.findById(id)
+
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("user with id: " + id + " doesn't exists"));
+        log.debug("user with id: {} requested: {}",id, user);
+
+        return user;
     }
 
     @Override
@@ -50,6 +54,7 @@ public class UserServiceImpl implements UserService {
 
         userMapper.updateUserFromUserUpdateDto(userUpdateDto, userToUpdate);
         User save = userRepository.save(userToUpdate);
+        log.debug("user with id: {} updated: {}",userId, save);
 
         return userMapper.userToUserDto(save);
     }
@@ -58,6 +63,8 @@ public class UserServiceImpl implements UserService {
     public boolean delete(long userId) {
 
         userRepository.deleteById(userId);
+        log.debug("user with id: {} deleted",userId);
+
         return true;
     }
 

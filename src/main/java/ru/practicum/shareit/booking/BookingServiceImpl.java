@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 
 @Primary
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
@@ -23,24 +26,16 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
 
 
-    @Autowired
-    public BookingServiceImpl(BookingRepository bookingRepository,
-                              UserService userService,
-                              ItemService itemService,
-                              BookingMapper bookingMapper) {
-        this.bookingRepository = bookingRepository;
-        this.userService = userService;
-        this.itemService = itemService;
-        this.bookingMapper = bookingMapper;
-    }
-
     @Override
-    public List<BookingCreateDto> findAll(Long userId) {//TODO useriD ??
+    public List<BookingCreateDto> findAll(Long userId) {
 
-        return bookingRepository.findAll().stream()
+        List<BookingCreateDto> collect = bookingRepository.findAll().stream()
                 .filter(Objects::nonNull)
                 .map(bookingMapper::bookingToBookingCreateDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        log.debug("Bookings for user id: {} returned collection: {}",userId, collect);
+
+        return collect;
     }
 
     @Override
@@ -48,6 +43,7 @@ public class BookingServiceImpl implements BookingService {
 
         checkBookingBasicConstraints(booking,userId);
         booking.setStatus(BookingStatus.WAITING);
+        log.debug("Bookings for user id: {} saved: {}",userId, booking);
 
         return bookingRepository.save(booking);
     }
@@ -67,6 +63,7 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(newStatus);
             bookingRepository.save(booking);
+            log.debug("Bookings  id: {} change status to: {}",bookingId, newStatus);
             return booking;
         }
     }
@@ -89,10 +86,13 @@ public class BookingServiceImpl implements BookingService {
                     .getSearchMethod(state)
                     .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-            return bookingSearch.getBookings(ownerId, bookingRepository).stream()
+            List<BookingDto> collect = bookingSearch.getBookings(ownerId, bookingRepository).stream()
                     .filter(Objects::nonNull)
                     .map(bookingMapper::bookingToBookingDto)
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            log.debug("Bookings for owner id: {} and state: {} returned collection: {}",ownerId, state, collect);
+
+            return collect;
         }
     }
 
@@ -106,10 +106,14 @@ public class BookingServiceImpl implements BookingService {
                     .getSearchMethod(state)
                     .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-            return bookingSearch.getBookingsByItemsOwner(ownerId, bookingRepository).stream()
+            List<BookingDto> collect = bookingSearch.getBookingsByItemsOwner(ownerId, bookingRepository).stream()
                     .filter(Objects::nonNull)
                     .map(bookingMapper::bookingToBookingDto)
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            log.debug("Bookings for owner id: {} and state: {} returned collection: {}",ownerId, state, collect);
+
+            return collect;
+
         }
     }
 
