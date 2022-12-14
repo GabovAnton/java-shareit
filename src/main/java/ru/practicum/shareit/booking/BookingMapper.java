@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserService;
 

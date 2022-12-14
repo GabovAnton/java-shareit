@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -27,6 +28,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ActiveProfiles("dev")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -135,7 +137,7 @@ class ShareItTests {
 
     @Test
     public void GetAllItemsForUserOneShouldReturnTwoRecords() {
-        List<Item> searchResult = itemRepository.findByOwner_Id(1L);
+        List<Item> searchResult = itemRepository.findByOwnerId(1L);
 
         assertThat(searchResult)
                 .isNotEmpty()
@@ -148,7 +150,7 @@ class ShareItTests {
     @Test
     public void CreateBookingInFutureOnItem2ByUserShouldNotThrowError() {
         Booking booking = new Booking();
-        booking.setItem(itemRepository.findByOwner_Id(1L).stream().findFirst().get());
+        booking.setItem(itemRepository.findByOwnerId(1L).stream().findFirst().get());
         booking.setBooker(userRepository.findById(3L).get());
         booking.setEnd(LocalDateTime.now().plusDays(5));
         booking.setStart(LocalDateTime.now().plusMinutes(3));
@@ -157,7 +159,7 @@ class ShareItTests {
                 .getItem().getName()
                 .equals("Аккумуляторная дрель"));
 
-        List<Booking> future = bookingRepository.findByBooker_IdAndStartIsAfter(3L, LocalDateTime.now());
+        List<Booking> future = bookingRepository.SearchBookingsByBookerInFutureTime(3L, LocalDateTime.now());
         assertThat(future).isNotEmpty()
                 .hasSize(1)
                 .extracting(Booking::getId)
@@ -168,7 +170,7 @@ class ShareItTests {
     @Test
     public void CreateBookingInPastOnItem2ByUserShouldNotThrowError() {
         Booking booking = new Booking();
-        booking.setItem(itemRepository.findByOwner_Id(1L).stream().findFirst().get());
+        booking.setItem(itemRepository.findByOwnerId(1L).stream().findFirst().get());
         booking.setBooker(userRepository.findById(3L).get());
         booking.setEnd(LocalDateTime.now().minusDays(30));
         booking.setStart(LocalDateTime.now().minusDays(35));
@@ -177,7 +179,7 @@ class ShareItTests {
                 .getItem().getName()
                 .equals("Аккумуляторная дрель"));
 
-        List<Booking> future = bookingRepository.findByBooker_IdAndEndIsBefore(3L, LocalDateTime.now());
+        List<Booking> future = bookingRepository.SearchBookingsByBookerInPastTime(3L, LocalDateTime.now());
         assertThat(future).isNotEmpty()
                 .hasSize(1)
                 .extracting(Booking::getId)
@@ -187,7 +189,7 @@ class ShareItTests {
     @Test
     public void CreateBookingInCurrentOnItem2ByUserShouldNotThrowError() {
         Booking booking = new Booking();
-        booking.setItem(itemRepository.findByOwner_Id(1L).stream().findFirst().get());
+        booking.setItem(itemRepository.findByOwnerId(1L).stream().findFirst().get());
         booking.setBooker(userRepository.findById(3L).get());
         booking.setStart(LocalDateTime.now().minusSeconds(1));
         booking.setEnd(LocalDateTime.now().plusSeconds(10));
@@ -196,7 +198,7 @@ class ShareItTests {
                 .getItem().getName()
                 .equals("Аккумуляторная дрель"));
 
-        List<Booking> future = bookingRepository.findByBooker_IdCurrent(3L, LocalDateTime.now());
+        List<Booking> future = bookingRepository.SearchBookingsByBookerInPresentTime(3L, LocalDateTime.now());
         assertThat(future).isNotEmpty()
                 .hasSize(1)
                 .extracting(Booking::getId)
@@ -206,13 +208,13 @@ class ShareItTests {
     @Test
     public void CreateCommentOnItem2ByUserShouldNotThrowError() {
         Comment comment = new Comment();
-        comment.setItem(itemRepository.findByOwner_Id(1L).stream().findFirst().get());
+        comment.setItem(itemRepository.findByOwnerId(1L).stream().findFirst().get());
         comment.setText("test comment");
         comment.setAuthor(userRepository.findById(3L).get());
         comment.setCreated(LocalDateTime.now());
         commentRepository.save(comment);
         Set<Comment> itemComments = itemRepository
-                .findByOwner_Id(1L).stream().filter(x -> x.getId().equals(1L)).findFirst().get().getItemComments();
+                .findByOwnerId(1L).stream().filter(x -> x.getId().equals(1L)).findFirst().get().getItemComments();
 
         assertThat(itemComments).isNotEmpty()
                 .hasSize(1)

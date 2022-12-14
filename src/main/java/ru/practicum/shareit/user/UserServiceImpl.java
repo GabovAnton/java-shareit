@@ -16,14 +16,14 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
     private final UserMapper userMapper;
 
     @Override
     public User getUser(long id) {
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("user with id: " + id + " doesn't exists"));
-        log.debug("user with id: {} requested: {}",id, user);
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("user with id: " + id + " doesn't exists"));
+        log.debug("user with id: {} requested: {}", id, user);
 
         return user;
     }
@@ -31,10 +31,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAll() {
 
-        List<UserDto> userList = userRepository.findAll().stream()
-                .filter(Objects::nonNull)
-                .map(userMapper::userToUserDto)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        List<UserDto> userList = userRepository.findAll().stream().filter(Objects::nonNull).map(userMapper::userToUserDto).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.debug("all items requested: {}", userList.size());
         return userList;
     }
@@ -49,12 +46,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(UserUpdateDto userUpdateDto, Long userId) {
 
-        User userToUpdate = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
+        User userToUpdate = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
 
         userMapper.updateUserFromUserUpdateDto(userUpdateDto, userToUpdate);
         User save = userRepository.save(userToUpdate);
-        log.debug("user with id: {} updated: {}",userId, save);
+        log.debug("user with id: {} updated: {}", userId, save);
 
         return userMapper.userToUserDto(save);
     }
@@ -63,7 +59,7 @@ public class UserServiceImpl implements UserService {
     public boolean delete(long userId) {
 
         userRepository.deleteById(userId);
-        log.debug("user with id: {} deleted",userId);
+        log.debug("user with id: {} deleted", userId);
 
         return true;
     }

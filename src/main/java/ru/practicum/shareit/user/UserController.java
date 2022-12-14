@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
+
     @Autowired
     private final UserService userService;
 
@@ -26,9 +27,7 @@ public class UserController {
         return userMapper.userToUserDto(userService.getUser(userId));
     }
 
-    /*
-        @JsonView(UserDto.SimpleView.class)
-    */
+
     @GetMapping()
     public List<UserDto> getAll() {
         return userService.getAll();

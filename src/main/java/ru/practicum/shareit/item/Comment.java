@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,6 +33,6 @@ public class Comment {
     @JsonIgnore
     private Item item;
 
-    @Column(name="created_date",  nullable = false)
+    @Column(name = "created_date", nullable = false)
     private LocalDateTime created;
 }

@@ -2,8 +2,6 @@ package ru.practicum.shareit.booking;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.ItemService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -11,26 +9,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/bookings")
 public class BookingController {
+
     private final BookingService bookingService;
-    private final ItemService itemService;
-    private final ItemMapper itemMapper;
+
     private final BookingMapper bookingMapper;
 
     @Autowired
-    public BookingController(BookingService bookingService,
-                             ItemService itemService,
-                             ItemMapper itemMapper,
-                             BookingMapper bookingMapper) {
+    public BookingController(BookingService bookingService, BookingMapper bookingMapper) {
         this.bookingService = bookingService;
-        this.itemService = itemService;
-        this.itemMapper = itemMapper;
         this.bookingMapper = bookingMapper;
     }
 
 
     @PostMapping()
-    public BookingDto create(@Valid @RequestBody BookingCreateDto bookingCreateDto,
-                             @RequestHeader("X-Sharer-User-Id") long userId) {
+    public BookingDto create(@Valid @RequestBody BookingCreateDto bookingCreateDto, @RequestHeader("X-Sharer-User-Id") long userId) {
 
         Booking booking = bookingMapper.bookingDtoToBooking(bookingCreateDto, userId);
         Booking savedBooking = bookingService.save(booking, userId);
@@ -41,8 +33,7 @@ public class BookingController {
 
 
     @PatchMapping("{bookingId}")
-    public BookingDto update(@PathVariable long bookingId, @RequestParam Boolean approved,
-                             @RequestHeader("X-Sharer-User-Id") long userId) {
+    public BookingDto update(@PathVariable long bookingId, @RequestParam Boolean approved, @RequestHeader("X-Sharer-User-Id") long userId) {
         Booking booking = bookingService.changeBookingStatus(bookingId, approved, userId);
         BookingDto bookingDto = bookingMapper.bookingToBookingDto(booking);
 
@@ -59,19 +50,18 @@ public class BookingController {
 
     }
 
-   @GetMapping("")
-   public List<BookingDto> getBookingByState(@RequestParam(defaultValue = "ALL", required = false) String state,
-                                       @RequestHeader("X-Sharer-User-Id") long userId) {
-       return bookingService.getBookingByState(userId, state);
+    @GetMapping("")
+    public List<BookingDto> getBookingByState(@RequestParam(defaultValue = "ALL", required = false) String state, @RequestHeader("X-Sharer-User-Id") long userId) {
+        return bookingService.getBookingByState(userId, state);
 
-   }
-   @GetMapping("/owner")
-   public List<BookingDto> getItemsByStateAndOwner(@RequestParam(defaultValue = "ALL", required = false) String state,
-                                             @RequestHeader("X-Sharer-User-Id") long userId) {
+    }
 
-       List<BookingDto> bookingByStateAndOwner = bookingService.getBookingByStateAndOwner(userId, state);
-       return bookingByStateAndOwner; //
+    @GetMapping("/owner")
+    public List<BookingDto> getItemsByStateAndOwner(@RequestParam(defaultValue = "ALL", required = false) String state, @RequestHeader("X-Sharer-User-Id") long userId) {
 
-   }
+        List<BookingDto> bookingByStateAndOwner = bookingService.getBookingByStateAndOwner(userId, state);
+        return bookingByStateAndOwner; //
+
+    }
 
 }

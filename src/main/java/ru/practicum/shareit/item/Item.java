@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.user.User;
 
@@ -26,7 +28,7 @@ public class Item {
     @Column(nullable = false)
     private String description;
 
-    @Column(name="is_available", nullable=false)
+    @Column(name = "is_available", nullable = false)
     private Boolean available;
 
     @Column
@@ -37,10 +39,10 @@ public class Item {
     @JsonIgnore
     private User owner;
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "item",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "item", cascade = CascadeType.ALL)
     private Set<Booking> itemBookings;
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "item",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "item", cascade = CascadeType.ALL)
     private Set<Comment> itemComments;
 
 }

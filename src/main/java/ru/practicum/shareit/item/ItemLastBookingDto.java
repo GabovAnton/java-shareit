@@ -10,5 +10,6 @@ import lombok.Setter;
 public class ItemLastBookingDto {
 
     private final Long id;
+
     private final Long bookerId;
 }

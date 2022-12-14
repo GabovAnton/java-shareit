@@ -1,11 +1,13 @@
 package ru.practicum.shareit.item;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import ru.practicum.shareit.user.UserDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Set;
 
 
@@ -14,7 +16,6 @@ import java.util.Set;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ItemDto {
-
 
     private long id;
 
@@ -27,14 +28,6 @@ public class ItemDto {
     @NotNull
     private Boolean available;
 
-    @Data
-    public static class owner implements Serializable {
-        private final Long id;
-        private final String name;
-        private final String email;
-        private final LocalDate registrationDate;
-    }
-
     private Long requestId;
 
     private ItemLastBookingDto lastBooking;
@@ -42,5 +35,6 @@ public class ItemDto {
     private ItemNextBookingDto nextBooking;
 
     private Set<CommentDto> comments;
-}
 
+    private UserDto owner;
+}

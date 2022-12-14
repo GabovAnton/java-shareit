@@ -19,7 +19,6 @@ public class ItemController {
 
     private final CommentMapper commentMapper;
 
-
     @GetMapping("{itemId}")
     public ItemDto getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getItemDto(itemId, userId);
@@ -32,16 +31,13 @@ public class ItemController {
     }
 
     @PostMapping()
-    public ItemDto create(@Valid @RequestBody ItemDto itemDto,
-                          @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDto create(@Valid @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") long userId) {
         Item savedItem = itemService.save(itemMapper.itemDtoToItem(itemDto), userId);
         return itemMapper.itemToItemDto(savedItem);
     }
 
-
     @PatchMapping("{itemId}")
-    public ItemDto update(@PathVariable long itemId, @Valid @RequestBody ItemPatchDto itemPatchDto,
-                          @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDto update(@PathVariable long itemId, @Valid @RequestBody ItemPatchDto itemPatchDto, @RequestHeader("X-Sharer-User-Id") long userId) {
         itemPatchDto.setId(itemId);
         return itemService.update(itemPatchDto, userId);
     }
@@ -54,13 +50,12 @@ public class ItemController {
         return search;
     }
 
-   @PostMapping("{itemId}/comment")
-   public CommentDto postComment(@PathVariable Long itemId,@Valid @RequestBody CommentDto commentDto,
-                         @RequestHeader("X-Sharer-User-Id") Long userId) {
-       Comment comment = itemService.saveComment(itemId, userId, commentDto);
-       CommentDto commentDto1 = commentMapper.commentToCommentDto(comment);
-       return commentDto1;
-   }
+    @PostMapping("{itemId}/comment")
+    public CommentDto postComment(@PathVariable Long itemId, @Valid @RequestBody CommentDto commentDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        Comment comment = itemService.saveComment(itemId, userId, commentDto);
+        CommentDto commentDto1 = commentMapper.commentToCommentDto(comment);
+        return commentDto1;
+    }
 
 
 }

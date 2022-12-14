@@ -50,6 +50,7 @@ public class ErrorHandler {
                 .status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(e.getMessage()));
     }
+
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(final IllegalArgumentException e) {
         log.warn(e.getMessage());
@@ -57,7 +58,6 @@ public class ErrorHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(e.getMessage()));
     }
-
 
 
 }

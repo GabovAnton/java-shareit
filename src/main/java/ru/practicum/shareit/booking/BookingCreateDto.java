@@ -18,5 +18,6 @@ public class BookingCreateDto {
     private final String status;
 
     private final Long itemId;
+
     private final Long userId;
 }

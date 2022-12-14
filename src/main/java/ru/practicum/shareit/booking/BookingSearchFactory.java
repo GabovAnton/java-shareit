@@ -8,7 +8,7 @@ public class BookingSearchFactory {
 
     static Map<String, BookingSearch> searchMap = new HashMap<>();
 
-    static  {
+    static {
         searchMap.put("ALL", new SearchAll());
         searchMap.put("CURRENT", new SearchCurrent());
         searchMap.put("PAST", new SearchPast());
@@ -16,7 +16,6 @@ public class BookingSearchFactory {
         searchMap.put("WAITING", new SearchWaiting());
         searchMap.put("REJECTED", new SearchRejected());
     }
-
 
 
     public static Optional<BookingSearch> getSearchMethod(String operator) {
