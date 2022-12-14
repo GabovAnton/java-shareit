@@ -1,23 +1,26 @@
 package ru.practicum.shareit.user;
 
-import ru.practicum.shareit.user.dto.UserDto;
+
+import org.mapstruct.*;
 
 
-public class UserMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
+public interface UserMapper {
 
-    public static UserDto toUserDto(User user) {
-        return new UserDto(
-                user.getId(),
-                user.getName(),
-                user.getEmail()
-        );
+    User userDtoToUser(UserDto userDto);
+
+    UserDto userToUserDto(User user);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User updateUserFromUserUpdateDto(UserUpdateDto userUpdateDto, @MappingTarget User user);
+
+    @AfterMapping
+    default void linkItems(@MappingTarget User user) {
+        user.getItems().forEach(item -> item.setOwner(user));
     }
 
-    public static User toUser(UserDto userDto) {
-        return new User(
-                userDto.getId(),
-                userDto.getName(),
-                userDto.getEmail()
-        );
+    @AfterMapping
+    default void linkComments(@MappingTarget User user) {
+        user.getComments().forEach(Comment -> Comment.setAuthor(user));
     }
 }
