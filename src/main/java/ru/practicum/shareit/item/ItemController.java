@@ -28,8 +28,11 @@ public class ItemController {
     }
 
     @GetMapping()
-    public List<ItemDto> getAll(@PathVariable Integer from, @PathVariable Integer size, @RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.getAll(size, from,userId);
+    public List<ItemDto> getAll(@RequestParam(required = false) Integer from,
+                                @RequestParam(required = false) Integer size,
+                                @RequestHeader("X-Sharer-User-Id") long userId) {
+
+        return itemService.getAll(size, from, userId);
     }
 
     @PostMapping()

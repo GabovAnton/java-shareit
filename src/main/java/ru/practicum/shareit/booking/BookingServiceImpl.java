@@ -10,10 +10,7 @@ import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Primary
 @Service
@@ -27,7 +24,8 @@ public class BookingServiceImpl implements BookingService {
 
     private final ItemService itemService;
 
-    private final BookingMapper bookingMapper;
+
+
 
     @Override
     public Booking save(Booking booking, long userId) {
@@ -61,23 +59,23 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking getBooking(long requesterId, long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking with id " + bookingId + " not found"));
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Booking with id " + bookingId + " not found"));
 
         checkItemOwner(booking, requesterId);
         return booking;
     }
 
     @Override
-    public List<BookingDto> getBookingByState(long ownerId, String state) {
+    public List<BookingDto> getBookingByState(int from, int size, long ownerId, String state) {
         if (!userService.existsById(ownerId)) {
             throw new EntityNotFoundException("user with id: " + ownerId + " not found");
         } else {
-            BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state).orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-            List<BookingDto> collect = bookingSearch.getBookings(ownerId, bookingRepository).stream()
-                    .filter(Objects::nonNull)
-                    .map(bookingMapper::bookingToBookingDto)
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
+
+            List<BookingDto> collect = bookingSearch.getBookings( from,  size, ownerId);
             log.debug("Bookings for owner id: {} and state: {} returned collection: {}", ownerId, state, collect);
 
             return collect;
@@ -85,14 +83,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookingByStateAndOwner(long ownerId, String state) {
+    public List<BookingDto> getBookingByStateAndOwner(int from, int size, long ownerId, String state) {
 
         if (!userService.existsById(ownerId)) {
             throw new EntityNotFoundException("user with id: " + ownerId + " not found");
         } else {
             BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state).orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-            List<BookingDto> collect = bookingSearch.getBookingsByItemsOwner(ownerId, bookingRepository).stream().filter(Objects::nonNull).map(bookingMapper::bookingToBookingDto).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            List<BookingDto> collect = bookingSearch.getBookingsByItemsOwner( from,  size, ownerId);
             log.debug("Bookings for owner id: {} and state: {} returned collection: {}", ownerId, state, collect);
 
             return collect;

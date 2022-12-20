@@ -1,94 +1,227 @@
 package ru.practicum.shareit.booking;
 
-import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface BookingSearch {
-    List<Booking> getBookings(long ownerId, BookingRepository bookingRepository);
+ //   List<Booking> getBookings(int from, int size, long ownerId, BookingRepository bookingRepository);
+    List<BookingDto> getBookings(int from, int size, long ownerId);
 
-    List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository);
+
+    List<BookingDto> getBookingsByItemsOwner(int from, int size, long ownerId);
 }
 
-class SearchAll implements BookingSearch {
+@RequiredArgsConstructor
+class SearchAll extends BookingSearchRoot implements BookingSearch  {
 
 
     @Override
-    public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByBooker(ownerId);
+    public List<BookingDto> getBookings(int from, int size, long ownerId) {
+
+
+        //    @Query("select b from Booking b where b.booker.id = ?1 order by b.start DESC")
+        return queryFactory.selectFrom(request)
+                .where(request.booker.id.eq(ownerId))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
     }
 
     @Override
-    public List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository) {
+    public List<BookingDto> getBookingsByItemsOwner(int from, int size, long ownerId) {
 
-        return bookingRepository.SearchBookingsByItemOwner(ownerId);
-    }
-}
-
-class SearchCurrent implements BookingSearch {
-
-    @Override
-    public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByBookerInPresentTime(ownerId, LocalDateTime.now());
-    }
-
-    @Override
-    public List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByItemOwnerInPresentTime(ownerId, LocalDateTime.now());
-    }
-}
-
-class SearchPast implements BookingSearch {
-
-    @Override
-    public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
-
-        return bookingRepository.SearchBookingsByBookerInPastTime(ownerId, LocalDateTime.now());
-    }
-
-    @Override
-    public List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByItemOwnerInPastTime(ownerId, LocalDateTime.now());
-    }
-}
-
-class SearchFuture implements BookingSearch {
+        //    @Query("select b from Booking b where   b.item.owner.id = ?1 order by b.start DESC")
 
 
-    @Override
-    public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByBookerInFutureTime(ownerId, LocalDateTime.now());
-    }
+        return queryFactory.selectFrom(request)
+                .where(request.item.owner.id.eq(ownerId))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
-    @Override
-    public List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByItemOwnerInFutureTime(ownerId, LocalDateTime.now());
     }
 }
 
-class SearchWaiting implements BookingSearch {
-
+class SearchCurrent extends BookingSearchRoot implements BookingSearch {
 
     @Override
-    public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByBookerAndStatus(ownerId, BookingStatus.WAITING);
+    public List<BookingDto> getBookings(int from, int size, long ownerId ) {
+
+       // @Query("select b from Booking b where b.booker.id = ?1 and b.start < ?2 and b.end > ?2 order by b.start DESC")
+        return queryFactory.selectFrom(request)
+                .where(request.booker.id.eq(ownerId)
+                        .and(request.start.before(currentTime)
+                                .and(request.end.after(currentTime))))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
     }
 
     @Override
-    public List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByItemOwnerAndStatus(ownerId, BookingStatus.WAITING);
+    public List<BookingDto> getBookingsByItemsOwner(int from, int size, long ownerId ) {
+
+        //    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start <?2 and b.end > ?2  order by b.start DESC")
+
+        return queryFactory.selectFrom(request)
+                .where(request.item.owner.id.eq(ownerId)
+                        .and(request.start.before(currentTime)
+                            .and(request.end.after(currentTime))))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
     }
 }
 
-class SearchRejected implements BookingSearch {
+class SearchPast extends BookingSearchRoot  implements BookingSearch {
 
     @Override
-    public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByBookerAndStatus(ownerId, BookingStatus.REJECTED);
+    public List<BookingDto> getBookings(int from, int size, long ownerId ) {
+        // @Query("select b from Booking b where b.booker.id = ?1 and b.end < ?2 order by b.start DESC")
+        return queryFactory.selectFrom(request)
+                .where(request.booker.id.eq(ownerId)
+                        .and(request.end.before(currentTime)))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     @Override
-    public List<Booking> getBookingsByItemsOwner(long ownerId, BookingRepository bookingRepository) {
-        return bookingRepository.SearchBookingsByItemOwnerAndStatus(ownerId, BookingStatus.REJECTED);
+    public List<BookingDto> getBookingsByItemsOwner(int from, int size, long ownerId ) {
+        //    @Query("select b from Booking b where  b.item.owner.id = ?1 and b.end < ?2 order by b.start DESC")
+        return queryFactory.selectFrom(request)
+                .where(request.item.owner.id.eq(ownerId)
+                        .and(request.end.before(currentTime)))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+    }
+}
+
+class SearchFuture extends BookingSearchRoot  implements BookingSearch {
+
+
+    @Override
+    public List<BookingDto> getBookings(int from, int size, long ownerId) {
+        //    @Query("select b from Booking b where b.booker.id = ?1 and b.start > ?2 order by b.start DESC")
+
+        return queryFactory.selectFrom(request)
+                .where(request.booker.id.eq(ownerId)
+                        .and(request.start.after(currentTime))
+                        .and(request.end.after(currentTime)))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+    }
+
+    @Override
+    public List<BookingDto> getBookingsByItemsOwner(int from, int size, long ownerId) {
+        //    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start >?2 and b.end > ?2  order by b.start DESC")
+
+        return queryFactory.selectFrom(request)
+                .where(request.item.owner.id.eq(ownerId)
+                        .and(request.start.after(currentTime))
+                        .and(request.end.after(currentTime)))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+    }
+}
+
+class SearchWaiting extends BookingSearchRoot  implements BookingSearch {
+
+
+    @Override
+    public List<BookingDto> getBookings(int from, int size, long ownerId) {
+        //    @Query("select b from Booking b where b.booker.id = ?1 and b.status = ?2 order by b.start DESC")
+
+        return queryFactory.selectFrom(request)
+                .where(request.booker.id.eq(ownerId).and(request.status.eq(BookingStatus.WAITING)))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+    }
+
+    @Override
+    public List<BookingDto> getBookingsByItemsOwner(int from, int size, long ownerId) {
+//    @Query("select b from Booking b " +
+//            "where b.item.owner.id = ?1 and b.status = ?2 " +
+//            "order by b.start DESC")
+
+        return queryFactory.selectFrom(request)
+                .where(request.item.owner.id.eq(ownerId).and(request.status.eq(BookingStatus.WAITING)))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+    }
+}
+
+class SearchRejected extends BookingSearchRoot  implements BookingSearch {
+
+    @Override
+    public List<BookingDto> getBookings(int from, int size, long ownerId) {
+        return queryFactory.selectFrom(request)
+                .where(request.booker.id.eq(ownerId).and(request.status.eq(BookingStatus.REJECTED)))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+    }
+
+    @Override
+    public List<BookingDto> getBookingsByItemsOwner(int from, int size, long ownerId) {
+
+
+        return queryFactory.selectFrom(request)
+                .where(request.item.owner.id.eq(ownerId).and(request.status.eq(BookingStatus.REJECTED)))
+                .orderBy(request.start.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream()
+                .map(bookingMapper::bookingToBookingDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 }
 
