@@ -6,7 +6,7 @@ public interface ItemService {
 
     ItemDto getItemDto(long id, long userId);
 
-    List<ItemDto> getAll(long userId);
+    List<ItemDto> getAll(int from, int size, long userId);
 
     Item map(long id);
 
@@ -14,7 +14,7 @@ public interface ItemService {
 
     Comment saveComment(Long itemId, Long userId, CommentDto commentDto);
 
-    List<ItemDto> search(String text);
+    List<ItemDto> search(int from, int size, String text);
 
     ItemDto update(ItemPatchDto itemDto, long userId);
 

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -11,9 +12,12 @@ import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.ShareItValidationException;
+import ru.practicum.shareit.request.QRequest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +39,9 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     private final BookingRepository bookingRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public ItemDto getItemDto(long id, long userId) {
 
@@ -61,21 +68,28 @@ public class ItemServiceImpl implements ItemService {
         return item.orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
     }
 
-    public List<ItemDto> getAll(long userId) {
+    public List<ItemDto> getAll(int from, int size, long userId) {
 
-        List<ItemDto> itemList = itemRepository.findByOwnerId(userId).stream().filter(Objects::nonNull).map(x -> {
+        QItem request = QItem.item;
 
-            Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+        Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
+        List<ItemDto> itemDtos = queryFactory.selectFrom(request)
+                .where(request.owner.id.eq(userId))
+                //.orderBy(request.XX.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream().map(x -> {
+                    ItemDto itemDto = itemMapper.itemToItemDto(x);
+                    itemDto.setComments(commentMapper.map(x.getItemComments()));
+                    List<Booking> bookings = x.getItemBookings().stream().filter(y -> y.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2).collect(Collectors.toList());
+                    return getItemDtoWithLastAndNextBookings(itemDto, bookings);
+                }).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
-            ItemDto itemDto = itemMapper.itemToItemDto(x);
-            itemDto.setComments(commentMapper.map(x.getItemComments()));
-            List<Booking> bookings = x.getItemBookings().stream().filter(y -> y.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2).collect(Collectors.toList());
-            return getItemDtoWithLastAndNextBookings(itemDto, bookings);
-        }).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
-        log.debug("all items requested by user id: {}: returned collection: {}", userId, itemList.size());
+        log.debug("all items requested by user id: {}: returned collection: {}", userId, itemDtos.size());
 
-        return itemList;
+        return itemDtos;
     }
 
     private ItemDto getItemDtoWithLastAndNextBookings(ItemDto itemDto, List<Booking> bookings) {
@@ -131,11 +145,27 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(int from, int size,String text) {
+        QItem request = QItem.item;
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+        Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
 
         String query = "%" + StringUtils.toRootLowerCase(text) + "%";
-        log.debug("search in items with query: {} requested", query);
-        List<ItemDto> itemDtos = StringUtils.isNotEmpty(text) ? itemRepository.findByNameOrDescription(query).stream().filter(Objects::nonNull).map(itemMapper::itemToItemDto).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) : new ArrayList<>();
+
+        List<ItemDto> itemDtos = StringUtils.isNotEmpty(text) ? queryFactory.selectFrom(request)
+                .where(request.name.like(query).or(request.description.like(query)))
+                //.orderBy(request.XX.desc())
+                .limit(size)
+                .offset(--from)
+                .fetch().stream().map(itemMapper::itemToItemDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) : new ArrayList<>();
+
+
+      /*  List<ItemDto> itemDtos = StringUtils.isNotEmpty(text) ? itemRepository.findByNameOrDescription(query)
+                .stream().filter(Objects::nonNull)
+                .map(itemMapper::itemToItemDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) : new ArrayList<>();*/
         log.debug("searh for item with query: {} returned result: {}", text, itemDtos);
 
         return itemDtos;

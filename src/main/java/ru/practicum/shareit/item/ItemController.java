@@ -3,6 +3,8 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingDto;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -26,8 +28,8 @@ public class ItemController {
     }
 
     @GetMapping()
-    public List<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.getAll(userId);
+    public List<ItemDto> getAll(@PathVariable Integer from, @PathVariable Integer size, @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.getAll(size, from,userId);
     }
 
     @PostMapping()
@@ -44,9 +46,9 @@ public class ItemController {
 
     @GetMapping("/search")
     @ResponseBody
-    public List<ItemDto> searchByQuery(@RequestParam String text, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDto> searchByQuery(@PathVariable Integer from, @PathVariable Integer size, @RequestParam String text, @RequestHeader("X-Sharer-User-Id") long userId) {
 
-        List<ItemDto> search = (itemService.search(text));
+        List<ItemDto> search = itemService.search(size, from, text);
         return search;
     }
 

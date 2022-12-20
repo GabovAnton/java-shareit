@@ -14,8 +14,7 @@ class SearchAll implements BookingSearch {
 
     @Override
     public List<Booking> getBookings(long ownerId, BookingRepository bookingRepository) {
-        List<Booking> bookings = bookingRepository.SearchBookingsByBooker(ownerId);
-        return bookings;
+        return bookingRepository.SearchBookingsByBooker(ownerId);
     }
 
     @Override

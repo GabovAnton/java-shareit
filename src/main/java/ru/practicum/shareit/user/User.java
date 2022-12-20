@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.*;
 import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.request.Request;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -26,6 +27,9 @@ public class User {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Comment> Comments;
+
+    @OneToMany(mappedBy = "requester")
+    private Set<Request> requesterRequests;
 
     @Column(name = "name", nullable = false)
     private String name;

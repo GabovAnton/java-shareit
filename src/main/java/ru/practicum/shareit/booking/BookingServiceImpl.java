@@ -42,7 +42,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking changeBookingStatus(long bookingId, Boolean isApproved, long requesterId) {
 
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking with id " + bookingId + " not found"));
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
+                new EntityNotFoundException("Booking with id " + bookingId + " not found"));
 
         if (!booking.getItem().getOwner().getId().equals(requesterId)) {
             throw new EntityNotFoundException("Booking status could be changed only by owner");
@@ -73,7 +74,10 @@ public class BookingServiceImpl implements BookingService {
         } else {
             BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state).orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-            List<BookingDto> collect = bookingSearch.getBookings(ownerId, bookingRepository).stream().filter(Objects::nonNull).map(bookingMapper::bookingToBookingDto).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            List<BookingDto> collect = bookingSearch.getBookings(ownerId, bookingRepository).stream()
+                    .filter(Objects::nonNull)
+                    .map(bookingMapper::bookingToBookingDto)
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
             log.debug("Bookings for owner id: {} and state: {} returned collection: {}", ownerId, state, collect);
 
             return collect;
