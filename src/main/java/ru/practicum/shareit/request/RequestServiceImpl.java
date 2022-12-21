@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,13 +60,12 @@ public class RequestServiceImpl implements RequestService {
         QRequest request = QRequest.request;
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-
         return queryFactory.selectFrom(request)
                 .where(request.requester.id.notIn(userId))
                  .orderBy(request.createdDate.desc())
                  .limit(size)
                 .offset(--from)
-                .fetch().stream() //TODO verify!!!!
+                .fetch().stream()
                 .map(requestMapper::requestToRequestDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 

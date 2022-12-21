@@ -1,9 +1,14 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+@Component
 public class BookingSearchFactory {
 
     static Map<String, BookingSearch> searchMap = new HashMap<>();

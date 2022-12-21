@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,13 +47,17 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto getItemDto(long id, long userId) {
 
 
-        Item item = itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
         log.debug("item with id: {} requested, returned result: {}", id, item);
         ItemDto itemDto = itemMapper.itemToItemDto(item);
 
         itemDto.setComments(commentMapper.map(item.getItemComments()));
         Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
-        List<Booking> bookings = item.getItemBookings().stream().filter(x -> x.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2).collect(Collectors.toList());
+        List<Booking> bookings = item.getItemBookings().stream()
+                .filter(x -> x.getItem().getOwner().getId().equals(userId))
+                .sorted(byDateEnd).limit(2)
+                .collect(Collectors.toList());
 
         ItemDto itemDtoWithLastAndNextBookings = getItemDtoWithLastAndNextBookings(itemDto, bookings);
         log.debug("item with id: {}  by user id: {} requested, returned result: {}", id, userId, item);
@@ -68,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
         return item.orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
     }
 
-    public List<ItemDto> getAll(int from, int size, long userId) {
+    public List<ItemDto> getAll(Integer from, Integer size, long userId) {
 
         QItem request = QItem.item;
 
@@ -76,13 +81,16 @@ public class ItemServiceImpl implements ItemService {
         Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
         List<ItemDto> itemDtos = queryFactory.selectFrom(request)
                 .where(request.owner.id.eq(userId))
-                //.orderBy(request.XX.desc())
-                .limit(size)
-                .offset(--from)
+                .limit( (size != null ? size : itemRepository.count()))
+                .offset(from != null ? --from : 0)
                 .fetch().stream().map(x -> {
                     ItemDto itemDto = itemMapper.itemToItemDto(x);
                     itemDto.setComments(commentMapper.map(x.getItemComments()));
-                    List<Booking> bookings = x.getItemBookings().stream().filter(y -> y.getItem().getOwner().getId().equals(userId)).sorted(byDateEnd).limit(2).collect(Collectors.toList());
+                    List<Booking> bookings = x.getItemBookings().stream()
+                            .filter(y -> y.getItem().getOwner().getId().equals(userId))
+                            .sorted(byDateEnd)
+                            .limit(2)
+                            .collect(Collectors.toList());
                     return getItemDtoWithLastAndNextBookings(itemDto, bookings);
                 }).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
@@ -107,11 +115,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Long getBookingId(List<Booking> bookings, int rowNumber) {
-        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getId() != null) ? bookings.get(rowNumber).getId() : null;
+        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber)
+                .getId() != null) ? bookings.get(rowNumber).getId() : null;
     }
 
     private Long getBookerId(List<Booking> bookings, int rowNumber) {
-        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getBooker() != null && bookings.get(rowNumber).getBooker().getId() != null) ? bookings.get(rowNumber).getBooker().getId() : null;
+        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings
+                .get(rowNumber).getBooker() != null && bookings.get(rowNumber)
+                .getBooker().getId() != null) ? bookings.get(rowNumber).getBooker().getId() : null;
     }
 
     @Override
@@ -128,7 +139,8 @@ public class ItemServiceImpl implements ItemService {
             throw new ForbiddenException("Comment should not be empty");
         }
         User author = userService.getUser(userId);
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("item with id: " + itemId + " doesn't exists"));
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("item with id: " + itemId + " doesn't exists"));
 
         if (bookingRepository.existsByItem_IdAndBooker_IdAndStatusAndEndIsBefore(itemId, userId, BookingStatus.APPROVED, LocalDateTime.now())) {
             Comment comment = commentMapper.commentDtoToComment(commentDto);
@@ -145,19 +157,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(int from, int size,String text) {
+    public List<ItemDto> search(Integer from, Integer size, String text) {
         QItem request = QItem.item;
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-        Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
 
         String query = "%" + StringUtils.toRootLowerCase(text) + "%";
 
         List<ItemDto> itemDtos = StringUtils.isNotEmpty(text) ? queryFactory.selectFrom(request)
-                .where(request.name.like(query).or(request.description.like(query)))
-                //.orderBy(request.XX.desc())
-                .limit(size)
-                .offset(--from)
+                .where(request.available.eq(true)
+                        .and(request.name.likeIgnoreCase(query).or(request.description.likeIgnoreCase(query))))
+                .limit( (size != null ? size : itemRepository.count()))
+                .offset(from != null ? --from : 0)
                 .fetch().stream().map(itemMapper::itemToItemDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) : new ArrayList<>();
 
@@ -175,7 +186,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(ItemPatchDto itemPatchDto, long userId) {
 
-        Item itemToUpdate = itemRepository.findById(itemPatchDto.getId()).orElseThrow(() -> new EntityNotFoundException("item id: " + itemPatchDto.getId() + " not found"));
+        Item itemToUpdate = itemRepository.findById(itemPatchDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("item id: " + itemPatchDto.getId() + " not found"));
 
         if (itemToUpdate.getOwner() != null && itemToUpdate.getOwner().getId() != userId) {
             throw new ShareItValidationException("error while trying to update item which belongs to another user");
@@ -191,7 +203,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Boolean isItemAvailable(long itemId) {
 
-        if (Boolean.TRUE.equals(itemRepository.isItemAvailable(itemId).orElseThrow(() -> new EntityNotFoundException("item id: " + itemId + " not found")).getAvailable())) {
+        if (Boolean.TRUE.equals(itemRepository.isItemAvailable(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("item id: " + itemId + " not found")).getAvailable())) {
             return true;
         } else {
             throw new ForbiddenException("item with id: " + itemId + " is unavailable for booking");

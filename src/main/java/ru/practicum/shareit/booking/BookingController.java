@@ -51,7 +51,8 @@ public class BookingController {
     }
 
     @GetMapping("")
-    public List<BookingDto> getBookingByState(@RequestParam Integer from, @RequestParam Integer size,
+    public List<BookingDto> getBookingByState(@RequestParam(required = false) Integer from,
+                                              @RequestParam(required = false) Integer size,
                                               @RequestParam(defaultValue = "ALL", required = false) String state,
                                               @RequestHeader("X-Sharer-User-Id") long userId) {
         return bookingService.getBookingByState(size, from, userId, state);
@@ -59,7 +60,8 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getItemsByStateAndOwner(@PathVariable Integer from, @PathVariable Integer size,
+    public List<BookingDto> getItemsByStateAndOwner(@RequestParam(required = false) Integer from,
+                                                    @RequestParam(required = false) Integer size,
                                                     @RequestParam(defaultValue = "ALL", required = false) String state,
                                                     @RequestHeader("X-Sharer-User-Id") long userId) {
 
