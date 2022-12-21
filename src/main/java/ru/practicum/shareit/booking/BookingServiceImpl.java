@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
@@ -26,10 +25,8 @@ public class BookingServiceImpl implements BookingService {
     private final UserService userService;
 
     private final ItemService itemService;
-
     @PersistenceContext
     private EntityManager entityManager;
-private final     BookingMapper bookingMapper;
 
     @Override
     public Booking save(Booking booking, long userId) {
@@ -39,6 +36,10 @@ private final     BookingMapper bookingMapper;
         log.debug("Bookings for user id: {} saved: {}", userId, booking);
 
         return bookingRepository.save(booking);
+    }
+
+    protected BookingRepository getBookingRepository() {
+        return bookingRepository;
     }
 
     @Override
@@ -79,7 +80,7 @@ private final     BookingMapper bookingMapper;
             BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state)
                     .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-            List<BookingDto> collect = bookingSearch.getBookings(from,  size, ownerId, entityManager,bookingRepository,bookingMapper);
+            List<BookingDto> collect = bookingSearch.getBookings(from, size, ownerId, entityManager, bookingRepository);
             log.debug("Bookings for owner id: {} and state: {} returned collection: {}", ownerId, state, collect);
 
             return collect;
@@ -94,7 +95,7 @@ private final     BookingMapper bookingMapper;
         } else {
             BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state).orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-            List<BookingDto> collect = bookingSearch.getBookingsByItemsOwner( from,  size, ownerId,entityManager,bookingRepository, bookingMapper);
+            List<BookingDto> collect = bookingSearch.getBookingsByItemsOwner(from, size, ownerId, entityManager, bookingRepository);
             log.debug("Bookings for owner id: {} and state: {} returned collection: {}", ownerId, state, collect);
 
             return collect;
