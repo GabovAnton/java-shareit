@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
@@ -51,11 +52,12 @@ public class BookingController {
     }
 
     @GetMapping("")
-    public List<BookingDto> getBookingByState(@RequestParam(required = false) Integer from,
+    public List<BookingDto> getBookingByState(@RequestParam(required = false) @Min(value = 0, message = "from should not be less than 0") Integer from,
+                                              @Min(value = 0, message = "size should not be less than 0")
                                               @RequestParam(required = false) Integer size,
                                               @RequestParam(defaultValue = "ALL", required = false) String state,
                                               @RequestHeader("X-Sharer-User-Id") long userId) {
-        return bookingService.getBookingByState(size, from, userId, state);
+        return bookingService.getBookingByState(from, size, userId, state);
 
     }
 
@@ -65,7 +67,7 @@ public class BookingController {
                                                     @RequestParam(defaultValue = "ALL", required = false) String state,
                                                     @RequestHeader("X-Sharer-User-Id") long userId) {
 
-        List<BookingDto> bookingByStateAndOwner = bookingService.getBookingByStateAndOwner(size, from, userId, state);
+        List<BookingDto> bookingByStateAndOwner = bookingService.getBookingByStateAndOwner(from,size , userId, state);
         return bookingByStateAndOwner; //
 
     }

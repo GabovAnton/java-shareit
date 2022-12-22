@@ -6,6 +6,7 @@ import lombok.Data;
 import ru.practicum.shareit.item.CommentDto;
 import ru.practicum.shareit.user.UserDto;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -18,11 +19,11 @@ import java.util.Set;
 public class RequestDto implements Serializable {
 
     private final Long id;
-
-    private final String description;
+@NotBlank
+private final String description;
 
     private final UserDto requester;
 
-    private final LocalDateTime createdDate;
+    private final LocalDateTime created;
 
 }

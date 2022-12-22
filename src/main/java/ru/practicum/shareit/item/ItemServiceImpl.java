@@ -76,13 +76,15 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getAll(Integer from, Integer size, long userId) {
 
         QItem request = QItem.item;
+        long totalItems = itemRepository.count() + 1;
+        int offset = from != null ? from : 0;
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
         List<ItemDto> itemDtos = queryFactory.selectFrom(request)
                 .where(request.owner.id.eq(userId))
-                .limit( (size != null ? size : itemRepository.count()))
-                .offset(from != null ? --from : 0)
+                .limit(size != null ? size : totalItems)
+                .offset(offset)
                 .fetch().stream().map(x -> {
                     ItemDto itemDto = itemMapper.itemToItemDto(x);
                     itemDto.setComments(commentMapper.map(x.getItemComments()));
@@ -163,12 +165,13 @@ public class ItemServiceImpl implements ItemService {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
         String query = "%" + StringUtils.toRootLowerCase(text) + "%";
-
+        long totalItems = itemRepository.count() + 1;
+        int offset = from != null ? from : 0;
         List<ItemDto> itemDtos = StringUtils.isNotEmpty(text) ? queryFactory.selectFrom(request)
                 .where(request.available.eq(true)
                         .and(request.name.likeIgnoreCase(query).or(request.description.likeIgnoreCase(query))))
-                .limit( (size != null ? size : itemRepository.count()))
-                .offset(from != null ? --from : 0)
+                .limit(size != null ? size : totalItems)
+                .offset(offset)
                 .fetch().stream().map(itemMapper::itemToItemDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) : new ArrayList<>();
 

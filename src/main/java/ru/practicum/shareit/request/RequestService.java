@@ -6,7 +6,7 @@ public interface RequestService {
     List<RequestWithProposalsDto> getAll(Long userId);
     RequestDto SaveRequest(RequestDto requestDto, Long userId);
 
-    List<RequestDto> getAllFromOthers(int from, int size, Long userId);
+    List<RequestWithProposalsDto> getAllFromOthers(Integer from, Integer size, Long userId);
 
     RequestWithProposalsDto GetRequest(Long requestId, Long userId);
 

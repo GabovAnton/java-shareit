@@ -1,11 +1,19 @@
 package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.TypeMismatchException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
+import java.util.Set;
 
 @Slf4j
 @RestControllerAdvice
@@ -58,6 +66,22 @@ public class ErrorHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(e.getMessage()));
     }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse>  handleConstraintViolationException(final ValidationException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleTypeMismatchException(final TypeMismatchException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
+
 
 
 }

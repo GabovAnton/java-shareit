@@ -1,14 +1,17 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
 @RequestMapping("/requests")
 @RequiredArgsConstructor
+@Validated
 public class RequestController {
     private final RequestService requestService;
 
@@ -24,10 +27,13 @@ public class RequestController {
     }
 
     //GET /requests/all?from={from}&size={size}
-    @PostMapping("/requests/all?from={from}&size={size}")
-    public List<RequestDto> getAllFromOthers(@PathVariable Integer from, @PathVariable Integer size,
+    @GetMapping("/all")
+    public List<RequestWithProposalsDto> getAllFromOthers(@RequestParam(required = false)
+                                                 @Min(value = 0, message = "from should be positive") Integer from,
+                                             @RequestParam(required = false)
+                                               @Min(value = 0, message = "size should greater than 0") Integer size,
                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return requestService.getAllFromOthers(size, from, userId);
+        return requestService.getAllFromOthers(from, size, userId);
     }
 
     //GET /requests/{requestId}

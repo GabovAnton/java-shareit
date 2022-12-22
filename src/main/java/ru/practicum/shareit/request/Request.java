@@ -28,7 +28,7 @@ public class Request {
     private String description;
 
     @Column(nullable = false, name = "created_date")
-    private LocalDateTime createdDate;
+    private LocalDateTime created;
 
     @ManyToOne
     @JoinColumn(name = "requester_id", nullable = false)

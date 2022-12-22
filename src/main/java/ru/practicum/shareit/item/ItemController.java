@@ -2,16 +2,19 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Validated
 public class ItemController {
 
     @Autowired
@@ -28,11 +31,13 @@ public class ItemController {
     }
 
     @GetMapping()
-    public List<ItemDto> getAll(@RequestParam(required = false) Integer from,
-                                @RequestParam(required = false) Integer size,
+    public List<ItemDto> getAll(@RequestParam(required = false)
+                                    @Min(value = 0, message = "from should be positive") Integer from,
+                                @RequestParam(required = false)
+                                    @Min(value = 0, message = "size should greater than 0") Integer size,
                                 @RequestHeader("X-Sharer-User-Id") long userId) {
 
-        return itemService.getAll(size, from, userId);
+        return itemService.getAll(from, size, userId);
     }
 
     @PostMapping()
@@ -50,11 +55,13 @@ public class ItemController {
 
     @GetMapping("/search")
     @ResponseBody
-    public List<ItemDto> searchByQuery(@RequestParam(required = false) Integer from,
-                                       @RequestParam(required = false) Integer size,
+    public List<ItemDto> searchByQuery(@RequestParam(required = false)
+                                           @Min(value = 0, message = "from should be positive") Integer from,
+                                       @RequestParam(required = false)
+                                           @Min(value = 0, message = "size should greater than 0") Integer size,
                                        @RequestParam String text, @RequestHeader("X-Sharer-User-Id") long userId) {
 
-        List<ItemDto> search = itemService.search(size, from, text);
+        List<ItemDto> search = itemService.search(from,  size, text);
         return search;
     }
 

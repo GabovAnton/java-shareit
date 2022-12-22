@@ -20,7 +20,6 @@ public class BookingSearchRoot {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);*/
 
 
-    LocalDateTime currentTime = LocalDateTime.now();
 
     public List<Booking> addLimitAndOffset(Integer from, Integer size, JPAQuery<Booking> query,
                                            BookingRepository bookingRepository) {
