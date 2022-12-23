@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bookings")
+@Validated
 public class BookingController {
 
     private final BookingService bookingService;
@@ -52,22 +54,23 @@ public class BookingController {
     }
 
     @GetMapping("")
-    public List<BookingDto> getBookingByState(@RequestParam(required = false) @Min(value = 0, message = "from should not be less than 0") Integer from,
-                                              @Min(value = 0, message = "size should not be less than 0")
-                                              @RequestParam(required = false) Integer size,
-                                              @RequestParam(defaultValue = "ALL", required = false) String state,
-                                              @RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<BookingDto> getBookingByState(
+            @RequestParam(required = false) @Min(value = 0, message = "from should not be less than 0") Integer from,
+            @RequestParam(required = false) @Min(value = 0, message = "size should not be less than 1") Integer size,
+            @RequestParam(defaultValue = "ALL", required = false) String state,
+            @RequestHeader("X-Sharer-User-Id") long userId) {
         return bookingService.getBookingByState(from, size, userId, state);
 
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getItemsByStateAndOwner(@RequestParam(required = false) Integer from,
-                                                    @RequestParam(required = false) Integer size,
-                                                    @RequestParam(defaultValue = "ALL", required = false) String state,
-                                                    @RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<BookingDto> getItemsByStateAndOwner(
+            @RequestParam(required = false) @Min(value = 0, message = "from should not be less than 0") Integer from,
+            @RequestParam(required = false) @Min(value = 0, message = "size should not be less than 1") Integer size,
+            @RequestParam(defaultValue = "ALL", required = false) String state,
+            @RequestHeader("X-Sharer-User-Id") long userId) {
 
-        List<BookingDto> bookingByStateAndOwner = bookingService.getBookingByStateAndOwner(from,size , userId, state);
+        List<BookingDto> bookingByStateAndOwner = bookingService.getBookingByStateAndOwner(from, size, userId, state);
         return bookingByStateAndOwner; //
 
     }

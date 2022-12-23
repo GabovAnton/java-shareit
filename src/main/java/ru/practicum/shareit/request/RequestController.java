@@ -22,7 +22,8 @@ public class RequestController {
     }
 
     @PostMapping()
-    public RequestDto create(@Valid @RequestBody RequestDto requestDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public RequestDto create(@Valid @RequestBody RequestDto requestDto,
+                             @RequestHeader("X-Sharer-User-Id") Long userId) {
         return requestService.SaveRequest(requestDto, userId);
     }
 
@@ -31,14 +32,15 @@ public class RequestController {
     public List<RequestWithProposalsDto> getAllFromOthers(@RequestParam(required = false)
                                                  @Min(value = 0, message = "from should be positive") Integer from,
                                              @RequestParam(required = false)
-                                               @Min(value = 0, message = "size should greater than 0") Integer size,
+                                               @Min(value = 0, message = "size should greater than 1") Integer size,
                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
         return requestService.getAllFromOthers(from, size, userId);
     }
 
     //GET /requests/{requestId}
     @GetMapping("{requestId}")
-    public RequestWithProposalsDto getBookingById(@PathVariable Long requestId, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public RequestWithProposalsDto getBookingById(@PathVariable Long requestId,
+                                                  @RequestHeader("X-Sharer-User-Id") long userId) {
         return requestService.GetRequest(requestId, userId);
     }
 }

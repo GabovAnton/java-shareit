@@ -18,10 +18,7 @@ import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.request.Request;
-import ru.practicum.shareit.request.RequestDto;
-import ru.practicum.shareit.request.RequestMapper;
-import ru.practicum.shareit.request.RequestService;
+import ru.practicum.shareit.request.*;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserMapper;
@@ -229,7 +226,7 @@ class ShareItTests {
         int day = 1;
         for (int i = 0; i < 30; i++) {
             Request request = new Request();
-            request.setCreatedDate(LocalDateTime.now().plusDays(day++));
+            request.setCreated(LocalDateTime.now().plusDays(day++));
 
             int length = 50;
             boolean useLetters = true;
@@ -246,11 +243,12 @@ class ShareItTests {
         }
 
         List<Long> collect = requestService.getAllFromOthers(26, 10, 6L).stream()
-                .map(RequestDto::getId).collect(Collectors.toList());
+                .map(RequestWithProposalsDto::getId).collect(Collectors.toList());
 
         assertThat(collect, hasSize(5));
         assertThat(collect, Matchers.containsInRelativeOrder(List.of(5L, 4L, 3L, 2L, 1L).toArray()));
 
     }
+
 
 }
