@@ -14,7 +14,7 @@ public interface BookingMapper {
 
     @Mapping(source = "userId", target = "booker")
     @Mapping(source = "bookingCreateDto.itemId", target = "item")
-    Booking bookingDtoToBooking(BookingCreateDto bookingCreateDto, long userId);
+    Booking bookingCreateDtoToBooking(BookingCreateDto bookingCreateDto, long userId);
 
     BookingCreateDto bookingToBookingCreateDto(Booking booking);
 

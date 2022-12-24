@@ -15,8 +15,8 @@ public abstract class BookingMapperDecorator implements BookingMapper {
     private BookingMapper delegate;
 
     @Override
-    public Booking bookingDtoToBooking(BookingCreateDto bookingCreateDto, long userId) {
-        Booking booking = delegate.bookingDtoToBooking(bookingCreateDto, userId);
+    public Booking bookingCreateDtoToBooking(BookingCreateDto bookingCreateDto, long userId) {
+        Booking booking = delegate.bookingCreateDtoToBooking(bookingCreateDto, userId);
         booking.setBooker(userService.getUser(bookingCreateDto.getUserId()));
 
         return booking;

@@ -1,18 +1,15 @@
 package ru.practicum.shareit.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Builder
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
 
     private Long id;
@@ -24,7 +21,7 @@ public class UserDto {
     @Email
     private String email;
 
-    @Email
+    @DateTimeFormat
     private String registrationDate;
 
 

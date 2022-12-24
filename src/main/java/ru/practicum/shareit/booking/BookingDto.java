@@ -1,6 +1,12 @@
 package ru.practicum.shareit.booking;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.user.UserDto;
 
@@ -9,17 +15,24 @@ import java.time.LocalDateTime;
 
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookingDto implements Serializable {
 
-    private final Long id;
+    private  Long id;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern="uuuu-MM-dd'T'HH:mm:ss")
+    private  LocalDateTime start;
 
-    private final LocalDateTime start;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern="uuuu-MM-dd'T'HH:mm:ss")
+    private  LocalDateTime end;
 
-    private final LocalDateTime end;
+    private  BookingStatus status;
 
-    private final BookingStatus status;
+    private  ItemDto item;
 
-    private final ItemDto item;
+    private  UserDto booker;
 
-    private final UserDto booker;
+
 }
