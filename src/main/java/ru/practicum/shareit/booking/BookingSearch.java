@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceContext;
+import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -28,7 +25,7 @@ public interface BookingSearch {
 }
 
 @Service
-class SearchAll extends BookingSearchRoot implements BookingSearch  {
+class SearchAll  implements BookingSearch  {
 
     @Override
     public List<BookingDto> getBookings(Integer from, Integer size, long ownerId, EntityManager entityManager,
@@ -71,7 +68,7 @@ class SearchAll extends BookingSearchRoot implements BookingSearch  {
     }
 }
 
-class SearchCurrent extends BookingSearchRoot implements BookingSearch {
+class SearchCurrent  implements BookingSearch {
 
 
     @Override
@@ -120,7 +117,7 @@ class SearchCurrent extends BookingSearchRoot implements BookingSearch {
     }
 }
 
-class SearchPast extends BookingSearchRoot  implements BookingSearch {
+class SearchPast   implements BookingSearch {
 
 
 
@@ -165,7 +162,7 @@ class SearchPast extends BookingSearchRoot  implements BookingSearch {
     }
 }
 
-class SearchFuture extends BookingSearchRoot  implements BookingSearch {
+class SearchFuture   implements BookingSearch {
 
 
 
@@ -210,7 +207,7 @@ class SearchFuture extends BookingSearchRoot  implements BookingSearch {
     }
 }
 
-class SearchWaiting extends BookingSearchRoot  implements BookingSearch {
+class SearchWaiting   implements BookingSearch {
 
 
 
@@ -253,19 +250,25 @@ class SearchWaiting extends BookingSearchRoot  implements BookingSearch {
 
     }
 }
+/* class QueryHelper{
+      static JPAQuery<Booking> query;
+     public static JPAQuery<Booking> getQuery(EntityManager entityManager) {
+         query = new JPAQuery<>(entityManager);
+        return query;
+    }
 
-class SearchRejected extends BookingSearchRoot  implements BookingSearch {
-
-
-
+}*/
+class SearchRejected   implements BookingSearch {
     @Override
     public List<BookingDto> getBookings(Integer from, Integer size, long ownerId,EntityManager entityManager,BookingRepository bookingRepository) {
         QBooking qBooking = QBooking.booking;
-        JPAQuery<Booking> query = new JPAQuery<>(entityManager);
+       JPAQuery<Booking> query = new JPAQuery<>(entityManager);
 
-        long totalItems = bookingRepository.count() + 1;
+        //JPAQuery<Booking>   query =  QueryHelper.getQuery(entityManager);
+
+            long totalItems = bookingRepository.count() + 1;
         int offset = from != null ? from : 0;
-        return query.from(qBooking)
+        List<BookingDto> collect = query.from(qBooking)
                 .where(qBooking.booker.id.eq(ownerId).and(qBooking.status.eq(BookingStatus.REJECTED)))
                 .orderBy(qBooking.start.desc())
                 .limit(size != null ? size : totalItems)
@@ -273,6 +276,7 @@ class SearchRejected extends BookingSearchRoot  implements BookingSearch {
                 .fetch().stream()
                 .map(BookingMapper.INSTANCE::bookingToBookingDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        return collect;
 
     }
 

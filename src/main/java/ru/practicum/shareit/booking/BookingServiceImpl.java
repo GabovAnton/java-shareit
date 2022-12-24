@@ -93,9 +93,11 @@ public class BookingServiceImpl implements BookingService {
         if (!userService.existsById(ownerId)) {
             throw new EntityNotFoundException("user with id: " + ownerId + " not found");
         } else {
-            BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state).orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
+            BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
-            List<BookingDto> collect = bookingSearch.getBookingsByItemsOwner(from, size, ownerId, entityManager, bookingRepository);
+            List<BookingDto> collect = bookingSearch
+                    .getBookingsByItemsOwner(from, size, ownerId, entityManager, bookingRepository);
             log.debug("Bookings for owner id: {} and state: {} returned collection: {}", ownerId, state, collect);
 
             return collect;
@@ -103,10 +105,11 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void checkItemOwner(Booking booking, Long requesterId) {
+    private Boolean checkItemOwner(Booking booking, Long requesterId) {
         if (!booking.getBooker().getId().equals(requesterId) && !booking.getItem().getOwner().getId().equals(requesterId)) {
             throw new EntityNotFoundException("Booking could be retrieved only by items owner or booking author");
         }
+        return true;
     }
 
     private void checkBookingBasicConstraints(Booking booking, Long requesterId) {

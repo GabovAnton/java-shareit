@@ -70,8 +70,8 @@ class BookingControllerTest {
     @BeforeEach
     void setUp() {
 
-        LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5
-        );
+        LocalDateTime currentDate = LocalDateTime
+                .of(2022, 12, 10, 5, 5, 5, 5);
         //for testing json LocalDateTime
         mapper.registerModule(new JavaTimeModule());
 
@@ -106,7 +106,6 @@ class BookingControllerTest {
 
     @Test
     void getBookingById_whenInvoked() {
-        List<BookingDto> expectedBookings = List.of(BookingMapper.INSTANCE.bookingToBookingDto(new Booking()));
         when(bookingMockService.getBooking(anyLong(), anyLong()))
                 .thenReturn(booking);
         when(bookingMapper.bookingToBookingDto(booking))
@@ -252,6 +251,7 @@ class BookingControllerTest {
         List<BookingDto> expectedBookings = List.of(bookingDto);
         when(bookingMockService.getBookingByStateAndOwner(anyInt(), anyInt(), anyLong(),any()))
                 .thenReturn(expectedBookings);
+
 
         mvc.perform(get("/bookings/owner")
                         .characterEncoding(StandardCharsets.UTF_8)
