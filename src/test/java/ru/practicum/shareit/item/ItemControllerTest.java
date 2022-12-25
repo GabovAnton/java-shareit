@@ -30,27 +30,22 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-
-@WebMvcTest(controllers = ItemController.class)
-/*@ExtendWith(MockitoExtension.class)
-@AutoConfigureMockMvc*/
-
+//@ExtendWith(MockitoExtension.class)
+@WebMvcTest(ItemController.class)
 class ItemControllerTest {
 
-   /* @Autowired
-    ObjectMapper mapper;*/
+    @Autowired
+    ObjectMapper mapper;
+@Mock
+ItemMapper itemMapper;
+@Mock
+CommentMapper commentMapper;
 
-    /*@Mock
-    ItemMapper itemMapper;
-
-    @Mock
-    CommentMapper commentMapper;*/
-
-   /* @MockBean
+    @MockBean
     ItemService itemMockService;
 
     @InjectMocks
-    private ItemController itemController;*/
+    private ItemController itemController;
 
     LocalDateTime currentDate = LocalDateTime
             .of(2022, 12, 10, 5, 5, 5, 5);
@@ -59,26 +54,22 @@ class ItemControllerTest {
 
     @Test
     void getItemById() {
-     /*   ReflectionTestUtils.setField(itemController, "itemService", itemMockService);
-        ReflectionTestUtils.setField(itemController, "itemMapper", itemMapper);
-        ReflectionTestUtils.setField(itemController, "commentMapper", commentMapper);*/
+        ReflectionTestUtils.setField(itemController, "itemService", itemMockService);
 
-       /* ItemDto itemDto = makeItemDto();
+        ItemDto itemDto = makeItemDto();
 
         when(itemMockService.getItemDto(anyLong(), anyLong()))
                 .thenReturn(itemDto);
 
-        when(itemMapper.itemToItemDto(any()))
-                .thenReturn(itemDto);
-
-        ResponseEntity<ItemDto> response = itemController.getItemById(1L, 1L);
+        ResponseEntity<ItemDto> response = itemController.getItemById(100L, 100L);
 
         assertThat(HttpStatus.OK, equalTo(response.getStatusCode()));
-        assertThat(itemDto, equalTo(response.getBody()));*/
+        assertThat(itemDto, equalTo(response.getBody()));
     }
 
     @Test
     void getAll() {
+
     }
 
     @Test

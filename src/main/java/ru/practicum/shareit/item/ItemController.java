@@ -21,9 +21,9 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    private final ItemMapper itemMapper;
+    private  ItemMapper itemMapper;
 
-    private final CommentMapper commentMapper;
+    private  CommentMapper commentMapper;
 
     @GetMapping("{itemId}")
     public ResponseEntity<ItemDto> getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
