@@ -15,10 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
     private final UserService userService;
 
-    @Autowired
     private final UserMapper userMapper;
 
 

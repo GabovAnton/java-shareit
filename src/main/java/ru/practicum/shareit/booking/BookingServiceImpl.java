@@ -25,6 +25,9 @@ public class BookingServiceImpl implements BookingService {
     private final UserService userService;
 
     private final ItemService itemService;
+
+    private final BookingSearchFactory bookingSearchFactory;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -77,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
             throw new EntityNotFoundException("user with id: " + ownerId + " not found");
         } else {
 
-            BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state)
+            BookingSearch bookingSearch = bookingSearchFactory.getSearchMethod(state)
                     .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
             List<BookingDto> collect = bookingSearch.getBookings(from, size, ownerId, entityManager, bookingRepository);
@@ -93,7 +96,7 @@ public class BookingServiceImpl implements BookingService {
         if (!userService.existsById(ownerId)) {
             throw new EntityNotFoundException("user with id: " + ownerId + " not found");
         } else {
-            BookingSearch bookingSearch = BookingSearchFactory.getSearchMethod(state)
+            BookingSearch bookingSearch = bookingSearchFactory.getSearchMethod(state)
                     .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
 
             List<BookingDto> collect = bookingSearch

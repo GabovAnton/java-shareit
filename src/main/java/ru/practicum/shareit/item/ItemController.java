@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.Booking;
@@ -17,16 +18,16 @@ import java.util.List;
 @Validated
 public class ItemController {
 
-    @Autowired
+
     private final ItemService itemService;
-    @Autowired
+
     private final ItemMapper itemMapper;
 
     private final CommentMapper commentMapper;
 
     @GetMapping("{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.getItemDto(itemId, userId);
+    public ResponseEntity<ItemDto> getItemById(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+        return ResponseEntity.ok(itemService.getItemDto(itemId, userId));
 
     }
 

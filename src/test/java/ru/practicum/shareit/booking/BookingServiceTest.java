@@ -45,26 +45,28 @@ import static org.mockito.Mockito.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
-
+    @Mock
     private final EntityManager em;
     LocalDateTime currentDate = LocalDateTime
             .of(2022, 12, 10, 5, 5, 5, 5);
-
+    @Mock
+    BookingSearch bookingSearch = new SearchRejected();
+    @Mock
+    BookingSearchFactory bookingSearchFactory;
     @Mock
     private BookingRepository bookingMockRepository;
     @Mock
     private UserService userMockService;
     @Mock
     private ItemService itemMockService;
-
-
-
-
+    @Mock
+    private SearchRejected searchRejected;
     @InjectMocks
     private BookingService bookingService = new BookingServiceImpl(
             bookingMockRepository,
             userMockService,
-            itemMockService);
+            itemMockService, bookingSearchFactory
+    );
     @Captor
     private ArgumentCaptor<Booking> bookingArgumentCaptor;
 
@@ -268,6 +270,7 @@ class BookingServiceTest {
     void getBookingByState_UnknownStateShouldThrowException() {
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
         ReflectionTestUtils.setField(bookingService, "userService", userMockService);
+        ReflectionTestUtils.setField(bookingService, "bookingSearchFactory", bookingSearchFactory);
 
         when(userMockService.existsById(anyLong()))
                 .thenReturn(true);
@@ -281,29 +284,18 @@ class BookingServiceTest {
 
     @Test
     void getBookingByState_ShouldReturnListOfObjects() {
-       /* long ownerId = 100L;
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
         ReflectionTestUtils.setField(bookingService, "userService", userMockService);
 
         ReflectionTestUtils.setField(bookingService, "entityManager", em);
-*//*
-        when(em.getEntityManagerFactory()).thenReturn(entityManagerFactory);
-        //  mockEntityManager.persist(any());
-      *//**//*  ReflectionTestUtils.(
-                bookingService, "checkItemOwner", booking, requesterId);
-*//**//*
 
-        when(userMockService.existsById(anyLong()))
-                .thenReturn(true);
-
-
-        BookingDto e1 = makeBookingDto();
-        List<BookingDto> bookingDtoCollection = List.of(e1);
+        ReflectionTestUtils.setField(bookingService, "bookingSearchFactory", bookingSearchFactory);
 
 
 
-        JPAQuery jpaQuery1 = mock(JPAQuery.class);
+
+  /*      JPAQuery jpaQuery1 = mock(JPAQuery.class);
 
         ReflectionTestUtils.setField(queryHelper, "query", jpaQuery1);
         ReflectionTestUtils.setField(searchRejected, "query", jpaQuery1);
@@ -328,43 +320,29 @@ class BookingServiceTest {
 
         when(jpaQuery1.offset(anyLong())).thenReturn(jpaQuery1);
 
-        when(jpaQuery1.fetch()).thenReturn(bookingDtoCollection);*//*
-
-
-
-
-
-
-
-*//*
-        BookingSearch bookingSearch = new SearchRejected();
-        when(userMockService.existsById(anyLong()))
-                .thenReturn(true);*//*
-
-        JPAQuery<Booking> jpaQuery1 = new JPAQuery<>(em);
-
-
-       // when(QueryHelper.getQuery(em)).thenReturn(jpaQuery1);
-     //   doReturn(jpaQuery1).when(QueryHelper.getQuery(any()));
-
-
+        when(jpaQuery1.fetch()).thenReturn(bookingDtoCollection);
+*/
 
         when(userMockService.existsById(anyLong()))
                 .thenReturn(true);
+
+        when(bookingSearchFactory.getSearchMethod("REJECTED"))
+                .thenReturn(Optional.of(searchRejected));
+
+
         List<BookingDto> bookingDtoCollection = List.of(makeBookingDto());
-        SearchRejected searchRejected = mock(SearchRejected.class);
 
+        when(searchRejected.getBookings(1, 5, 100L, em, bookingMockRepository))
+                .thenReturn(bookingDtoCollection);
 
-    *//*    when(bookingService.getBookingByState(1,5,100L,"REJECTED"))
-                .thenReturn(bookingDtoCollection);*//*
-        doReturn(bookingDtoCollection).when(bookingService).getBookingByState(anyInt(),5,100L,"REJECTED");
         List<BookingDto> bookingDtoFromRepository = bookingService
                 .getBookingByState(1, 5, 100L, "REJECTED");
 
-      //  Mockito.verify(searchRejected, atLeast(1)).getBookings(1, 5, 100L, em, bookingMockRepository);
+        Mockito.verify(searchRejected, atLeast(1))
+                .getBookings(1, 5, 100L, em, bookingMockRepository);
 
 
-        assertThat(bookingDtoCollection, equalTo(bookingDtoFromRepository));*/
+        assertThat(bookingDtoCollection, equalTo(bookingDtoFromRepository));
 
 
     }
@@ -375,6 +353,8 @@ class BookingServiceTest {
         long ownerId = 100L;
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
         ReflectionTestUtils.setField(bookingService, "userService", userMockService);
+        ReflectionTestUtils.setField(bookingService, "bookingSearchFactory", bookingSearchFactory);
+
 
         when(userMockService.existsById(anyLong()))
                 .thenReturn(false);
@@ -391,6 +371,7 @@ class BookingServiceTest {
     void getBookingByStateAndOwner_UnknownStateShouldThrowException() {
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
         ReflectionTestUtils.setField(bookingService, "userService", userMockService);
+        ReflectionTestUtils.setField(bookingService, "bookingSearchFactory", bookingSearchFactory);
 
         when(userMockService.existsById(anyLong()))
                 .thenReturn(true);
