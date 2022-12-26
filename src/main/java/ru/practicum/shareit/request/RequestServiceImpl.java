@@ -33,6 +33,8 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final UserService userService;
     private final RequestMapper requestMapper;
+
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -41,9 +43,10 @@ public class RequestServiceImpl implements RequestService {
         QRequest qRequest = QRequest.request;
 
         User user = userService.getUser(userId);
-        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+        JPAQuery<Request> query = new JPAQuery<>(entityManager);
 
-        List<RequestWithProposalsDto> requests = queryFactory.selectFrom(qRequest)
+
+        List<RequestWithProposalsDto> requests = query.from(qRequest)
                 .where(qRequest.requester.id.eq(user.getId()))
                 .orderBy(qRequest.created.desc())
                 .fetch().stream()
@@ -58,7 +61,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public RequestDto SaveRequest(RequestDto requestDto, Long userId) {
+    public RequestDto saveRequest(RequestDto requestDto, Long userId) {
         Request request = requestMapper.requestDtoToRequest(requestDto);
         request.setRequester(userService.getUser(userId));
         request.setCreated(LocalDateTime.now());
@@ -69,10 +72,6 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestWithProposalsDto> getAllFromOthers(Integer from, Integer size, Long userId) {
-        // int page = (int) Math.round(Math.floor(from / size));
-
-        //  PageRequest pageRequest = PageRequest.of(page, size, Sort.by("created_date"));
-
 
         QRequest request = QRequest.request;
 
@@ -93,10 +92,6 @@ public class RequestServiceImpl implements RequestService {
             x.setItems(getItemsDto(x.getId())))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
-        /*      return   requestRepository.getByRequester_IdNotOrderByCreatedDateDesc(userId, pageRequest).stream()
-                .filter(Objects::nonNull)
-                .map(requestMapper::requestToRequestDto)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));*/
     }
 
     @Override

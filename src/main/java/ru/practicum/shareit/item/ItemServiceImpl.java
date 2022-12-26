@@ -1,10 +1,10 @@
 package ru.practicum.shareit.item;
 
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
@@ -13,7 +13,6 @@ import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.ShareItValidationException;
-import ru.practicum.shareit.request.QRequest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 
@@ -32,10 +31,11 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
 
     private final UserService userService;
+    @Autowired
+    private   ItemMapper itemMapper;
 
-    private final ItemMapper itemMapper;
-
-    private final CommentMapper commentMapper;
+    @Autowired
+    private  CommentMapper commentMapper;
 
     private final CommentRepository commentRepository;
 
@@ -106,11 +106,13 @@ public class ItemServiceImpl implements ItemService {
         if (bookings.size() > 1) {
             Long lastBookingId = getBookingId(bookings, 0);
             Long lastBookerId = getBookerId(bookings, 0);
-            itemDto.setLastBooking(lastBookingId != null && lastBookerId != null ? new ItemLastBookingDto(lastBookingId, lastBookerId) : null);
+            itemDto.setLastBooking(lastBookingId != null
+                    && lastBookerId != null ? new ItemLastBookingDto(lastBookingId, lastBookerId) : null);
 
             Long nextBookingId = getBookingId(bookings, 1);
             Long nextBookerId = getBookerId(bookings, 1);
-            itemDto.setNextBooking(lastBookingId != null && lastBookerId != null ? new ItemNextBookingDto(nextBookingId, nextBookerId) : null);
+            itemDto.setNextBooking(lastBookingId != null
+                    && lastBookerId != null ? new ItemNextBookingDto(nextBookingId, nextBookerId) : null);
         }
 
         return itemDto;

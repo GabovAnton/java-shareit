@@ -44,22 +44,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserUpdateDto userUpdateDto, Long userId) {
+    public UserDto update(UserUpdateDto userUpdateDto, Long userToUpdateId, Long userId) {
 
-        User userToUpdate = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
+        User userToUpdate = userRepository.findById(userToUpdateId).orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
 
         userMapper.updateUserFromUserUpdateDto(userUpdateDto, userToUpdate);
         User save = userRepository.save(userToUpdate);
-        log.debug("user with id: {} updated: {}", userId, save);
+        log.debug("user with id: {} updated: {}", userToUpdateId, save);
 
         return userMapper.userToUserDto(save);
     }
 
     @Override
-    public boolean delete(long userId) {
-
-        userRepository.deleteById(userId);
-        log.debug("user with id: {} deleted", userId);
+    public boolean delete(Long userToDeleteId, Long userId) {
+//TODO логика-кто может удалять
+        userRepository.deleteById(userToDeleteId);
+        log.debug("user with id: {} deleted", userToDeleteId);
 
         return true;
     }

@@ -1,13 +1,19 @@
 package ru.practicum.shareit.user;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
-@Data
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
@@ -21,8 +27,9 @@ public class UserDto {
     @Email
     private String email;
 
-    @DateTimeFormat
-    private String registrationDate;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern="uuuu-MM-dd'T'HH:mm:ss")
+    private LocalDateTime registrationDate;
 
 
 }

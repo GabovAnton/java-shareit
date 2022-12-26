@@ -1,64 +1,66 @@
 package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingController;
-import ru.practicum.shareit.booking.BookingDto;
 import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserDto;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-//@ExtendWith(MockitoExtension.class)
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@AutoConfigureJsonTesters
 @WebMvcTest(ItemController.class)
 class ItemControllerTest {
 
     @Autowired
     ObjectMapper mapper;
-@Mock
-ItemMapper itemMapper;
-@Mock
-CommentMapper commentMapper;
 
     @MockBean
-    ItemService itemMockService;
+    ItemService itemService;
 
     @InjectMocks
-    private ItemController itemController;
+    ItemController itemController;
 
     LocalDateTime currentDate = LocalDateTime
             .of(2022, 12, 10, 5, 5, 5, 5);
-  /*  @Autowired
-    private MockMvc mvc;*/
+    @Autowired
+    private MockMvc mvc;
+
 
     @Test
-    void getItemById() {
-        ReflectionTestUtils.setField(itemController, "itemService", itemMockService);
+    void getItemById_whenInvoked() {
+        ReflectionTestUtils.setField(itemController, "itemService", itemService);
 
         ItemDto itemDto = makeItemDto();
 
-        when(itemMockService.getItemDto(anyLong(), anyLong()))
+        when(itemService.getItemDto(anyLong(), anyLong()))
                 .thenReturn(itemDto);
 
         ResponseEntity<ItemDto> response = itemController.getItemById(100L, 100L);
@@ -68,24 +70,136 @@ CommentMapper commentMapper;
     }
 
     @Test
-    void getAll() {
+    void getAll_ShouldReturnList() throws Exception {
+
+        ItemDto itemDto = makeItemDto();
+        List<ItemDto> expectedItems = List.of(itemDto);
+        when(itemService.getAll(anyInt(), anyInt(), anyLong()))
+                .thenReturn(expectedItems);
+        mvc.perform(get("/items")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL)
+                        .param("from", "5")
+                        .param("size", "5")
+                        .header("X-Sharer-User-Id", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].name", equalTo(itemDto.getName())))
+                .andExpect(jsonPath("$[0].id", is(itemDto.getId()), Long.class));
+    }
+
+    @Test
+    void create_ShouldReturnSameObject() throws Exception {
+
+        ItemDto itemDto = makeItemDto();
+        Item item = makeItem();
+
+
+        when(itemService.save(any(), anyLong()))
+                .thenReturn(item);
+
+
+        mvc.perform(post("/items")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", "1"))
+                .andDo(print())
+                .andExpect(status().isOk()).andDo(print())
+                .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
+                .andExpect(jsonPath("$.name", equalTo(itemDto.getName())));
+
+    }
+
+
+    @Test
+    void create_ByWrongPersonThenEntityNotFoundExceptionThrown() throws Exception {
+
+        ItemDto itemDto = makeItemDto();
+        Item item = makeItem();
+        when(itemService.save(any(), anyLong()))
+                .thenThrow(new EntityNotFoundException("foo"));
+
+
+        mvc.perform(post("/items")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", "1"))
+
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(404));
 
     }
 
     @Test
-    void create() {
+    void update_ShouldReturnUpdatedEntity() throws Exception {
+        ItemDto itemDto = makeItemDto();
+        ItemPatchDto itemPatchDto = makePathDto();
+
+        when(itemService.update(any(), anyLong()))
+                .thenReturn(itemDto);
+
+        mvc.perform(patch("/items/{itemId}", 1L)
+                        .content(mapper.writeValueAsString(itemPatchDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", "1"))
+                .andExpect(status().isOk()).andDo(print())
+                .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
+                .andExpect(jsonPath("$.name", equalTo(itemDto.getName())));
+
     }
 
     @Test
-    void update() {
+    void searchByQuery_ShouldReturnListOfEntity() throws Exception {
+        ItemDto itemDto = makeItemDto();
+        List<ItemDto> expectedItems = List.of(itemDto);
+
+        when(itemService.search(anyInt(), anyInt(), anyString()))
+                .thenReturn(expectedItems);
+
+        mvc.perform(get("/items/search/")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("from", "5")
+                        .param("size", "5")
+                        .param("text", "отВертКа")
+                        .header("X-Sharer-User-Id", "1"))
+                .andDo(print())
+                .andExpect(status().isOk()).andDo(print())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(itemDto.getId()), Long.class))
+                .andExpect(jsonPath("$[0].name", equalTo(itemDto.getName())));
     }
 
     @Test
-    void searchByQuery() {
-    }
+    void postComment_ShouldReturnSameObject() throws Exception {
+        Comment comment = makeComment();
+        CommentDto commentDto = makeCommentDto();
 
-    @Test
-    void postComment() {
+
+        when(itemService.saveComment(any(), anyLong(), any()))
+                .thenReturn(comment);
+
+
+        mvc.perform(post("/items/{itemId}/comment", 100L)
+                        .content(mapper.writeValueAsString(commentDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", "1"))
+                .andDo(print())
+                .andExpect(status().isOk()).andDo(print())
+                .andExpect(jsonPath("$.id", is(comment.getId()), Long.class))
+                .andExpect(jsonPath("$.text", equalTo(comment.getText())));
+
     }
 
     private ItemDto makeItemDto() {
@@ -157,11 +271,34 @@ CommentMapper commentMapper;
         return comment;
     }
 
+    private CommentDto makeCommentDto() {
+        return new CommentDto(
+                100L,
+                "good thing",
+                100L,
+                "Artur",
+                currentDate.minusDays(1)
+        );
+
+    }
+
     private User makeUser() {
         User user = new User();
         user.setId(100L);
         user.setName("Artur");
         user.setEmail("artur@gmail.com");
         return user;
+    }
+
+    private ItemPatchDto makePathDto() {
+        return new ItemPatchDto(
+                100L,
+                "UpdatedName",
+                "updated description",
+                true,
+                100L
+
+        );
+
     }
 }

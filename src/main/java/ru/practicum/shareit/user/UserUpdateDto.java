@@ -1,8 +1,6 @@
 package ru.practicum.shareit.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.item.CommentDto;
 import ru.practicum.shareit.item.ItemDto;
 
@@ -14,18 +12,20 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class UserUpdateDto implements Serializable {
 
-    private final Long id;
+    private  Long id;
 
-    private final Set<ItemDto> items;
+    private  Set<ItemDto> items;
 
-    private final Set<CommentDto> Comments;
+    private  Set<CommentDto> Comments;
 
-    private final String name;
+    private  String name;
 
-    private final String email;
+    private  String email;
 
-    private final LocalDate registrationDate;
+    private  String registrationDate;
 
 }

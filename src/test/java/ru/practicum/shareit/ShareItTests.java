@@ -238,7 +238,7 @@ class ShareItTests {
             request.setRequester(users.get(0));
 
             RequestDto requestDto = requestMapper.requestToRequestDto(request);
-            requestService.SaveRequest(requestDto, users.get(0).getId());
+            requestService.saveRequest(requestDto, users.get(0).getId());
 
         }
 

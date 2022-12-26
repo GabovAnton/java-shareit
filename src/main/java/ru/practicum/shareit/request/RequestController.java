@@ -24,7 +24,7 @@ public class RequestController {
     @PostMapping()
     public RequestDto create(@Valid @RequestBody RequestDto requestDto,
                              @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return requestService.SaveRequest(requestDto, userId);
+        return requestService.saveRequest(requestDto, userId);
     }
 
     //GET /requests/all?from={from}&size={size}

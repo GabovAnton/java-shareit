@@ -4,7 +4,8 @@ import java.util.List;
 
 public interface RequestService {
     List<RequestWithProposalsDto> getAll(Long userId);
-    RequestDto SaveRequest(RequestDto requestDto, Long userId);
+    
+    RequestDto saveRequest(RequestDto requestDto, Long userId);
 
     List<RequestWithProposalsDto> getAllFromOthers(Integer from, Integer size, Long userId);
 
