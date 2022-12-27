@@ -31,7 +31,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAll() {
 
-        List<UserDto> userList = userRepository.findAll().stream().filter(Objects::nonNull).map(userMapper::userToUserDto).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        List<UserDto> userList = userRepository.findAll().stream().filter(Objects::nonNull)
+                .map(UserMapper.INSTANCE::userToUserDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         log.debug("all items requested: {}", userList.size());
         return userList;
     }

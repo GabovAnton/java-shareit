@@ -200,16 +200,6 @@ class RequestServiceTest {
 
     }
 
-    @Test
-    void getAllFromOthers() {
-
-
-    }
-
-    @Test
-    void getRequest() {
-    }
-
     private ItemDto makeItemDto() {
         ItemDto itemDto = new ItemDto();
         itemDto.setId(100L);

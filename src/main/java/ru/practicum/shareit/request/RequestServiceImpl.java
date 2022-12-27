@@ -100,7 +100,7 @@ public class RequestServiceImpl implements RequestService {
         if (!requestRepository.existsById(requestId)){
             throw new EntityNotFoundException("request with id: " + requestId + " not found");
         }
-        User user = userService.getUser(userId);
+        userService.getUser(userId);
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         RequestWithProposalsDto request = requestMapper.requestToRequestWithProposalDto(queryFactory.selectFrom(qRequest)

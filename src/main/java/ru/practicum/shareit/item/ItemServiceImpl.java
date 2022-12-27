@@ -182,7 +182,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream().filter(Objects::nonNull)
                 .map(itemMapper::itemToItemDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) : new ArrayList<>();*/
-        log.debug("searh for item with query: {} returned result: {}", text, itemDtos);
+        log.debug("search for item with query: {} returned result: {}", text, itemDtos);
 
         return itemDtos;
 

@@ -1,5 +1,8 @@
 package ru.practicum.shareit.item;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.*;
 
 import java.io.Serializable;
@@ -8,15 +11,18 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class CommentDto implements Serializable {
 
-    private final Long id;
+    private  Long id;
 
-    private final String text;
+    private  String text;
 
-    private final Long authorId;
+    private  Long authorId;
 
-    private final String authorName;
+    private  String authorName;
 
-    private final LocalDateTime created;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern="uuuu-MM-dd'T'HH:mm:ss")
+    private  LocalDateTime created;
 }

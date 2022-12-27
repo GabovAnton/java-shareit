@@ -6,6 +6,8 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @JsonTest
@@ -13,20 +15,29 @@ public class UserDtoJsonTest {
 
     @Autowired
     private JacksonTester<UserDto> json;
+    LocalDateTime currentDate = LocalDateTime
+            .of(2022, 12, 10, 5, 5, 5, 5);
 
     @Test
     void testUserDto() throws Exception {
-        /* UserDto userDto = new UserDto(
-                1L,
-                "John",
-                "john.doe@mail.com",
-                "2022.07.03 19:55:00");
 
-        JsonContent<UserDto> result = json.write(userDto);
 
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
-        assertThat(result).extractingJsonPathStringValue("$.firstName").isEqualTo("John");
-        assertThat(result).extractingJsonPathStringValue("$.lastName").isEqualTo("Doe");
-        assertThat(result).extractingJsonPathStringValue("$.email").isEqualTo("john.doe@mail.com");*/
+        JsonContent<UserDto> result = json.write(makeUserDto());
+
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(100);
+        assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("Artur");
+        assertThat(result).extractingJsonPathStringValue("$.email").isEqualTo("artur@gmail.com");
+        assertThat(result).extractingJsonPathStringValue("$.registrationDate")
+                .isEqualTo("2022-11-25T05:05:05");
     }
+
+    private UserDto makeUserDto() {
+        UserDto user = new UserDto();
+        user.setId(100L);
+        user.setName("Artur");
+        user.setEmail("artur@gmail.com");
+        user.setRegistrationDate(currentDate.minusDays(15));
+        return user;
+    }
+
 }
