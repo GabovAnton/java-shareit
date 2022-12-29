@@ -8,10 +8,5 @@ public interface RequestMapper {
 
     RequestWithProposalsDto requestToRequestWithProposalDto(Request request);
 
-    Request requestDtoToRequest(RequestWithProposalsDto requestDto);
-
     RequestDto requestToRequestDto(Request request);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Request updateRequestFromRequestDto(RequestDto requestDto, @MappingTarget Request request);
 }

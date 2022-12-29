@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -20,13 +17,10 @@ public class UserController {
 
     private final UserService userService;
 
-
-
     @GetMapping("{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable long userId) {
         return ResponseEntity.ok(UserMapper.INSTANCE.userToUserDto(userService.getUser(userId)));
     }
-
 
     @GetMapping()
     public List<UserDto> getAll() {

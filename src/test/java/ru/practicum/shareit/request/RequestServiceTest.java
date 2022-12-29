@@ -19,11 +19,7 @@ import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -39,30 +35,14 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
 class RequestServiceTest {
-    @Mock
-    private final EntityManager em;
-    @Mock
-    CriteriaBuilder builder;
-    @Mock
-    CriteriaQuery<Request> criteriaQuery;
-    @Mock
-    CriteriaQuery<Long> countCriteriaQuery;
-    @Mock
-    TypedQuery<Request> query;
     LocalDateTime currentDate = LocalDateTime
             .of(2022, 12, 10, 5, 5, 5, 5);
     @Mock
     private RequestMapper requestMapper;
     @Mock
     private UserService userService;
-    @Mock
-    private UserMapper userMapper;
-    @Mock
-    private JPAQueryFactory queryFactory;
     @Captor
     private ArgumentCaptor<Request> requestArgumentCaptor;
-    @Mock
-    private EntityManagerFactory entityManagerFactory;
     @Mock
     private RequestRepository requestRepository;
     @InjectMocks
@@ -88,93 +68,6 @@ class RequestServiceTest {
         });
         assertThat(entityNotFoundException.getMessage(),
                 equalTo("user with id: " + userId + " doesn't exists"));
-
-    }
-
-    @Test
-    void getAll_ShouldReturnList() {
-
-     /*   ReflectionTestUtils.setField(requestService, "entityManager", em);
-
-
-        ReflectionTestUtils.setField(requestService, "userService", userService);
-        RequestWithProposalsDto requestWithProposalsDto = makeRequestWithProposalsDto();
-        List<RequestWithProposalsDto> expectedItems = List.of(requestWithProposalsDto);
-        User user = makeUser();
-
-        Long userId =100L;
-
-      *//*  when(entityManagerFactory.getCache())
-                .thenReturn(emfCache);*//*
-        when(em.getEntityManagerFactory())
-                .thenReturn(entityManagerFactory);
-        when(em.getEntityManagerFactory())
-                .thenReturn(entityManagerFactory);
-       *//* when(entityManagerMock.createNamedQuery("User.findAll"))
-                .thenReturn(findAllQuery);
-        when(findAllQuery.getResultList())
-                .thenReturn(mockUsersDbCollection);*//*
-
-
-     //   when(em.find(any(),anyLong())).thenReturn( makeRequest());
-        //when(em.)
-       // when(em.find(Customer.class,1L)).thenReturn(sampleCustomer);
-       // JPAQuery jpaQuery = Mockito.mock(JPAQuery.class<>(em));
-
-        //QRequest qRequest   = Mockito.mock(QRequest.class);
-
-       // ReflectionTestUtils.setField(requestService, "query", jpaQuery);
-
-      //  when(jpaQuery.fetch()).thenReturn(expectedItems);
-//when(jpaQuery.from(qRequest)).thenReturn(jpaQuery);
-
-*//*
-        when(queryFactory.selectFrom(any())).thenReturn(jpaQuery);
-     //   when(queryFactory.selectFrom(any())).thenReturn(jpaQuery);
-        when(jpaQuery.where(any(BooleanExpression.class))).thenReturn(jpaQuery);
-        when(jpaQuery.orderBy(any(OrderSpecifier.class))).thenReturn(jpaQuery);
-        when(jpaQuery.fetch()).thenReturn(expectedItems);*//*
-
-     //   requestService.getAll(100L);
-
-        *//*when(jpaQuery.select(any(Expression.class))).thenReturn(jpaQuery);
-
-        when(jpaQuery.limit(anyLong())).thenReturn(jpaQuery);
-        when(jpaQuery.offset(anyLong())).thenReturn(jpaQuery);
-        when(jpaQuery.fetch()).thenReturn(expectedItems);*//*
-        //JPAQueryFactory queryFactory = Mockito.mock(JPAQueryFactory.class, Mockito.RETURNS_DEEP_STUBS);
-
-
-
-        when(userService.getUser(anyLong()))
-                .thenReturn(makeUser());
-
-    //    JPAQuery step1 = Mockito.mock(JPAQuery.class);
-
-
-       *//* when(queryFactory.from(qRequest)).thenReturn(step1);
-
-
-        JPAQuery step2 = Mockito.mock(JPAQuery.class);
-        Mockito.when(step1.where(any(BooleanExpression.class))).thenReturn(step2);
-
-        JPAQuery step3 = Mockito.mock(JPAQuery.class);
-        Mockito.when(step2.orderBy(any(OrderSpecifier.class))).thenReturn(step3);
-
-        when(step2.fetch()).thenReturn(expectedItems);
-*//*
-
-
-        when(em.getCriteriaBuilder()).thenReturn(builder);
-        when(builder.createQuery(Request.class)).thenReturn(criteriaQuery);
-        when(em.createQuery(criteriaQuery)).thenReturn(query);
-        when(query.getResultList()).thenReturn(List.of(makeRequest()));
-
-        //when(em.createQuery(any(), eq(Request.class))).thenReturn(query);
-     *//*   when(query.setParameter(any(String.class), any(String.class))).thenReturn(query);
-        when(query.getResultList()).thenReturn(List.of(makeRequest()));*//*
-
-        requestService.getAll(100L);*/
 
     }
 
@@ -260,13 +153,4 @@ class RequestServiceTest {
         return request;
     }
 
-    private RequestWithProposalsDto makeRequestWithProposalsDto() {
-        return new RequestWithProposalsDto(
-                100L,
-                "some item",
-                makeUserDto(),
-                currentDate.minusDays(2),
-                List.of(makeItemDto())
-        );
-    }
 }

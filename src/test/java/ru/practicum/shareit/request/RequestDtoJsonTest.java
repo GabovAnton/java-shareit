@@ -20,13 +20,13 @@ public class RequestDtoJsonTest {
     private JacksonTester<UserDto> UserDtoJson;
     LocalDateTime currentDate = LocalDateTime
             .of(2022, 12, 10, 5, 5, 5, 5);
+
     @Test
     void testRequestDto() throws Exception {
 
 
         JsonContent<RequestDto> result = json.write(makeRequestDto());
         JsonContent<UserDto> userDtoJsonContent = UserDtoJson.write(makeUserDto());
-
 
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(100);
@@ -53,6 +53,7 @@ public class RequestDtoJsonTest {
         user.setRegistrationDate(currentDate.minusDays(15));
         return user;
     }
+
     private RequestDto makeRequestDto() {
         return new RequestDto(
                 100L,

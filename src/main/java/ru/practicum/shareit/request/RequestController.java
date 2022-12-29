@@ -27,7 +27,6 @@ public class RequestController {
         return requestService.saveRequest(requestDto, userId);
     }
 
-    //GET /requests/all?from={from}&size={size}
     @GetMapping("/all")
     public List<RequestWithProposalsDto> getAllFromOthers(@RequestParam(required = false)
                                                  @Min(value = 0, message = "from should be positive") Integer from,
@@ -37,7 +36,6 @@ public class RequestController {
         return requestService.getAllFromOthers(from, size, userId);
     }
 
-    //GET /requests/{requestId}
     @GetMapping("{requestId}")
     public RequestWithProposalsDto getBookingById(@PathVariable Long requestId,
                                                   @RequestHeader("X-Sharer-User-Id") long userId) {

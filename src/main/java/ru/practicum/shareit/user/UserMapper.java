@@ -1,13 +1,11 @@
 package ru.practicum.shareit.user;
 
-
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
-import ru.practicum.shareit.booking.BookingMapper;
-
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface UserMapper {
+
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     User userDtoToUser(UserDto userDto);

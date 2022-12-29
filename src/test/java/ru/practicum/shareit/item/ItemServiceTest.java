@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -13,22 +12,19 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.ShareItValidationException;
-import ru.practicum.shareit.request.*;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserService;
 
 import javax.persistence.EntityManager;
-
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 
@@ -204,12 +200,7 @@ class ItemServiceTest {
 
         Long itemId = 100L;
 
-        ItemShortAvailability itemShortAvailability = new ItemShortAvailability() {
-            @Override
-            public Boolean getAvailable() {
-                return false;
-            }
-        };
+        ItemShortAvailability itemShortAvailability = () -> false;
 
         when(itemRepository.isItemAvailable(anyLong()))
                 .thenReturn(Optional.of(itemShortAvailability));
@@ -224,29 +215,6 @@ class ItemServiceTest {
         verify(itemRepository, never()).save(any());
 
     }
-
-    private ItemDto makeItemDto() {
-        ItemDto itemDto = new ItemDto();
-        itemDto.setId(100L);
-        itemDto.setName("thing");
-        itemDto.setDescription("just simple thing");
-        itemDto.setAvailable(true);
-        itemDto.setRequestId(100L);
-        itemDto.setLastBooking(new ItemLastBookingDto(100L, 100L));
-        itemDto.setNextBooking(new ItemNextBookingDto(100L, 100L));
-
-        CommentDto commentDto = new CommentDto(100L,
-                "good thing",
-                101L,
-                "Artur",
-                LocalDateTime.now().minusDays(100));
-
-        itemDto.setComments(Set.of(commentDto));
-        itemDto.setOwner(new UserDto());
-
-        return itemDto;
-    }
-
 
     private User makeUser() {
         User user = new User();

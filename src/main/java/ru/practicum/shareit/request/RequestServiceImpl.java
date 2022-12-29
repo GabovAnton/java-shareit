@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -34,15 +33,16 @@ public class RequestServiceImpl implements RequestService {
     private final UserService userService;
     private final RequestMapper requestMapper;
 
-
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
     public List<RequestWithProposalsDto> getAll(Long userId) {
+
         QRequest qRequest = QRequest.request;
 
         User user = userService.getUser(userId);
+
         JPAQuery<Request> query = new JPAQuery<>(entityManager);
 
 
@@ -62,9 +62,13 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public RequestDto saveRequest(RequestDto requestDto, Long userId) {
+
         Request request = requestMapper.requestDtoToRequest(requestDto);
+
         request.setRequester(userService.getUser(userId));
+
         request.setCreated(LocalDateTime.now());
+
         Request save = requestRepository.save(request);
 
         return requestMapper.requestToRequestDto(save);
@@ -76,7 +80,9 @@ public class RequestServiceImpl implements RequestService {
         QRequest request = QRequest.request;
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+
         long TotalItems = requestRepository.count() + 1;
+
         int offset = from != null ? (from > 1 ? --from : from) : 0;
 
         List<RequestWithProposalsDto> requests = queryFactory.selectFrom(request)
@@ -103,7 +109,8 @@ public class RequestServiceImpl implements RequestService {
         userService.getUser(userId);
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-        RequestWithProposalsDto request = requestMapper.requestToRequestWithProposalDto(queryFactory.selectFrom(qRequest)
+        RequestWithProposalsDto request = requestMapper
+                .requestToRequestWithProposalDto(queryFactory.selectFrom(qRequest)
                 .where(qRequest.id.eq(requestId))
                 .fetchOne());
         request.setItems(getItemsDto(request.getId()));

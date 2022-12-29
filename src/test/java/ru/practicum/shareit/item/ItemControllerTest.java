@@ -56,6 +56,7 @@ class ItemControllerTest {
 
     @Test
     void getItemById_whenInvoked() {
+
         ReflectionTestUtils.setField(itemController, "itemService", itemService);
 
         ItemDto itemDto = makeItemDto();
@@ -66,6 +67,7 @@ class ItemControllerTest {
         ResponseEntity<ItemDto> response = itemController.getItemById(100L, 100L);
 
         assertThat(HttpStatus.OK, equalTo(response.getStatusCode()));
+
         assertThat(itemDto, equalTo(response.getBody()));
     }
 
@@ -73,9 +75,12 @@ class ItemControllerTest {
     void getAll_ShouldReturnList() throws Exception {
 
         ItemDto itemDto = makeItemDto();
+
         List<ItemDto> expectedItems = List.of(itemDto);
+
         when(itemService.getAll(anyInt(), anyInt(), anyLong()))
                 .thenReturn(expectedItems);
+
         mvc.perform(get("/items")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -94,12 +99,11 @@ class ItemControllerTest {
     void create_ShouldReturnSameObject() throws Exception {
 
         ItemDto itemDto = makeItemDto();
-        Item item = makeItem();
 
+        Item item = makeItem();
 
         when(itemService.save(any(), anyLong()))
                 .thenReturn(item);
-
 
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
@@ -119,7 +123,6 @@ class ItemControllerTest {
     void create_ByWrongPersonThenEntityNotFoundExceptionThrown() throws Exception {
 
         ItemDto itemDto = makeItemDto();
-        Item item = makeItem();
         when(itemService.save(any(), anyLong()))
                 .thenThrow(new EntityNotFoundException("foo"));
 
@@ -138,7 +141,9 @@ class ItemControllerTest {
 
     @Test
     void update_ShouldReturnUpdatedEntity() throws Exception {
+
         ItemDto itemDto = makeItemDto();
+
         ItemPatchDto itemPatchDto = makePathDto();
 
         when(itemService.update(any(), anyLong()))
@@ -158,7 +163,9 @@ class ItemControllerTest {
 
     @Test
     void searchByQuery_ShouldReturnListOfEntity() throws Exception {
+
         ItemDto itemDto = makeItemDto();
+
         List<ItemDto> expectedItems = List.of(itemDto);
 
         when(itemService.search(anyInt(), anyInt(), anyString()))
@@ -181,13 +188,13 @@ class ItemControllerTest {
 
     @Test
     void postComment_ShouldReturnSameObject() throws Exception {
-        Comment comment = makeComment();
-        CommentDto commentDto = makeCommentDto();
 
+        Comment comment = makeComment();
+
+        CommentDto commentDto = makeCommentDto();
 
         when(itemService.saveComment(any(), anyLong(), any()))
                 .thenReturn(comment);
-
 
         mvc.perform(post("/items/{itemId}/comment", 100L)
                         .content(mapper.writeValueAsString(commentDto))
@@ -249,6 +256,7 @@ class ItemControllerTest {
     }
 
     private Booking makeBooking() {
+
         Booking booking = new Booking();
         booking.setBooker(new User());
         booking.setStart(currentDate.minusDays(2));
@@ -297,7 +305,6 @@ class ItemControllerTest {
                 "updated description",
                 true,
                 100L
-
         );
 
     }

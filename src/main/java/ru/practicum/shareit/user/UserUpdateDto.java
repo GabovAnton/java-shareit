@@ -5,7 +5,6 @@ import ru.practicum.shareit.item.CommentDto;
 import ru.practicum.shareit.item.ItemDto;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Set;
 
 

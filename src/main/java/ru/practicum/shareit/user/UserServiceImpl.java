@@ -22,7 +22,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(long id) {
 
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("user with id: " + id + " doesn't exists"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user with id: " + id + " doesn't exists"));
         log.debug("user with id: {} requested: {}", id, user);
 
         return user;
@@ -34,24 +35,32 @@ public class UserServiceImpl implements UserService {
         List<UserDto> userList = userRepository.findAll().stream().filter(Objects::nonNull)
                 .map(UserMapper.INSTANCE::userToUserDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
         log.debug("all items requested: {}", userList.size());
+
         return userList;
     }
 
     @Override
     public User save(User user) {
+
         User savedUser = userRepository.save(user);
+
         log.debug("new user created: {}", savedUser);
+
         return savedUser;
     }
 
     @Override
     public UserDto update(UserUpdateDto userUpdateDto, Long userToUpdateId, Long userId) {
 
-        User userToUpdate = userRepository.findById(userToUpdateId).orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
+        User userToUpdate = userRepository.findById(userToUpdateId)
+                .orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
 
         userMapper.updateUserFromUserUpdateDto(userUpdateDto, userToUpdate);
+
         User save = userRepository.save(userToUpdate);
+
         log.debug("user with id: {} updated: {}", userToUpdateId, save);
 
         return userMapper.userToUserDto(save);
@@ -59,8 +68,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean delete(Long userToDeleteId, Long userId) {
-//TODO логика-кто может удалять
+
         userRepository.deleteById(userToDeleteId);
+
         log.debug("user with id: {} deleted", userToDeleteId);
 
         return true;
@@ -68,6 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean existsById(long userId) {
+
         return userRepository.existsById(userId);
     }
 

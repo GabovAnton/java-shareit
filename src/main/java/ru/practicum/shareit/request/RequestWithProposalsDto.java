@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-/**
- * A DTO for the {@link Request} entity
- */
 @Data
 @Builder
 public class RequestWithProposalsDto implements Serializable {

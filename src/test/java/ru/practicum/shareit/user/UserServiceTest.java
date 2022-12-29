@@ -34,8 +34,6 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-    @Mock
-    private final EntityManager em;
 
     LocalDateTime currentDate = LocalDateTime
             .of(2022, 12, 10, 5, 5, 5, 5);
@@ -44,9 +42,6 @@ class UserServiceTest {
     UserRepository userRepository;
     @Mock
     private  UserMapper userMapper;
-
-    @Captor
-    private ArgumentCaptor<User> userArgumentCaptor;
 
     @InjectMocks
     private UserService userService = new UserServiceImpl(
@@ -148,16 +143,6 @@ class UserServiceTest {
         user.setName("Artur");
         user.setEmail("artur@gmail.com");
 
-        return user;
-    }
-
-
-    private UserDto makeUserDto() {
-        UserDto user = new UserDto();
-        user.setId(100L);
-        user.setName("Artur");
-        user.setEmail("artur@gmail.com");
-        user.setRegistrationDate(currentDate.minusDays(15));
         return user;
     }
 

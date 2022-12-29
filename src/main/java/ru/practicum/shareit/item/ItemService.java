@@ -6,7 +6,6 @@ public interface ItemService {
 
     ItemDto getItemDto(long id, long userId);
 
-   // List<ItemDto> getAll(long userId);
     List<ItemDto> getAll(Integer from, Integer size, long userId);
 
     Item map(long id);

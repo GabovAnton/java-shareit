@@ -55,8 +55,7 @@ class BookingControllerTest {
     private BookingCreateDto bookingCreateDto;
     private Booking booking;
     private MockMvc mvc;
-    @Captor
-    private ArgumentCaptor<Booking> bookingArgumentCaptor;
+
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
 
     @BeforeEach
@@ -73,14 +72,23 @@ class BookingControllerTest {
                 .build();
 
         Item item = new Item();
+
         item.setName("test Item");
+
         item.setDescription("test description");
+
         item.setId(100L);
+
         booking = new Booking();
+
         booking.setBooker(new User());
+
         booking.setStart(currentDate.minusDays(2));
+
         booking.setEnd(currentDate.plusDays(2));
+
         booking.setStatus(BookingStatus.WAITING);
+
         booking.setItem(item);
 
         booking.setId(100L);
@@ -98,13 +106,17 @@ class BookingControllerTest {
 
     @Test
     void getBookingById_whenInvoked() {
+
         when(bookingMockService.getBooking(anyLong(), anyLong()))
                 .thenReturn(booking);
+
         when(bookingMapper.bookingToBookingDto(booking))
                 .thenReturn(bookingDto);
+
         ResponseEntity<BookingDto> response = bookingController.getBookingById(1L, 1L);
 
         assertThat(HttpStatus.OK, equalTo(response.getStatusCode()));
+
         assertThat(bookingDto, equalTo(response.getBody()));
 
     }
@@ -174,11 +186,12 @@ class BookingControllerTest {
     void update_ShouldSetStatusToApproved() throws Exception {
 
         Booking updatedBooking = new Booking();
+
         booking.setStatus(BookingStatus.APPROVED);
+
         when(bookingMapper.bookingToBookingDto(updatedBooking))
                 .thenReturn(BookingMapper.INSTANCE.bookingToBookingDto(booking));
 
-        //verify(bookingMockService.changeBookingStatus())
         when(bookingMockService.changeBookingStatus(1L, true, 1L))
                 .thenReturn(updatedBooking);
 
@@ -218,10 +231,11 @@ class BookingControllerTest {
     void getBookingByState_ShouldReturnList() throws Exception {
 
         List<BookingDto> expectedBookings = List.of(bookingDto);
-        when(bookingMockService.getBookingByState(anyInt(), anyInt(), anyLong(),any()))
+
+        when(bookingMockService.getBookingByState(anyInt(), anyInt(), anyLong(), any()))
                 .thenReturn(expectedBookings);
 
-       mvc.perform(get("/bookings")
+        mvc.perform(get("/bookings")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL)
@@ -231,17 +245,18 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", "1")
                 )
                 .andExpect(status().isOk())
-               .andExpect(jsonPath("$", hasSize(1)))
-               .andExpect(jsonPath("$[0].start", equalTo(bookingDto.getStart().format(dateTimeFormatter))))
-               .andExpect(jsonPath("$[0].id", is(bookingCreateDto.getId()), Long.class))
-               .andExpect(jsonPath("$[0].end", equalTo(bookingDto.getEnd().format(dateTimeFormatter))));
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].start", equalTo(bookingDto.getStart().format(dateTimeFormatter))))
+                .andExpect(jsonPath("$[0].id", is(bookingCreateDto.getId()), Long.class))
+                .andExpect(jsonPath("$[0].end", equalTo(bookingDto.getEnd().format(dateTimeFormatter))));
     }
 
     @Test
     void getItemsByStateAndOwner_ShouldReturnList() throws Exception {
 
         List<BookingDto> expectedBookings = List.of(bookingDto);
-        when(bookingMockService.getBookingByStateAndOwner(anyInt(), anyInt(), anyLong(),any()))
+
+        when(bookingMockService.getBookingByStateAndOwner(anyInt(), anyInt(), anyLong(), any()))
                 .thenReturn(expectedBookings);
 
 
