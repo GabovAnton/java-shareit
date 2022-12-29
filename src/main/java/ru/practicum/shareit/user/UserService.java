@@ -10,9 +10,9 @@ public interface UserService {
 
     User save(User user);
 
-    UserDto update(UserUpdateDto userUpdateDto, Long userToUpdateId, Long userId);
+    UserDto update(UserUpdateDto userUpdateDto, Long userToUpdateId);
 
-    boolean delete(Long userToDeleteId, Long userId);
+    boolean delete(Long userToDeleteId);
 
     Boolean existsById(long userId);
 }

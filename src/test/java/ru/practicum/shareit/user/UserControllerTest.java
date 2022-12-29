@@ -102,7 +102,7 @@ class UserControllerTest {
         UserDto userDto = makeUserDto();
         UserUpdateDto userUpdateDto = makeUserUpdateDto();
 
-        when(userService.update(any(), anyLong(), anyLong()))
+        when(userService.update(any(), anyLong()))
                 .thenReturn(userDto);
 
         mvc.perform(MockMvcRequestBuilders.patch("/users/{userToUpdateId}", 100L)
@@ -120,7 +120,7 @@ class UserControllerTest {
     @Test
     void delete() throws Exception {
 
-        when(userService.delete(anyLong(), anyLong()))
+        when(userService.delete(anyLong()))
                 .thenReturn(true);
 
         mvc.perform(MockMvcRequestBuilders

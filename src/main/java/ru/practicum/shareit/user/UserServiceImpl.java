@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserUpdateDto userUpdateDto, Long userToUpdateId, Long userId) {
+    public UserDto update(UserUpdateDto userUpdateDto, Long userToUpdateId) {
 
         User userToUpdate = userRepository.findById(userToUpdateId)
                 .orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean delete(Long userToDeleteId, Long userId) {
+    public boolean delete(Long userToDeleteId) {
 
         userRepository.deleteById(userToDeleteId);
 

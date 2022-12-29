@@ -3,8 +3,6 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -12,15 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.ItemShortAvailability;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -105,7 +98,7 @@ class UserServiceTest {
                 .thenReturn(Optional.empty());
         UserUpdateDto userUpdateDto = makeUserUpdateDto();
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
-            userService.update(userUpdateDto, 100L, 100L);
+            userService.update(userUpdateDto, 100L);
         });
         assertThat(entityNotFoundException.getMessage(),
                 equalTo("user id: " + userId + " not found"));
@@ -115,7 +108,7 @@ class UserServiceTest {
     void deleteShouldNotThrowException() {
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
         doNothing().when(userRepository).deleteById(anyLong());
-        assertThat(userService.delete(100L, 110L), equalTo(true));
+        assertThat(userService.delete(100L), equalTo(true));
 
     }
 

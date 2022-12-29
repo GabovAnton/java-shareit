@@ -35,14 +35,13 @@ public class UserController {
     }
 
     @PatchMapping("{userToUpdateId}")
-    public UserDto update(@PathVariable long userToUpdateId, @Valid @RequestBody UserUpdateDto userUpdateDto,
-                          @RequestHeader("X-Sharer-User-Id") long userId) {
-        return userService.update(userUpdateDto, userToUpdateId,userId);
+    public UserDto update(@PathVariable long userToUpdateId, @Valid @RequestBody UserUpdateDto userUpdateDto) {
+        return userService.update(userUpdateDto, userToUpdateId);
     }
 
     @DeleteMapping("{userToDeleteId}")
-    public boolean delete(@PathVariable long userToDeleteId, @RequestHeader("X-Sharer-User-Id") long userId) {
-        return userService.delete(userToDeleteId, userId);
+    public boolean delete(@PathVariable long userToDeleteId) {
+        return userService.delete(userToDeleteId);
     }
 
 

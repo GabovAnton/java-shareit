@@ -43,13 +43,13 @@ public class ErrorHandler {
                 .body(new ErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler
+/*    @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleConflictException(final ConflictException e) {
         log.warn(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(e.getMessage()));
-    }
+    }*/
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleValidateException(final ShareItValidationException e) {
