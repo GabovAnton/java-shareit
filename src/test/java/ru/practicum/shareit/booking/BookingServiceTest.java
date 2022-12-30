@@ -32,7 +32,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-
 @ActiveProfiles("dev")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -40,7 +39,6 @@ import static org.mockito.Mockito.*;
 
 @Sql(scripts = {"classpath:/schema.sql", "classpath:/SampleData.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ExtendWith(MockitoExtension.class)
@@ -62,30 +60,24 @@ class BookingServiceTest {
     @Mock
     private SearchRejected searchRejected;
     @InjectMocks
-    private BookingService bookingService = new BookingServiceImpl(
-            bookingMockRepository,
-            userMockService,
-            itemMockService, bookingSearchFactory
-    );
+    private BookingService bookingService = new BookingServiceImpl(bookingMockRepository, userMockService, itemMockService, bookingSearchFactory);
     @Captor
     private ArgumentCaptor<Booking> bookingArgumentCaptor;
 
     @Test
-    void getBooking_WhenBookingNotFoundThenEntityNotFoundExceptionThrown() {
+    void getBookingWhenBookingNotFoundThenEntityNotFoundExceptionThrown() {
         long bookingId = 0L;
 
-        when(bookingMockRepository.findById(bookingId))
-                .thenThrow(new EntityNotFoundException("Booking with id " + bookingId + " not found"));
+        when(bookingMockRepository.findById(bookingId)).thenThrow(new EntityNotFoundException("Booking with id " + bookingId + " not found"));
 
         assertThrows(EntityNotFoundException.class, () -> {
             bookingMockRepository.findById(bookingId);
         });
 
-
     }
 
     @Test
-    void getBooking_WhenBookingAccessedByUnauthorizedPersonThenEntityNotFoundExceptionThrown() {
+    void getBookingWhenBookingAccessedByUnauthorizedPersonThenEntityNotFoundExceptionThrown() {
         Long requesterId = 10L;
 
         User owner = new User();
@@ -101,14 +93,13 @@ class BookingServiceTest {
         booking.getItem().setOwner(owner);
 
         assertThrows(EntityNotFoundException.class, () -> {
-            ReflectionTestUtils.invokeMethod(
-                    bookingService, "checkItemOwner", booking, requesterId);
+            ReflectionTestUtils.invokeMethod(bookingService, "checkItemOwner", booking, requesterId);
         });
 
     }
 
     @Test
-    void Save_WhenEndLessThanStartFailAndShouldNotInvokeRepository() {
+    void saveWhenEndLessThanStartFailAndShouldNotInvokeRepository() {
 
         Booking booking = makeBooking();
 
@@ -122,15 +113,14 @@ class BookingServiceTest {
 
         Mockito.verify(bookingMockRepository, never()).save(booking);
 
-        Mockito.verify(bookingMockRepository, never()).SearchBookingsById(booking.getItem().getId(),
-                booking.getBooker().getId());
+        Mockito.verify(bookingMockRepository, never()).searchBookingsById(booking.getItem().getId(), booking.getBooker().getId());
 
         Mockito.verify(itemMockService, never()).isItemAvailable(booking.getItem().getId());
 
     }
 
     @Test
-    void Save_WhenTryToBookTheSameItemTwiceShouldNotInvokeRepository() {
+    void saveWhenTryToBookTheSameItemTwiceShouldNotInvokeRepository() {
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
@@ -140,12 +130,9 @@ class BookingServiceTest {
 
         booking.setEnd(LocalDateTime.now().plusYears(15));
 
-
         List<Booking> bookingsFromRepository = List.of(booking);
 
-        when(bookingMockRepository.SearchBookingsById(anyLong(), anyLong()))
-                .thenReturn(bookingsFromRepository);
-
+        when(bookingMockRepository.searchBookingsById(anyLong(), anyLong())).thenReturn(bookingsFromRepository);
 
         assertThrows(EntityNotFoundException.class, () -> {
             bookingService.save(booking, 1L);
@@ -157,9 +144,8 @@ class BookingServiceTest {
 
     }
 
-
     @Test
-    void save_ShouldNotThrowException() {
+    void saveShouldNotThrowException() {
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
@@ -181,28 +167,26 @@ class BookingServiceTest {
     }
 
     @Test
-    void changeBookingStatus_ToWrongBookingShouldThrowException() {
+    void changeBookingStatusToWrongBookingShouldThrowException() {
 
         long bookingId = 100L;
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
-        when(bookingMockRepository.findById(anyLong()))
-                .thenThrow(new EntityNotFoundException("Booking with id " + bookingId + " not found"));
+        when(bookingMockRepository.findById(anyLong())).thenThrow(new EntityNotFoundException("Booking with id " + bookingId + " not found"));
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             bookingService.changeBookingStatus(bookingId, true, 100L);
         });
 
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("Booking with id " + bookingId + " not found"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("Booking with id " + bookingId + " not found"));
 
         Mockito.verify(bookingMockRepository, never()).save(any());
 
     }
 
     @Test
-    void changeBookingStatus_ByWrongOwnerBookingShouldThrowException() {
+    void changeBookingStatusByWrongOwnerBookingShouldThrowException() {
 
         Booking booking = makeBooking();
 
@@ -212,23 +196,20 @@ class BookingServiceTest {
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
-        when(bookingMockRepository.findById(anyLong()))
-                .thenReturn(Optional.of(booking));
-
+        when(bookingMockRepository.findById(anyLong())).thenReturn(Optional.of(booking));
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             bookingService.changeBookingStatus(bookingId, true, 100L);
         });
 
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("Booking status could be changed only by owner"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("Booking status could be changed only by owner"));
 
         Mockito.verify(bookingMockRepository, never()).save(any());
 
     }
 
     @Test
-    void changeBookingStatus_ToSameStatusShouldThrowException() {
+    void changeBookingStatusToSameStatusShouldThrowException() {
 
         Booking booking = makeBooking();
 
@@ -238,23 +219,20 @@ class BookingServiceTest {
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
-        when(bookingMockRepository.findById(anyLong()))
-                .thenReturn(Optional.of(booking));
-
+        when(bookingMockRepository.findById(anyLong())).thenReturn(Optional.of(booking));
 
         ForbiddenException forbiddenException = assertThrows(ForbiddenException.class, () -> {
             bookingService.changeBookingStatus(bookingId, true, 100L);
         });
 
-        assertThat(forbiddenException.getMessage(),
-                equalTo("Booking status has already been changed"));
+        assertThat(forbiddenException.getMessage(), equalTo("Booking status has already been changed"));
 
         Mockito.verify(bookingMockRepository, never()).save(any());
 
     }
 
     @Test
-    void changeBookingStatus_ShouldReturnSavedObject() {
+    void changeBookingStatusShouldReturnSavedObject() {
 
         Booking booking = makeBooking();
 
@@ -266,8 +244,7 @@ class BookingServiceTest {
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
-        when(bookingMockRepository.findById(anyLong()))
-                .thenReturn(Optional.of(booking));
+        when(bookingMockRepository.findById(anyLong())).thenReturn(Optional.of(booking));
 
         bookingService.changeBookingStatus(bookingId, true, 100L);
 
@@ -280,9 +257,8 @@ class BookingServiceTest {
 
     }
 
-
     @Test
-    void getBookingByState_ByWrongUserShouldThrowException() {
+    void getBookingByStateByWrongUserShouldThrowException() {
 
         long ownerId = 100L;
 
@@ -290,19 +266,17 @@ class BookingServiceTest {
 
         ReflectionTestUtils.setField(bookingService, "userService", userMockService);
 
-        when(userMockService.existsById(anyLong()))
-                .thenReturn(false);
+        when(userMockService.existsById(anyLong())).thenReturn(false);
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             bookingService.getBookingByState(1, 5, 100L, "APPROVED");
         });
 
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("user with id: " + ownerId + " not found"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("user with id: " + ownerId + " not found"));
     }
 
     @Test
-    void getBookingByState_UnknownStateShouldThrowException() {
+    void getBookingByStateUnknownStateShouldThrowException() {
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
@@ -310,54 +284,17 @@ class BookingServiceTest {
 
         ReflectionTestUtils.setField(bookingService, "bookingSearchFactory", bookingSearchFactory);
 
-        when(userMockService.existsById(anyLong()))
-                .thenReturn(true);
+        when(userMockService.existsById(anyLong())).thenReturn(true);
 
         IllegalArgumentException IllegalArgumentException = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.getBookingByState(1, 5, 100L, "UNKNOWN");
         });
 
-        assertThat(IllegalArgumentException.getMessage(),
-                equalTo("Unknown state: UNSUPPORTED_STATUS"));
+        assertThat(IllegalArgumentException.getMessage(), equalTo("Unknown state: UNSUPPORTED_STATUS"));
     }
 
     @Test
-    void getBookingByState_ShouldReturnListOfObjects() {
-
-        ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
-
-        ReflectionTestUtils.setField(bookingService, "userService", userMockService);
-
-        ReflectionTestUtils.setField(bookingService, "entityManager", em);
-
-        ReflectionTestUtils.setField(bookingService, "bookingSearchFactory", bookingSearchFactory);
-
-        when(userMockService.existsById(anyLong()))
-                .thenReturn(true);
-
-        when(bookingSearchFactory.getSearchMethod("REJECTED"))
-                .thenReturn(Optional.of(searchRejected));
-
-
-        List<BookingDto> bookingDtoCollection = List.of(makeBookingDto());
-
-        when(searchRejected.getBookings(1, 5, 100L, em, bookingMockRepository))
-                .thenReturn(bookingDtoCollection);
-
-        List<BookingDto> bookingDtoFromRepository = bookingService
-                .getBookingByState(1, 5, 100L, "REJECTED");
-
-        Mockito.verify(searchRejected, atLeast(1))
-                .getBookings(1, 5, 100L, em, bookingMockRepository);
-
-
-        assertThat(bookingDtoCollection, equalTo(bookingDtoFromRepository));
-
-    }
-
-
-    @Test
-    void getBookingByStateAndOwner_ByWrongUserShouldThrowException() {
+    void getBookingByStateAndOwnerByWrongUserShouldThrowException() {
 
         long ownerId = 100L;
 
@@ -367,21 +304,17 @@ class BookingServiceTest {
 
         ReflectionTestUtils.setField(bookingService, "bookingSearchFactory", bookingSearchFactory);
 
-
-        when(userMockService.existsById(anyLong()))
-                .thenReturn(false);
+        when(userMockService.existsById(anyLong())).thenReturn(false);
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             bookingService.getBookingByStateAndOwner(1, 5, 100L, "APPROVED");
         });
 
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("user with id: " + ownerId + " not found"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("user with id: " + ownerId + " not found"));
     }
 
-
     @Test
-    void getBookingByStateAndOwner_UnknownStateShouldThrowException() {
+    void getBookingByStateAndOwnerUnknownStateShouldThrowException() {
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
@@ -389,15 +322,13 @@ class BookingServiceTest {
 
         ReflectionTestUtils.setField(bookingService, "bookingSearchFactory", bookingSearchFactory);
 
-        when(userMockService.existsById(anyLong()))
-                .thenReturn(true);
+        when(userMockService.existsById(anyLong())).thenReturn(true);
 
         IllegalArgumentException IllegalArgumentException = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.getBookingByStateAndOwner(1, 5, 100L, "UNKNOWN");
         });
 
-        assertThat(IllegalArgumentException.getMessage(),
-                equalTo("Unknown state: UNSUPPORTED_STATUS"));
+        assertThat(IllegalArgumentException.getMessage(), equalTo("Unknown state: UNSUPPORTED_STATUS"));
     }
 
     private Booking makeBooking() {
@@ -413,15 +344,5 @@ class BookingServiceTest {
         booking.getItem().getOwner().setId(100L);
 
         return booking;
-    }
-
-    private BookingDto makeBookingDto() {
-        BookingDto dto = new BookingDto();
-        dto.setStart(currentDate.minusDays(2));
-        dto.setEnd(currentDate.plusDays(2));
-        dto.setStatus(BookingStatus.REJECTED);
-        dto.setItem(new ItemDto());//todo
-        dto.setBooker(new UserDto());//todo
-        return dto;
     }
 }

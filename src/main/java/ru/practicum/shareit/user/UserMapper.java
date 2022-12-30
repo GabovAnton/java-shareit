@@ -2,6 +2,10 @@ package ru.practicum.shareit.user;
 
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
+import ru.practicum.shareit.item.Comment;
+import ru.practicum.shareit.item.Item;
+
+import java.util.Set;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface UserMapper {
@@ -17,11 +21,21 @@ public interface UserMapper {
 
     @AfterMapping
     default void linkItems(@MappingTarget User user) {
-        user.getItems().forEach(item -> item.setOwner(user));
+
+        Set<Item> items = user.getItems();
+        if (items != null) {
+            items.stream().peek(item -> item.setOwner(user));
+        }
+
     }
 
     @AfterMapping
     default void linkComments(@MappingTarget User user) {
-        user.getComments().forEach(Comment -> Comment.setAuthor(user));
+
+        Set<Comment> comments = user.getComments();
+        if (comments != null) {
+            comments.stream().peek(Comment -> Comment.setAuthor(user));
+        }
     }
+
 }

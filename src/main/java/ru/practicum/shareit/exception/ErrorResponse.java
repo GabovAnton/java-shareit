@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public class ErrorResponse {
+
     @Getter
     String error;
 }

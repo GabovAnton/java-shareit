@@ -16,41 +16,58 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @JsonTest
 public class ItemDtoJsonTest {
+
+    LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5);
+
     @Autowired
     private JacksonTester<ItemDto> json;
 
-    LocalDateTime currentDate = LocalDateTime
-            .of(2022, 12, 10, 5, 5, 5, 5);
     @Test
     void testItemDto() throws Exception {
 
-
         JsonContent<ItemDto> result = json.write(makeItemDto());
 
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(100);
+        assertThat(result)
+                .extractingJsonPathNumberValue("$.id")
+                .isEqualTo(100);
 
-        assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("thing");
+        assertThat(result)
+                .extractingJsonPathStringValue("$.name")
+                .isEqualTo("thing");
 
-        assertThat(result).extractingJsonPathStringValue("$.description")
+        assertThat(result)
+                .extractingJsonPathStringValue("$.description")
                 .isEqualTo("just simple thing");
 
-        assertThat(result).extractingJsonPathBooleanValue("$.available")
+        assertThat(result)
+                .extractingJsonPathBooleanValue("$.available")
                 .isEqualTo(true);
 
-        assertThat(result).extractingJsonPathNumberValue("$.requestId").isEqualTo(100);
-        assertThat(result).extractingJsonPathValue("$.lastBooking").extracting("id")
+        assertThat(result)
+                .extractingJsonPathNumberValue("$.requestId")
                 .isEqualTo(100);
-        assertThat(result).extractingJsonPathValue("$.lastBooking").extracting("bookerId")
+        assertThat(result)
+                .extractingJsonPathValue("$.lastBooking")
+                .extracting("id")
+                .isEqualTo(100);
+        assertThat(result)
+                .extractingJsonPathValue("$.lastBooking")
+                .extracting("bookerId")
                 .isEqualTo(100);
 
-        assertThat(result).extractingJsonPathValue("$.nextBooking").extracting("id")
+        assertThat(result)
+                .extractingJsonPathValue("$.nextBooking")
+                .extracting("id")
                 .isEqualTo(100);
-        assertThat(result).extractingJsonPathValue("$.nextBooking").extracting("bookerId")
+        assertThat(result)
+                .extractingJsonPathValue("$.nextBooking")
+                .extracting("bookerId")
                 .isEqualTo(100);
-
 
     }
+
     private BookingDto makeBookingDto() {
+
         BookingDto dto = new BookingDto();
         dto.setId(100L);
         dto.setStart(currentDate.minusDays(2));
@@ -60,7 +77,9 @@ public class ItemDtoJsonTest {
         dto.setBooker(makeUserDto());
         return dto;
     }
+
     private ItemDto makeItemDto() {
+
         ItemDto itemDto = new ItemDto();
         itemDto.setId(100L);
         itemDto.setName("thing");
@@ -70,18 +89,16 @@ public class ItemDtoJsonTest {
         itemDto.setLastBooking(new ItemLastBookingDto(100L, 100L));
         itemDto.setNextBooking(new ItemNextBookingDto(100L, 100L));
 
-        CommentDto commentDto = new CommentDto(100L,
-                "good thing",
-                101L,
-                "Artur",
-                currentDate.minusDays(15));
+        CommentDto commentDto = new CommentDto(100L, "good thing", 101L, "Artur", currentDate.minusDays(15));
 
         itemDto.setComments(Set.of(commentDto));
         itemDto.setOwner(new UserDto());
 
         return itemDto;
     }
+
     private UserDto makeUserDto() {
+
         UserDto user = new UserDto();
         user.setId(100L);
         user.setName("Artur");
@@ -89,11 +106,10 @@ public class ItemDtoJsonTest {
         user.setRegistrationDate(currentDate.minusDays(15));
         return user;
     }
+
     private CommentDto makeCommentDto() {
-        return new CommentDto(100L,
-                "good thing",
-                101L,
-                "Artur",
-                currentDate.minusDays(1));
+
+        return new CommentDto(100L, "good thing", 101L, "Artur", currentDate.minusDays(1));
     }
+
 }

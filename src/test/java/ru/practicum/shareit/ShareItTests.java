@@ -12,8 +12,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.Item;
@@ -41,46 +39,50 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 
 @Sql(scripts = {"classpath:/schema.sql", "classpath:/SampleData.sql"},
-        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-
+     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ShareItTests {
 
     private final UserRepository userRepository;
+
     private final UserMapper userMapper;
-    private final BookingRepository bookingRepository;
+
     private final ItemRepository itemRepository;
+
     private final CommentRepository commentRepository;
 
     private final RequestMapper requestMapper;
+
     private final RequestService requestService;
 
     @Test
     void contextLoads() {
+
     }
 
     @Test
     public void testDatabaseIsNotEmpty() {
+
         List<User> allUsers = userRepository.findAll();
-        assertThat(allUsers, hasSize(5));
+        assertThat(allUsers, hasSize(6));
 
         List<Item> allItems = itemRepository.findAll();
-        assertThat(allItems, hasSize(9));
+        assertThat(allItems, hasSize(10));
 
     }
 
     @Test
-    public void CreateUserShouldNotThrowExceptionOnSave() {
+    public void createUserShouldNotThrowExceptionOnSave() {
+
         UserDto userOne = new UserDto(null, "testName", "test@gmail.com", null);
 
-        assertThat(userRepository.save(userMapper.userDtoToUser(userOne)).getName(),
-                equalToIgnoringCase("testName"));
+        assertThat(userRepository.save(userMapper.userDtoToUser(userOne)).getName(), equalToIgnoringCase("testName"));
 
     }
 
     @Test
-    public void CreateUserWithDuplicateEmailShouldThrowExceptionOnSave() {
+    public void createUserWithDuplicateEmailShouldThrowExceptionOnSave() {
 
         UserDto userOne = new UserDto(null, "testName", "agabov@gmail.com", null);
 
@@ -91,7 +93,8 @@ class ShareItTests {
     }
 
     @Test
-    public void UpdateUserWithDuplicateEmailShouldThrowExceptionOnSave() {
+    public void updateUserWithDuplicateEmailShouldThrowExceptionOnSave() {
+
         User user = userRepository.findById(1L).get();
         user.setEmail("ivan@gmail.com");
 
@@ -101,7 +104,8 @@ class ShareItTests {
     }
 
     @Test
-    public void UpdateUserShouldNotThrowExceptionOnSave() {
+    public void updateUserShouldNotThrowExceptionOnSave() {
+
         User user = userRepository.findById(1L).get();
         user.setEmail("anton2@gmail.com");
 
@@ -110,7 +114,8 @@ class ShareItTests {
     }
 
     @Test
-    public void DeleteUserShouldNotThrowExceptionOnSave() {
+    public void deleteUserShouldNotThrowExceptionOnSave() {
+
         User user = userRepository.findById(1L).get();
 
         userRepository.delete(user);
@@ -118,7 +123,8 @@ class ShareItTests {
     }
 
     @Test
-    public void CreateItemShouldNotThrowExceptionOnSave() {
+    public void createItemShouldNotThrowExceptionOnSave() {
+
         Item item = new Item();
         item.setName("Test item");
         item.setAvailable(true);
@@ -129,19 +135,9 @@ class ShareItTests {
 
     }
 
-
     @Test
-    public void SearchInDescriptionShouldReturnOneRecord() {
-        List<Item> searchResult = itemRepository.findByNameOrDescription("%отверт%");
+    public void getAllItemsForUserOneShouldReturnTwoRecords() {
 
-        assertThat(searchResult, hasSize(1));
-        assertThat(searchResult.stream().anyMatch(x -> x.getName().equalsIgnoreCase("Отвертка")), is(true));
-
-
-    }
-
-    @Test
-    public void GetAllItemsForUserOneShouldReturnTwoRecords() {
         List<Item> searchResult = itemRepository.findByOwnerId(1L);
 
         assertThat(searchResult, hasSize(2));
@@ -149,63 +145,8 @@ class ShareItTests {
     }
 
     @Test
-    public void CreateBookingInFutureOnItem2ByUserShouldNotThrowError() {
-        Booking booking = new Booking();
-        booking.setItem(itemRepository.findByOwnerId(1L).stream().findFirst().get());
-        booking.setBooker(userRepository.findById(3L).get());
-        booking.setEnd(LocalDateTime.now().plusDays(5));
-        booking.setStart(LocalDateTime.now().plusMinutes(3));
+    public void createCommentOnItem2ByUserShouldNotThrowError() {
 
-
-        assertThat(bookingRepository.save(booking)
-                        .getItem().getName(),
-                equalTo("Аккумуляторная дрель"));
-
-        List<Booking> future = bookingRepository.SearchBookingsByBookerInFutureTime(3L, LocalDateTime.now());
-        assertThat(future, hasSize(1));
-        assertThat(future.stream().anyMatch(x -> x.getId().equals(1L)), is(true));
-
-    }
-
-    @Test
-    public void CreateBookingInPastOnItem2ByUserShouldNotThrowError() {
-        Booking booking = new Booking();
-        booking.setItem(itemRepository.findByOwnerId(1L).stream().findFirst().get());
-        booking.setBooker(userRepository.findById(3L).get());
-        booking.setEnd(LocalDateTime.now().minusDays(30));
-        booking.setStart(LocalDateTime.now().minusDays(35));
-
-        assertThat(bookingRepository.save(booking)
-                        .getItem().getName(),
-                equalTo("Аккумуляторная дрель"));
-
-        List<Booking> past = bookingRepository.SearchBookingsByBookerInPastTime(3L, LocalDateTime.now());
-
-        assertThat(past, hasSize(1));
-        assertThat(past.stream().anyMatch(x -> x.getId().equals(1L)), is(true));
-
-
-    }
-
-    @Test
-    public void CreateBookingInCurrentOnItem2ByUserShouldNotThrowError() {
-        Booking booking = new Booking();
-        booking.setItem(itemRepository.findByOwnerId(1L).stream().findFirst().get());
-        booking.setBooker(userRepository.findById(3L).get());
-        booking.setStart(LocalDateTime.now().minusSeconds(1));
-        booking.setEnd(LocalDateTime.now().plusSeconds(10));
-
-        assertThat(bookingRepository.save(booking)
-                        .getItem().getName(),
-                equalTo("Аккумуляторная дрель"));
-
-        List<Booking> current = bookingRepository.SearchBookingsByBookerInPresentTime(3L, LocalDateTime.now());
-        assertThat(current.stream().anyMatch(x -> x.getId().equals(1L)), is(true));
-
-    }
-
-    @Test
-    public void CreateCommentOnItem2ByUserShouldNotThrowError() {
         Comment comment = new Comment();
         comment.setItem(itemRepository.findByOwnerId(1L).stream().findFirst().get());
         comment.setText("test comment");
@@ -213,7 +154,12 @@ class ShareItTests {
         comment.setCreated(LocalDateTime.now());
         commentRepository.save(comment);
         Set<Comment> itemComments = itemRepository
-                .findByOwnerId(1L).stream().filter(x -> x.getId().equals(1L)).findFirst().get().getItemComments();
+                .findByOwnerId(1L)
+                .stream()
+                .filter(x -> x.getId().equals(1L))
+                .findFirst()
+                .get()
+                .getItemComments();
 
         assertThat(itemComments, hasSize(1));
         assertThat(itemComments.stream().anyMatch(x -> x.getText().equals("test comment")), is(true));
@@ -221,7 +167,8 @@ class ShareItTests {
     }
 
     @Test
-    public void Fetch10ElementsFrom26OfTotal30ElementShouldReturnExactFrom5To1() {
+    public void fetch10ElementsFrom26OfTotal30ElementShouldReturnExactFrom5To1() {
+
         List<User> users = new ArrayList<>(userRepository.findAll());
         int day = 1;
         for (int i = 0; i < 30; i++) {
@@ -242,13 +189,13 @@ class ShareItTests {
 
         }
 
-        List<Long> collect = requestService.getAllFromOthers(26, 10, 6L).stream()
-                .map(RequestWithProposalsDto::getId).collect(Collectors.toList());
+        int unrealId = users.size() + 1;
+        List<Long> collect = requestService.getAllFromOthers(26, 10, (long) unrealId).stream().map(
+                RequestWithProposalsDto::getId).collect(Collectors.toList());
 
-        assertThat(collect, hasSize(5));
+        assertThat(collect, hasSize(6));
         assertThat(collect, Matchers.containsInRelativeOrder(List.of(5L, 4L, 3L, 2L, 1L).toArray()));
 
     }
-
 
 }

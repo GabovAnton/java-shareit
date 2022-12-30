@@ -1,8 +1,9 @@
 package ru.practicum.shareit.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -11,8 +12,10 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "item_proposals")
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemProposal {
+
     @Id
     @Column(nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +31,5 @@ public class ItemProposal {
     @JoinColumn(name = "request_id")
     @JsonIgnore
     private Request request;
-
 
 }

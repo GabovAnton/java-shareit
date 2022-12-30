@@ -44,7 +44,7 @@ class UserControllerTest {
     private MockMvc mvc;
 
     @Test
-    void getUserById_whenInvoked() {
+    void getUserByIdwhenInvoked() {
 
         ReflectionTestUtils.setField(userController, "userService", userService);
         User user = makeUser();
@@ -59,7 +59,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getAll_ShouldReturnList() throws Exception {
+    void getAllShouldReturnList() throws Exception {
 
         UserDto userDto = makeUserDto();
         List<UserDto> expectedItems = List.of(userDto);
@@ -78,7 +78,7 @@ class UserControllerTest {
     }
 
     @Test
-    void create_ShouldReturnSameObject() throws Exception {
+    void createShouldReturnSameObject() throws Exception {
         UserDto userDto = makeUserDto();
         User user = makeUser();
 
@@ -98,7 +98,7 @@ class UserControllerTest {
     }
 
     @Test
-    void update_ShouldReturnUpdatedEntity() throws Exception {
+    void updateShouldReturnUpdatedEntity() throws Exception {
         UserDto userDto = makeUserDto();
         UserUpdateDto userUpdateDto = makeUserUpdateDto();
 

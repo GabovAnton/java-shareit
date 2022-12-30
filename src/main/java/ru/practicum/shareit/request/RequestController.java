@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class RequestController {
+
     private final RequestService requestService;
 
     @GetMapping("")
@@ -28,17 +29,16 @@ public class RequestController {
     }
 
     @GetMapping("/all")
-    public List<RequestWithProposalsDto> getAllFromOthers(@RequestParam(required = false)
-                                                 @Min(value = 0, message = "from should be positive") Integer from,
-                                             @RequestParam(required = false)
-                                               @Min(value = 0, message = "size should greater than 1") Integer size,
-                                             @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<RequestWithProposalsDto> getAllFromOthers(
+            @RequestParam(required = false) @Min(value = 0, message = "from should be positive") Integer from,
+            @RequestParam(required = false) @Min(value = 0, message = "size should greater than 1") Integer size,
+            @RequestHeader("X-Sharer-User-Id") Long userId) {
         return requestService.getAllFromOthers(from, size, userId);
     }
 
     @GetMapping("{requestId}")
     public RequestWithProposalsDto getBookingById(@PathVariable Long requestId,
                                                   @RequestHeader("X-Sharer-User-Id") long userId) {
-        return requestService.GetRequest(requestId, userId);
+        return requestService.getRequest(requestId, userId);
     }
 }

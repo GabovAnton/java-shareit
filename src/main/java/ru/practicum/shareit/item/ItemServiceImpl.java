@@ -4,7 +4,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
@@ -31,11 +30,10 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
 
     private final UserService userService;
-    @Autowired
-    private   ItemMapper itemMapper;
 
-    @Autowired
-    private  CommentMapper commentMapper;
+    private final ItemMapper itemMapper;
+
+    private final CommentMapper commentMapper;
 
     private final CommentRepository commentRepository;
 
@@ -46,9 +44,9 @@ public class ItemServiceImpl implements ItemService {
 
     public ItemDto getItemDto(long id, long userId) {
 
-
         Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("item with id: " + id + " doesn't exists"));
+                                  .orElseThrow(() -> new EntityNotFoundException(
+                                          "item with id: " + id + " doesn't exists"));
 
         log.debug("item with id: {} requested, returned result: {}", id, item);
 
@@ -58,10 +56,12 @@ public class ItemServiceImpl implements ItemService {
 
         Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
 
-        List<Booking> bookings = item.getItemBookings().stream()
-                .filter(x -> x.getItem().getOwner().getId().equals(userId))
-                .sorted(byDateEnd).limit(2)
-                .collect(Collectors.toList());
+        List<Booking> bookings = item.getItemBookings()
+                                     .stream()
+                                     .filter(x -> x.getItem().getOwner().getId().equals(userId))
+                                     .sorted(byDateEnd)
+                                     .limit(2)
+                                     .collect(Collectors.toList());
 
         ItemDto itemDtoWithLastAndNextBookings = getItemDtoWithLastAndNextBookings(itemDto, bookings);
 
@@ -70,7 +70,6 @@ public class ItemServiceImpl implements ItemService {
         return itemDtoWithLastAndNextBookings;
 
     }
-
 
     public Item map(long id) {
 
@@ -94,20 +93,27 @@ public class ItemServiceImpl implements ItemService {
         Comparator<Booking> byDateEnd = Comparator.comparing(Booking::getEnd);
 
         List<ItemDto> itemDtos = queryFactory.selectFrom(request)
-                .where(request.owner.id.eq(userId))
-                .limit(size != null ? size : totalItems)
-                .offset(offset)
-                .fetch().stream().map(x -> {
-                    ItemDto itemDto = itemMapper.itemToItemDto(x);
-                    itemDto.setComments(commentMapper.map(x.getItemComments()));
-                    List<Booking> bookings = x.getItemBookings().stream()
-                            .filter(y -> y.getItem().getOwner().getId().equals(userId))
-                            .sorted(byDateEnd)
-                            .limit(2)
-                            .collect(Collectors.toList());
-                    return getItemDtoWithLastAndNextBookings(itemDto, bookings);
-                }).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-
+                                             .where(request.owner.id.eq(userId))
+                                             .limit(size != null ? size : totalItems)
+                                             .offset(offset)
+                                             .fetch()
+                                             .stream()
+                                             .map(x -> {
+                                                 ItemDto itemDto = itemMapper.itemToItemDto(x);
+                                                 itemDto.setComments(commentMapper.map(x.getItemComments()));
+                                                 List<Booking> bookings = x.getItemBookings()
+                                                                           .stream()
+                                                                           .filter(y -> y.getItem()
+                                                                                         .getOwner()
+                                                                                         .getId()
+                                                                                         .equals(userId))
+                                                                           .sorted(byDateEnd)
+                                                                           .limit(2)
+                                                                           .collect(Collectors.toList());
+                                                 return getItemDtoWithLastAndNextBookings(itemDto, bookings);
+                                             })
+                                             .collect(Collectors.collectingAndThen(Collectors.toList(),
+                                                                                   Collections::unmodifiableList));
 
         log.debug("all items requested by user id: {}: returned collection: {}", userId, itemDtos.size());
 
@@ -122,15 +128,15 @@ public class ItemServiceImpl implements ItemService {
 
             Long lastBookerId = getBookerId(bookings, 0);
 
-            itemDto.setLastBooking(lastBookingId != null
-                    && lastBookerId != null ? new ItemLastBookingDto(lastBookingId, lastBookerId) : null);
+            itemDto.setLastBooking(lastBookingId != null && lastBookerId != null ?
+                                   new ItemLastBookingDto(lastBookingId, lastBookerId) : null);
 
             Long nextBookingId = getBookingId(bookings, 1);
 
             Long nextBookerId = getBookerId(bookings, 1);
 
-            itemDto.setNextBooking(lastBookingId != null
-                    && lastBookerId != null ? new ItemNextBookingDto(nextBookingId, nextBookerId) : null);
+            itemDto.setNextBooking(lastBookingId != null && lastBookerId != null ?
+                                   new ItemNextBookingDto(nextBookingId, nextBookerId) : null);
         }
 
         return itemDto;
@@ -138,15 +144,15 @@ public class ItemServiceImpl implements ItemService {
 
     private Long getBookingId(List<Booking> bookings, int rowNumber) {
 
-        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber)
-                .getId() != null) ? bookings.get(rowNumber).getId() : null;
+        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getId() != null) ?
+               bookings.get(rowNumber).getId() : null;
     }
 
     private Long getBookerId(List<Booking> bookings, int rowNumber) {
 
-        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings
-                .get(rowNumber).getBooker() != null && bookings.get(rowNumber)
-                .getBooker().getId() != null) ? bookings.get(rowNumber).getBooker().getId() : null;
+        return (bookings.size() > 0 && bookings.get(rowNumber) != null && bookings.get(rowNumber).getBooker() != null &&
+                bookings.get(rowNumber).getBooker().getId() != null) ? bookings.get(rowNumber).getBooker().getId() :
+               null;
     }
 
     @Override
@@ -171,10 +177,13 @@ public class ItemServiceImpl implements ItemService {
         User author = userService.getUser(userId);
 
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("item with id: " + itemId + " doesn't exists"));
+                                  .orElseThrow(() -> new EntityNotFoundException(
+                                          "item with id: " + itemId + " doesn't exists"));
 
-        if (bookingRepository.existsByItem_IdAndBooker_IdAndStatusAndEndIsBefore(itemId, userId, BookingStatus.APPROVED,
-                LocalDateTime.now())) {
+        if (bookingRepository.existsByItemIdAndBookerIdAndStatusAndEndIsBefore(itemId,
+                                                                               userId,
+                                                                               BookingStatus.APPROVED,
+                                                                               LocalDateTime.now())) {
 
             Comment comment = commentMapper.commentDtoToComment(commentDto);
 
@@ -190,8 +199,8 @@ public class ItemServiceImpl implements ItemService {
 
             return comment;
         } else {
-            throw new ForbiddenException("error while trying to add comment to item which hasn't  " +
-                    "finished booking by user");
+            throw new ForbiddenException(
+                    "error while trying to add comment to item which hasn't  " + "finished booking by user");
         }
     }
 
@@ -209,13 +218,20 @@ public class ItemServiceImpl implements ItemService {
         int offset = from != null ? from : 0;
 
         List<ItemDto> itemDtos = StringUtils.isNotEmpty(text) ? queryFactory.selectFrom(request)
-                .where(request.available.eq(true)
-                        .and(request.name.likeIgnoreCase(query).or(request.description.likeIgnoreCase(query))))
-                .limit(size != null ? size : totalItems)
-                .offset(offset)
-                .fetch().stream().map(itemMapper::itemToItemDto)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)) :
-                new ArrayList<>();
+                                                                            .where(request.available.eq(true)
+                                                                                                    .and(request.name.likeIgnoreCase(
+                                                                                                                        query)
+                                                                                                                     .or(request.description.likeIgnoreCase(
+                                                                                                                             query))))
+                                                                            .limit(size != null ? size : totalItems)
+                                                                            .offset(offset)
+                                                                            .fetch()
+                                                                            .stream()
+                                                                            .map(itemMapper::itemToItemDto)
+                                                                            .collect(Collectors.collectingAndThen(
+                                                                                    Collectors.toList(),
+                                                                                    Collections::unmodifiableList)) :
+                                 new ArrayList<>();
 
         log.debug("search for item with query: {} returned result: {}", text, itemDtos);
 
@@ -227,7 +243,8 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(ItemPatchDto itemPatchDto, long userId) {
 
         Item itemToUpdate = itemRepository.findById(itemPatchDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("item id: " + itemPatchDto.getId() + " not found"));
+                                          .orElseThrow(() -> new EntityNotFoundException(
+                                                  "item id: " + itemPatchDto.getId() + " not found"));
 
         if (itemToUpdate.getOwner() != null && itemToUpdate.getOwner().getId() != userId) {
             throw new ShareItValidationException("error while trying to update item which belongs to another user");
@@ -246,13 +263,14 @@ public class ItemServiceImpl implements ItemService {
     public Boolean isItemAvailable(long itemId) {
 
         if (Boolean.TRUE.equals(itemRepository.isItemAvailable(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("item id: " + itemId + " not found")).getAvailable())) {
+                                              .orElseThrow(() -> new EntityNotFoundException(
+                                                      "item id: " + itemId + " not found"))
+                                              .getAvailable())) {
             return true;
         } else {
             throw new ForbiddenException("item with id: " + itemId + " is unavailable for booking");
         }
 
     }
-
 
 }

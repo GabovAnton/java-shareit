@@ -23,7 +23,8 @@ public class UserServiceImpl implements UserService {
     public User getUser(long id) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("user with id: " + id + " doesn't exists"));
+                                  .orElseThrow(() -> new EntityNotFoundException(
+                                          "user with id: " + id + " doesn't exists"));
         log.debug("user with id: {} requested: {}", id, user);
 
         return user;
@@ -32,9 +33,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAll() {
 
-        List<UserDto> userList = userRepository.findAll().stream().filter(Objects::nonNull)
-                .map(UserMapper.INSTANCE::userToUserDto)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        List<UserDto> userList = userRepository.findAll()
+                                               .stream()
+                                               .filter(Objects::nonNull)
+                                               .map(UserMapper.INSTANCE::userToUserDto)
+                                               .collect(Collectors.collectingAndThen(Collectors.toList(),
+                                                                                     Collections::unmodifiableList));
 
         log.debug("all items requested: {}", userList.size());
 
@@ -55,7 +59,8 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UserUpdateDto userUpdateDto, Long userToUpdateId) {
 
         User userToUpdate = userRepository.findById(userToUpdateId)
-                .orElseThrow(() -> new EntityNotFoundException("user id: " + userUpdateDto.getId() + " not found"));
+                                          .orElseThrow(() -> new EntityNotFoundException(
+                                                  "user id: " + userUpdateDto.getId() + " not found"));
 
         userMapper.updateUserFromUserUpdateDto(userUpdateDto, userToUpdate);
 
@@ -81,6 +86,5 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.existsById(userId);
     }
-
 
 }

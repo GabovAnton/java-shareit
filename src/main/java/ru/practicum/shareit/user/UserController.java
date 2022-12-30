@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,6 @@ public class UserController {
         return userService.getAll();
     }
 
-
     @PostMapping()
     public UserDto create(@Valid @RequestBody UserDto userDto) {
         User savedUser = userService.save(UserMapper.INSTANCE.userDtoToUser(userDto));
@@ -43,6 +41,5 @@ public class UserController {
     public boolean delete(@PathVariable long userToDeleteId) {
         return userService.delete(userToDeleteId);
     }
-
 
 }

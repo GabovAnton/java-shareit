@@ -8,8 +8,8 @@ import ru.practicum.shareit.request.Request;
 import javax.persistence.*;
 import java.util.Set;
 
+
 @AllArgsConstructor
-@Builder
 @NoArgsConstructor
 @Getter
 @Setter

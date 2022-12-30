@@ -3,9 +3,8 @@ package ru.practicum.shareit.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
@@ -16,7 +15,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "requests")
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Request {
 
     @Id
@@ -37,6 +37,5 @@ public class Request {
 
     @OneToMany(mappedBy = "request")
     private Set<ItemProposal> requestItemProposals;
-
 
 }

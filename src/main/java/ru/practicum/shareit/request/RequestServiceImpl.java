@@ -1,13 +1,10 @@
 package ru.practicum.shareit.request;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.QBooking;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemDto;
@@ -30,7 +27,9 @@ import java.util.stream.Collectors;
 public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
+
     private final UserService userService;
+
     private final RequestMapper requestMapper;
 
     @PersistenceContext
@@ -45,18 +44,18 @@ public class RequestServiceImpl implements RequestService {
 
         JPAQuery<Request> query = new JPAQuery<>(entityManager);
 
-
         List<RequestWithProposalsDto> requests = query.from(qRequest)
-                .where(qRequest.requester.id.eq(user.getId()))
-                .orderBy(qRequest.created.desc())
-                .fetch().stream()
-                .filter(Objects::nonNull)
-                .map(requestMapper::requestToRequestWithProposalDto).collect(Collectors.toList());
+                                                      .where(qRequest.requester.id.eq(user.getId()))
+                                                      .orderBy(qRequest.created.desc())
+                                                      .fetch()
+                                                      .stream()
+                                                      .filter(Objects::nonNull)
+                                                      .map(requestMapper::requestToRequestWithProposalDto)
+                                                      .collect(Collectors.toList());
 
-
-        return requests.stream().peek(x ->
-                        x.setItems(getItemsDto(x.getId())))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        return requests.stream()
+                       .peek(x -> x.setItems(getItemsDto(x.getId())))
+                       .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
     }
 
@@ -86,43 +85,48 @@ public class RequestServiceImpl implements RequestService {
         int offset = from != null ? (from > 1 ? --from : from) : 0;
 
         List<RequestWithProposalsDto> requests = queryFactory.selectFrom(request)
-                .where(request.requester.id.notIn(userId))
-                .orderBy(request.created.desc())
-                .limit(size != null ? size : TotalItems)
-                .offset(offset)
-                .fetch().stream()
-                .map(requestMapper::requestToRequestWithProposalDto)
-                .collect(Collectors.toList());
+                                                             .where(request.requester.id.notIn(userId))
+                                                             .orderBy(request.created.desc())
+                                                             .limit(size != null ? size : TotalItems)
+                                                             .offset(offset)
+                                                             .fetch()
+                                                             .stream()
+                                                             .map(requestMapper::requestToRequestWithProposalDto)
+                                                             .collect(Collectors.toList());
 
-        return requests.stream().peek(x ->
-            x.setItems(getItemsDto(x.getId())))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        return requests.stream()
+                       .peek(x -> x.setItems(getItemsDto(x.getId())))
+                       .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
     }
 
     @Override
-    public RequestWithProposalsDto GetRequest(Long requestId, Long userId) {
+    public RequestWithProposalsDto getRequest(Long requestId, Long userId) {
         QRequest qRequest = QRequest.request;
-        if (!requestRepository.existsById(requestId)){
+        if (!requestRepository.existsById(requestId)) {
             throw new EntityNotFoundException("request with id: " + requestId + " not found");
         }
         userService.getUser(userId);
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-        RequestWithProposalsDto request = requestMapper
-                .requestToRequestWithProposalDto(queryFactory.selectFrom(qRequest)
-                .where(qRequest.id.eq(requestId))
-                .fetchOne());
+        RequestWithProposalsDto request =
+                requestMapper.requestToRequestWithProposalDto(queryFactory.selectFrom(qRequest)
+                                                                          .where(qRequest.id.eq(requestId))
+                                                                          .fetchOne());
         request.setItems(getItemsDto(request.getId()));
-      return   request;
+        return request;
 
     }
 
     private List<ItemDto> getItemsDto(Long requestId) {
         JPAQuery<Item> query = new JPAQuery<>(entityManager);
         QItem qItem = QItem.item;
-        return query.from(qItem).where(qItem.requestId.eq(requestId)).fetch().stream()
-                .map(ItemMapper.INSTANCE::itemToItemDto).collect(Collectors.toList());
+        return query.from(qItem)
+                    .where(qItem.requestId.eq(requestId))
+                    .fetch()
+                    .stream()
+                    .map(ItemMapper.INSTANCE::itemToItemDto)
+                    .collect(Collectors.toList());
     }
 
 }

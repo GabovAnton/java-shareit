@@ -15,7 +15,6 @@ import ru.practicum.shareit.exception.ShareItValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -27,90 +26,89 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
-    @Mock
-    private final EntityManager em;
 
-    LocalDateTime currentDate = LocalDateTime
-            .of(2022, 12, 10, 5, 5, 5, 5);
-
+    LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5);
 
     @Mock
     private ItemRepository itemRepository;
 
     @Mock
     private UserService userService;
+
     @Mock
     private CommentRepository commentRepository;
+
     @Mock
     private BookingRepository bookingRepository;
+
     @Captor
     private ArgumentCaptor<Item> itemArgumentCaptor;
 
+    @Mock
+    private ItemMapper itemMapper;
+
+    @Mock
+    private CommentMapper commentMapper;
+
     @InjectMocks
-    private ItemService itemService = new ItemServiceImpl(
-            itemRepository,
-            userService,
-            commentRepository,
-            bookingRepository
+    private ItemService itemService = new ItemServiceImpl(itemRepository, userService, itemMapper, commentMapper,
+
+                                                          commentRepository, bookingRepository
     );
 
     @Test
-    void getItemDto_WrongItemShouldThrowException() {
+    void getItemDtoWrongItemShouldThrowException() {
+
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
 
         Long ItemId = 100L;
-        when(itemRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             itemService.getItemDto(100L, 100L);
         });
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("item with id: " + ItemId + " doesn't exists"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("item with id: " + ItemId + " doesn't exists"));
     }
 
     @Test
     void getItemDto() {
+
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
 
         Long itemId = 100L;
-        when(itemRepository.findById(anyLong()))
-                .thenThrow(new EntityNotFoundException("item with id: " + itemId + " doesn't exists"));
+        when(itemRepository.findById(anyLong())).thenThrow(
+                new EntityNotFoundException("item with id: " + itemId + " doesn't exists"));
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             itemService.getItemDto(100L, 100L);
         });
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("item with id: " + itemId + " doesn't exists"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("item with id: " + itemId + " doesn't exists"));
     }
 
     @Test
-    void map_WrongItemShouldThrowException() {
+    void mapWrongItemShouldThrowException() {
+
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
 
         Long itemId = 100L;
-        when(itemRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             itemService.map(100L);
         });
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("item with id: " + itemId + " doesn't exists"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("item with id: " + itemId + " doesn't exists"));
     }
 
-
     @Test
-    void save_ShouldNotThrowException() {
+    void saveShouldNotThrowException() {
+
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
         ReflectionTestUtils.setField(itemService, "userService", userService);
         Item item = makeItem();
-        when(itemRepository.save(any()))
-                .thenReturn(item);
+        when(itemRepository.save(any())).thenReturn(item);
         itemService.save(item, 100L);
 
         Mockito.verify(itemRepository).save(itemArgumentCaptor.capture());
@@ -122,7 +120,8 @@ class ItemServiceTest {
     }
 
     @Test
-    void saveComment_ShouldThrowExceptionOnBlankText() {
+    void saveCommentShouldThrowExceptionOnBlankText() {
+
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
         ReflectionTestUtils.setField(itemService, "userService", userService);
         Comment comment = makeComment();
@@ -135,14 +134,14 @@ class ItemServiceTest {
             itemService.saveComment(100L, 100L, commentDto);
         });
 
-        assertThat(ForbiddenException.getMessage(),
-                equalTo("Comment should not be empty"));
+        assertThat(ForbiddenException.getMessage(), equalTo("Comment should not be empty"));
         verify(commentRepository, never()).save(comment);
 
     }
 
     @Test
-    void saveComment_ShouldThrowExceptionOnUnfinishedBooking() {
+    void saveCommentShouldThrowExceptionOnUnfinishedBooking() {
+
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
         ReflectionTestUtils.setField(itemService, "userService", userService);
         ReflectionTestUtils.setField(itemService, "bookingRepository", bookingRepository);
@@ -150,26 +149,25 @@ class ItemServiceTest {
         CommentDto commentDto = CommentMapper.INSTANCE.commentToCommentDto(comment);
 
         assertThat(comment.getText(), equalTo(commentDto.getText()));
-        when(itemRepository.findById(anyLong()))
-                .thenReturn(Optional.of(makeItem()));
-        when(userService.getUser(anyLong()))
-                .thenReturn(makeUser());
-        when(bookingRepository.existsByItem_IdAndBooker_IdAndStatusAndEndIsBefore(anyLong(), anyLong(),
-                any(), any()))
-                .thenReturn(false);
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(makeItem()));
+        when(userService.getUser(anyLong())).thenReturn(makeUser());
+        when(bookingRepository.existsByItemIdAndBookerIdAndStatusAndEndIsBefore(
+                anyLong(), anyLong(), any(), any())).thenReturn(false);
 
         ForbiddenException forbiddenException = assertThrows(ForbiddenException.class, () -> {
             itemService.saveComment(100L, 100L, commentDto);
         });
 
         assertThat(forbiddenException.getMessage(),
-                equalTo("error while trying to add comment to item which hasn't  finished booking by user"));
+                   equalTo("error while trying to add comment to item which hasn't  finished booking by user")
+        );
         verify(commentRepository, never()).save(comment);
 
     }
 
     @Test
-    void update_ShouldThrowExceptionOnUpdateItemWhichIsNotBelongToUser() {
+    void updateShouldThrowExceptionOnUpdateItemWhichIsNotBelongToUser() {
+
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
         ReflectionTestUtils.setField(itemService, "userService", userService);
 
@@ -180,43 +178,42 @@ class ItemServiceTest {
         item.setOwner(user);
 
         item.setOwner(user);
-        when(itemRepository.findById(anyLong()))
-                .thenReturn(Optional.of(item));
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
 
         ShareItValidationException shareItValidationException = assertThrows(ShareItValidationException.class, () -> {
             itemService.update(itemPatchDto, 200L);
         });
 
         assertThat(shareItValidationException.getMessage(),
-                equalTo("error while trying to update item which belongs to another user"));
+                   equalTo("error while trying to update item which belongs to another user")
+        );
 
         verify(itemRepository, never()).save(any());
 
     }
 
     @Test
-    void isItemAvailable_ShouldThrowExceptionOnUnavailableItem() {
+    void isItemAvailableShouldThrowExceptionOnUnavailableItem() {
+
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
 
         Long itemId = 100L;
 
         ItemShortAvailability itemShortAvailability = () -> false;
 
-        when(itemRepository.isItemAvailable(anyLong()))
-                .thenReturn(Optional.of(itemShortAvailability));
-
+        when(itemRepository.isItemAvailable(anyLong())).thenReturn(Optional.of(itemShortAvailability));
 
         ForbiddenException forbiddenException = assertThrows(ForbiddenException.class, () -> {
             itemService.isItemAvailable(itemId);
         });
 
-        assertThat(forbiddenException.getMessage(),
-                equalTo("item with id: " + itemId + " is unavailable for booking"));
+        assertThat(forbiddenException.getMessage(), equalTo("item with id: " + itemId + " is unavailable for booking"));
         verify(itemRepository, never()).save(any());
 
     }
 
     private User makeUser() {
+
         User user = new User();
         user.setId(100L);
         user.setName("Artur");
@@ -226,6 +223,7 @@ class ItemServiceTest {
     }
 
     private Comment makeComment() {
+
         Comment comment = new Comment();
         comment.setAuthor(makeUser());
         comment.setCreated(currentDate.minusDays(15));
@@ -236,6 +234,7 @@ class ItemServiceTest {
     }
 
     private Item makeItem() {
+
         Item item = new Item();
         item.setId(100L);
         Comment comment = makeComment();
@@ -247,15 +246,9 @@ class ItemServiceTest {
         return item;
     }
 
-
     private ItemPatchDto makeItemPatchDto() {
-        return new ItemPatchDto(
-                100L,
-                "simple thing",
-                "just simple thig, nothing interesting",
-                true,
-                100L
-        );
+
+        return new ItemPatchDto(100L, "simple thing", "just simple thig, nothing interesting", true, 100L);
     }
 
 }

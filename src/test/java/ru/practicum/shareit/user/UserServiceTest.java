@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
@@ -28,44 +28,40 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    LocalDateTime currentDate = LocalDateTime
-            .of(2022, 12, 10, 5, 5, 5, 5);
+    LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5);
 
     @Mock
     UserRepository userRepository;
+
     @Mock
-    private  UserMapper userMapper;
+    private UserMapper userMapper;
 
     @InjectMocks
-    private UserService userService = new UserServiceImpl(
-            userRepository,
-            userMapper
-    );
+    private UserService userService = new UserServiceImpl(userRepository, userMapper);
 
     @Test
-    void getUser_WrongIdShouldThrowException() {
+    void getUserWrongIdShouldThrowException() {
+
         Long userId = 100l;
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
-        when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             userService.getUser(userId);
         });
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("user with id: " + userId + " doesn't exists"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("user with id: " + userId + " doesn't exists"));
     }
 
     @Test
-    void getAll_ShouldReturnListOfEntity() {
+    void getAllShouldReturnListOfEntity() {
+
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
 
         User user = makeUser();
         List<User> expectedUsers = List.of(user);
 
-        when(userRepository.findAll())
-                .thenReturn(expectedUsers);
+        when(userRepository.findAll()).thenReturn(expectedUsers);
 
         List<UserDto> allUserDTO = userService.getAll();
         UserDto userDto = UserMapper.INSTANCE.userToUserDto(user);
@@ -74,38 +70,37 @@ class UserServiceTest {
         assertThat(allUserDTO.size(), equalTo(userDtos.size()));
         assertThat(allUserDTO.get(0).getName(), equalTo(userDtos.get(0).getName()));
 
-
     }
 
     @Test
-    void save_ShouldReturnSameEntity() {
+    void saveShouldReturnSameEntity() {
+
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
         ReflectionTestUtils.setField(userService, "userMapper", userMapper);
         User user = makeUser();
 
-        when(userRepository.save(any()))
-                .thenReturn(user);
+        when(userRepository.save(any())).thenReturn(user);
         User savedUser = userService.save(user);
         assertThat(savedUser, equalTo(user));
 
     }
 
     @Test
-    void update_WrongIdShouldThrowException() {
+    void updateWrongIdShouldThrowException() {
+
         Long userId = 100l;
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
-        when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         UserUpdateDto userUpdateDto = makeUserUpdateDto();
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             userService.update(userUpdateDto, 100L);
         });
-        assertThat(entityNotFoundException.getMessage(),
-                equalTo("user id: " + userId + " not found"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("user id: " + userId + " not found"));
     }
 
     @Test
     void deleteShouldNotThrowException() {
+
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
         doNothing().when(userRepository).deleteById(anyLong());
         assertThat(userService.delete(100L), equalTo(true));
@@ -113,15 +108,16 @@ class UserServiceTest {
     }
 
     @Test
-    void existsById_ShouldReturnTrue() {
+    void existsByIdShouldReturnTrue() {
+
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
-       when(userRepository.existsById(anyLong()))
-               .thenReturn(true);
+        when(userRepository.existsById(anyLong())).thenReturn(true);
         assertThat(userService.existsById(100L), equalTo(true));
 
     }
 
     private User makeUser() {
+
         User user = new User();
         user.setId(100L);
         user.setName("Artur");
@@ -131,6 +127,7 @@ class UserServiceTest {
     }
 
     private UserUpdateDto makeUserUpdateDto() {
+
         UserUpdateDto user = new UserUpdateDto();
         user.setId(100L);
         user.setName("Artur");
@@ -138,7 +135,5 @@ class UserServiceTest {
 
         return user;
     }
-
-
 
 }
