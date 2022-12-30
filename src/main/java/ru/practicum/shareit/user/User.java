@@ -1,22 +1,39 @@
 package ru.practicum.shareit.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import ru.practicum.shareit.item.Comment;
+import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.request.Request;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.*;
+import java.util.Set;
 
-@Data
+
 @AllArgsConstructor
-@Builder
 @NoArgsConstructor
+@Getter
+@Setter
+@Entity
+@Table(name = "users", schema = "public")
 public class User {
-    private long id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<Item> items;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL)
+    private Set<Comment> Comments;
+
+    @OneToMany(mappedBy = "requester")
+    private Set<Request> requesterRequests;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank
-    @Email
+    @Column(name = "email", nullable = false, length = 512, unique = true)
     private String email;
 }
