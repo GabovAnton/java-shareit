@@ -20,6 +20,7 @@ public class BookingService {
             @CacheEvict(value = "items"*//*, key = "{#userId + #bookingCreateDto.itemId}"*//*)},
             put = {@CachePut(key = "{#userId + #bookingCreateDto.id }")})*/
    // @CacheEvict(value = "items")
+    @CacheEvict(value = "items", key = "{#userId}")
     public BookingDto create(long userId, BookingCreateDto bookingCreateDto) {
 
         return bookingFeignClient.create(userId, bookingCreateDto);
@@ -29,6 +30,7 @@ public class BookingService {
             @CacheEvict(value = "items"*//*, key = "{#bookingCreateDto.itemId + #userId }"*//*),
             @CacheEvict(key = "{#userId, #result.id }")})*/
  //  @CacheEvict(value = "items")
+   @CacheEvict(value = "items", key = "{#userId}")
    public BookingDto update(long userId, long bookingId, Boolean approved) {
 
         return bookingFeignClient.update(bookingId, approved, userId);

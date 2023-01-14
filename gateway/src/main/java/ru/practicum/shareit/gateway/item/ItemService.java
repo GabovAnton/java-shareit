@@ -19,34 +19,54 @@ public class ItemService {
 
     private final ItemFeignClient itemFeignClient;
 
-    //@Cacheable(key = "{#userId + #itemId }")
+    @Cacheable(value = "items", key = "{#userId + #itemId}", unless="#result.id != null")
     public ItemDto getItem(
             long itemId, long userId) {
 
         return itemFeignClient.getItem(itemId, userId);
     }
 
-    @Cacheable(value = "items")
+    @Cacheable(value = "items", key = "{#userId}")
+    //@Cacheable(value = "items")
     public List<ItemDto> getAll(
             long userId, Integer from, Integer size) {
 
         return itemFeignClient.getAll(userId, from, size);
     }
 
-    @CachePut(key = "{#userId + #result.id}")
+    @CachePut(value = "items", key = "{#userId, #result.id}", unless="#result.lastBooking != null || #result" +
+                                                                     ".nextBooking != null ")
     public ItemDto create(long userId, ItemDto itemDto) {
 
         return itemFeignClient.create(userId, itemDto);
     }
 
-    @CacheEvict(value = "items")
+    //@CachePut(value = "items", key = "{#userId, #result.id}")
+    @CachePut(value = "items", key = "{#userId, #result.id}", unless="#result.lastBooking != null || #result" +
+                                                                     ".nextBooking != null ")
+    //TODO добавить удаление кэша из поиска
+
+/*    @Caching(
+            cacheable = {
+                    @Cacheable("users"),
+                    @Cacheable("contacts")
+            },
+            put = {
+                    @CachePut("tables"),
+                    @CachePut("chairs"),
+                    @CachePut(value = "meals", key = "#user.email")
+            },
+            evict = {
+                    @CacheEvict(value = "services", key = "#user.name")
+            }
+    )*/
     public ItemDto update(
             long userId, long itemId, ItemPatchDto itemPatchDto) {
 
         return itemFeignClient.update(userId, itemId, itemPatchDto);
     }
 
-    //@Cacheable(key = "{ #userId + #text}")
+    @Cacheable(value="search", key = "{ #userId + #text}")
     public List<ItemDto> search(
             long userId, Integer from, Integer size, String text) {
 
@@ -57,7 +77,7 @@ public class ItemService {
     @CacheEvict(key = "{ #userId + #itemId}")
 */
     //@CacheEvict(key = "{ #userId + #itemId}")
-    @CacheEvict(value = "items")
+    @CacheEvict(value = "items", key = "{#userId, #itemId}")
     public CommentDto postComment(
             Long itemId, CommentDto commentDto, Long userId) {
 

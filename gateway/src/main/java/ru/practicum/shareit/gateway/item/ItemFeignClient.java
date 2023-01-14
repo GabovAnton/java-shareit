@@ -32,7 +32,8 @@ public interface ItemFeignClient {
             @PathVariable("itemId") long itemId,
             @RequestBody ItemPatchDto itemPatchDto);
 
-   @GetMapping("/search?from={from}&size={size}&text={text}")
+    //@GetMapping("/search?from={from}&size={size}&text={text}")
+   @GetMapping("/search?text={text}")
     //@GetMapping("/search/{text}")
     List<ItemDto> search(
             @RequestHeader("X-Sharer-User-Id") long userId,

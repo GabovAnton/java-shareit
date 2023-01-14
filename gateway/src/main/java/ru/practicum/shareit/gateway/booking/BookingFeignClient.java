@@ -8,7 +8,7 @@ import ru.practicum.shareit.gateway.booking.dto.BookingDto;
 
 import java.util.List;
 
-@FeignClient(value = "bookingClient", path = "/bookings/items", url = "${SHAREIT_SERVER_URL}")
+@FeignClient(value = "bookingClient", path = "/bookings", url = "${SHAREIT_SERVER_URL}")
 @Headers("X-Sharer-User-Id: {userId}")
 public interface BookingFeignClient {
 
