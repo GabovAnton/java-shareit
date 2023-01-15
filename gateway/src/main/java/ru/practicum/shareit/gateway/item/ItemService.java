@@ -1,8 +1,7 @@
 package ru.practicum.shareit.gateway.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -14,12 +13,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@CacheConfig(cacheNames = {"items"})
 public class ItemService {
+
+   @Autowired
+  private TestServiceEvictCache testServiceEvictCache;
 
     private final ItemFeignClient itemFeignClient;
 
-    @Cacheable(value = "items", key = "{#userId + #itemId}", unless="#result.id != null")
+    @Cacheable(value = "items", key = "{#userId, #itemId}", unless="#result.id != null")
     public ItemDto getItem(
             long itemId, long userId) {
 
@@ -27,59 +28,39 @@ public class ItemService {
     }
 
     @Cacheable(value = "items", key = "{#userId}")
-    //@Cacheable(value = "items")
     public List<ItemDto> getAll(
             long userId, Integer from, Integer size) {
 
         return itemFeignClient.getAll(userId, from, size);
     }
 
-    @CachePut(value = "items", key = "{#userId, #result.id}", unless="#result.lastBooking != null || #result" +
-                                                                     ".nextBooking != null ")
+
+    @CachePut(value = "items", key = "{#userId + #result.id}")
     public ItemDto create(long userId, ItemDto itemDto) {
+        testServiceEvictCache.evictAllCacheValues("search");
 
         return itemFeignClient.create(userId, itemDto);
     }
 
-    //@CachePut(value = "items", key = "{#userId, #result.id}")
-    @CachePut(value = "items", key = "{#userId, #result.id}", unless="#result.lastBooking != null || #result" +
-                                                                     ".nextBooking != null ")
-    //TODO добавить удаление кэша из поиска
 
-/*    @Caching(
-            cacheable = {
-                    @Cacheable("users"),
-                    @Cacheable("contacts")
-            },
-            put = {
-                    @CachePut("tables"),
-                    @CachePut("chairs"),
-                    @CachePut(value = "meals", key = "#user.email")
-            },
-            evict = {
-                    @CacheEvict(value = "services", key = "#user.name")
-            }
-    )*/
+    @CachePut(value = "items", key = "{#userId + #result.id}")
     public ItemDto update(
-            long userId, long itemId, ItemPatchDto itemPatchDto) {
-
+            Long userId, Long itemId, ItemPatchDto itemPatchDto) {
+        testServiceEvictCache.evictAllCacheValues("search");
         return itemFeignClient.update(userId, itemId, itemPatchDto);
     }
 
-    @Cacheable(value="search", key = "{ #userId + #text}")
+    @Cacheable(value="search")
     public List<ItemDto> search(
             long userId, Integer from, Integer size, String text) {
 
         return itemFeignClient.search(userId, from, size, text);
     }
 
-/*
-    @CacheEvict(key = "{ #userId + #itemId}")
-*/
-    //@CacheEvict(key = "{ #userId + #itemId}")
-    @CacheEvict(value = "items", key = "{#userId, #itemId}")
+
     public CommentDto postComment(
             Long itemId, CommentDto commentDto, Long userId) {
+        testServiceEvictCache.evictSingleCacheValue("items", userId.toString() + itemId.toString());
 
         return itemFeignClient.postComment(itemId, commentDto, userId);
     }

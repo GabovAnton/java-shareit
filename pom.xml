@@ -50,6 +50,8 @@
 						<systemPropertyVariables>
 							<spring.profiles.active>test</spring.profiles.active>
 						</systemPropertyVariables>
+						<argLine>-Dfile.encoding=UTF-8</argLine>
+
 					</configuration>
 				</plugin>
 				<plugin>
