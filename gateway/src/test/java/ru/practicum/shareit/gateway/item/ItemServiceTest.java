@@ -27,7 +27,7 @@ class ItemServiceTest {
     LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5);
 
     @Autowired
-   private ItemFeignClient itemFeignClient;
+    private ItemFeignClient itemFeignClient;
 
     @Test
     void getItemShouldReturnDto() {
@@ -101,6 +101,7 @@ class ItemServiceTest {
 
     @Test
     void search() {
+
         stubFor(get("/items/search?text=test&from=0&size=10")
                 .withHeader("X-Sharer-User-Id", WireMock.matching("1"))
                 .willReturn(WireMock
@@ -115,6 +116,7 @@ class ItemServiceTest {
 
     @Test
     void postComment() {
+
         stubFor(post("/items/1/comment")
                 .withRequestBody(equalToJson(
                         "{ \"id\" : null, \"text\" : \"good thing\", \"authorId\" : 100, \"authorName\" : \"Artur\", \"created\" : \"2022-11-25T05:05:05\"}\n",
@@ -126,7 +128,7 @@ class ItemServiceTest {
                         .withStatus(HttpStatus.OK.value())
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("oneItem-response.json")));
-        itemFeignClient.postComment(1L,makeCommentDto(),1L);
+        itemFeignClient.postComment(1L, makeCommentDto(), 1L);
     }
 
     private ItemPatchDto makeItemPatchDto() {

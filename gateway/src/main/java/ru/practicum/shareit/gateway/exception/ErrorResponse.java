@@ -8,5 +8,5 @@ public class ErrorResponse {
 
     @Getter
     String error;
-}
 
+}

@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.gateway.item.dto.ItemDto;
 import ru.practicum.shareit.gateway.item.dto.CommentDto;
+import ru.practicum.shareit.gateway.item.dto.ItemDto;
 
 import java.io.Serializable;
 import java.util.Set;

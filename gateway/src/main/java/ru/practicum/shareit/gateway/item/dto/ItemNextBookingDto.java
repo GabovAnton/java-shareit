@@ -12,4 +12,5 @@ public class ItemNextBookingDto {
     private final Long id;
 
     private final Long bookerId;
+
 }

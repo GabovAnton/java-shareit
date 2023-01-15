@@ -18,4 +18,5 @@ public class ItemPatchDto {
     private Boolean available;
 
     private Long requestId;
+
 }

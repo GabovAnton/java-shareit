@@ -36,4 +36,5 @@ public class ItemDto {
     private Set<CommentDto> comments;
 
     private UserDto owner;
+
 }

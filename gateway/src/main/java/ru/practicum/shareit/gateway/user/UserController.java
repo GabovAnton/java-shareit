@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.gateway.user.dto.UserUpdateDto;
 import ru.practicum.shareit.gateway.user.dto.UserDto;
+import ru.practicum.shareit.gateway.user.dto.UserUpdateDto;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -17,8 +17,6 @@ import java.util.List;
 @Slf4j
 @Validated
 public class UserController {
-
-   // private final UserClient userClient;
 
     @Autowired
     private UserService userService;
@@ -53,6 +51,7 @@ public class UserController {
 
     @DeleteMapping("{userToDeleteId}")
     public Boolean delete(@PathVariable long userToDeleteId) {
+
         log.info("Delete user Id {}", userToDeleteId);
 
         return userService.delete(userToDeleteId);

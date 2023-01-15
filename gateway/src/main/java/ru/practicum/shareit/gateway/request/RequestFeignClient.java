@@ -3,8 +3,8 @@ package ru.practicum.shareit.gateway.request;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.gateway.request.dto.RequestWithProposalsDto;
 import ru.practicum.shareit.gateway.request.dto.RequestDto;
+import ru.practicum.shareit.gateway.request.dto.RequestWithProposalsDto;
 
 import java.util.List;
 

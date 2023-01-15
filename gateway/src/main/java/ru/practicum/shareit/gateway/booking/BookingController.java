@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.gateway.booking.dto.BookingCreateDto;
-import ru.practicum.shareit.gateway.booking.dto.BookingState;
 import ru.practicum.shareit.gateway.booking.dto.BookingDto;
+import ru.practicum.shareit.gateway.booking.dto.BookingState;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;

@@ -19,9 +19,7 @@ public interface ItemFeignClient {
 
     @GetMapping()
     List<ItemDto> getAll(
-            @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam Integer from,
-            @RequestParam Integer size);
+            @RequestHeader("X-Sharer-User-Id") long userId, @RequestParam Integer from, @RequestParam Integer size);
 
     @PostMapping
     ItemDto create(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody ItemDto itemDto);
@@ -32,9 +30,7 @@ public interface ItemFeignClient {
             @PathVariable("itemId") long itemId,
             @RequestBody ItemPatchDto itemPatchDto);
 
-    //@GetMapping("/search?from={from}&size={size}&text={text}")
-   @GetMapping("/search?text={text}")
-    //@GetMapping("/search/{text}")
+    @GetMapping("/search?text={text}")
     List<ItemDto> search(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @RequestParam Integer from,

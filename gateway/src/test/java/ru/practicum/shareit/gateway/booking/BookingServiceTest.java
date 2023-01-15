@@ -26,8 +26,6 @@ class BookingServiceTest {
 
     LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5);
 
-    /*@Autowired
-    CacheManager cacheManager;*/
     @Autowired
     BookingFeignClient bookingFeignClient;
 

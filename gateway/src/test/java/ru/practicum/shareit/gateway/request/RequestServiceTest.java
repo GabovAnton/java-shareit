@@ -31,6 +31,7 @@ class RequestServiceTest {
 
     @Test
     void getAllShouldRequestItemsList() {
+
         stubFor(get("/requests?from=0&size=10")
                 .withHeader("X-Sharer-User-Id", WireMock.matching("1"))
                 .willReturn(WireMock
@@ -39,13 +40,18 @@ class RequestServiceTest {
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("requests-response.json")));
         List<RequestWithProposalsDto> requestWithProposalsDtos = requestFeignClient.getAll(1L, 0, 10);
-        assertThat(requestWithProposalsDtos).isNotEmpty().hasSize(1).element(0).
-                extracting(RequestWithProposalsDto::getId).isEqualTo(100L);
+        assertThat(requestWithProposalsDtos)
+                .isNotEmpty()
+                .hasSize(1)
+                .element(0)
+                .extracting(RequestWithProposalsDto::getId)
+                .isEqualTo(100L);
 
     }
 
     @Test
     void getAllFromOthers() {
+
         stubFor(get("/requests/all?from=0&size=10")
                 .withHeader("X-Sharer-User-Id", WireMock.matching("1"))
                 .willReturn(WireMock
@@ -54,9 +60,12 @@ class RequestServiceTest {
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("requests-response.json")));
         List<RequestWithProposalsDto> requestWithProposalsDtos = requestFeignClient.getAllFromOthers(1L, 0, 10);
-        assertThat(requestWithProposalsDtos).isNotEmpty().hasSize(1).element(0).
-                extracting(RequestWithProposalsDto::getId).isEqualTo(100L);
-
+        assertThat(requestWithProposalsDtos)
+                .isNotEmpty()
+                .hasSize(1)
+                .element(0)
+                .extracting(RequestWithProposalsDto::getId)
+                .isEqualTo(100L);
 
     }
 
@@ -64,7 +73,11 @@ class RequestServiceTest {
     void createShouldReturnNewDto() {
 
         stubFor(post("/requests")
-                .withRequestBody(equalToJson("{\"id\":100,\"description\":\"simple test description\",\"requester\":{\"id\":100,\"name\":\"Artur\",\"email\":\"artur@gmail.com\",\"registrationDate\":\"2022-11-25T05:05:05\"},\"created\":\"2022-12-09T05:05:05\"}",
+                .withRequestBody(equalToJson("{\"id\":100,\"description\":\"simple test description\"," +
+                                             "\"requester\":{\"id\":100," +
+                                             "\"name\":\"Artur\",\"email\":\"artur@gmail.com\"," +
+                                             "\"registrationDate\":\"2022-11-25T05:05:05\"}" +
+                                             ",\"created\":\"2022-12-09T05:05:05\"}",
                         true,
                         true))
                 .withHeader("X-Sharer-User-Id", WireMock.matching("1"))
@@ -82,6 +95,7 @@ class RequestServiceTest {
 
     @Test
     void getRequestById() {
+
         stubFor(get("/requests/100")
                 .withHeader("X-Sharer-User-Id", WireMock.matching("1"))
                 .willReturn(WireMock
@@ -110,14 +124,5 @@ class RequestServiceTest {
         );
 
     }
-
-   /* private RequestWithProposalsDto makeRequestWithProposalDto() {
-RequestWithProposalsDto request = new RequestWithProposalsDto();
-
-        return new RequestWithProposalsDto(100L, "simple test description", makeUserDto(), currentDate.minusDays(1)
-
-        );
-
-    }*/
 
 }

@@ -54,8 +54,9 @@ public class RequestController {
 
     @GetMapping("{requestId}")
     public RequestWithProposalsDto getRequestById(
-            @PathVariable Long requestId, @RequestHeader("X-Sharer-User-Id") long userId){
-        return requestService.getRequestById(requestId,userId);
+            @PathVariable Long requestId, @RequestHeader("X-Sharer-User-Id") long userId) {
+
+        return requestService.getRequestById(requestId, userId);
     }
 
 }
