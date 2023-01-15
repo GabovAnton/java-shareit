@@ -11,6 +11,9 @@ import ru.practicum.shareit.gateway.user.dto.UserDto;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -36,5 +39,15 @@ public class BookingDto implements Serializable {
     private ItemDto item;
 
     private UserDto booker;
+
+    private void writeObject(ObjectOutputStream stream) throws IOException {
+
+        stream.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+
+        stream.defaultReadObject();
+    }
 
 }

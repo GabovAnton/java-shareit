@@ -8,6 +8,9 @@ import ru.practicum.shareit.gateway.user.dto.UserDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Set;
 
 @Getter

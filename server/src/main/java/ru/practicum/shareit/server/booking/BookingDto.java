@@ -36,13 +36,13 @@ public class BookingDto implements Serializable {
 
     private UserDto booker;
 
-    private void writeObject(ObjectOutputStream stream)
-            throws IOException {
+    private void writeObject(ObjectOutputStream stream) throws IOException {
+
         stream.defaultWriteObject();
     }
 
-    private void readObject(ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+
         stream.defaultReadObject();
     }
 
