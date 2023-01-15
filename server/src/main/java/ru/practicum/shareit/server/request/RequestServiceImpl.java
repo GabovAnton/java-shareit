@@ -89,7 +89,7 @@ public class RequestServiceImpl implements RequestService {
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 
-        long TotalItems = requestRepository.count() + 1;
+        long totalItems = requestRepository.count() + 1;
 
         int offset = from != null ? (from > 1 ? --from : from) : 0;
 
@@ -97,7 +97,7 @@ public class RequestServiceImpl implements RequestService {
                 .selectFrom(request)
                 .where(request.requester.id.notIn(userId))
                 .orderBy(request.created.desc())
-                .limit(size != null ? size : TotalItems)
+                .limit(size != null ? size : totalItems)
                 .offset(offset)
                 .fetch()
                 .stream()

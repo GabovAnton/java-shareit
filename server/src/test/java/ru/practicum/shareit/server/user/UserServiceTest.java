@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.practicum.shareit.server.exception.EntityNotFoundException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
