@@ -27,13 +27,15 @@ public class RequestWithProposalsDto implements Serializable {
     private final LocalDateTime created;
 
     private List<ItemDto> items;
-    private void writeObject(ObjectOutputStream stream)
-            throws IOException {
+
+    private void writeObject(ObjectOutputStream stream) throws IOException {
+
         stream.defaultWriteObject();
     }
 
-    private void readObject(ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+
         stream.defaultReadObject();
     }
+
 }
