@@ -1,6 +1,5 @@
-#FROM --platform=linux/amd64 amazoncorretto:11-alpine-jdk
 FROM bellsoft/liberica-openjdk-alpine-musl:11
-ENV TZ=Europe/Moscow
+#ENV TZ=Europe/Moscow
 
 ENV JAVA_TOOL_OPTIONS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8086
 COPY target/*.jar app.jar
