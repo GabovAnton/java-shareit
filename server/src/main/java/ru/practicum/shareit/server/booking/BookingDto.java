@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.server.item.ItemDto;
 import ru.practicum.shareit.server.user.UserDto;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -32,5 +35,15 @@ public class BookingDto implements Serializable {
     private ItemDto item;
 
     private UserDto booker;
+
+    private void writeObject(ObjectOutputStream stream)
+            throws IOException {
+        stream.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+    }
 
 }
