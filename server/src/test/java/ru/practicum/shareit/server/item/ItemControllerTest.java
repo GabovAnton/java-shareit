@@ -80,12 +80,12 @@ class ItemControllerTest {
 
         mvc
                 .perform(get("/items")
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.ALL)
-                                 .param("from", "5")
-                                 .param("size", "5")
-                                 .header("X-Sharer-User-Id", "1"))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL)
+                        .param("from", "5")
+                        .param("size", "5")
+                        .header("X-Sharer-User-Id", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", equalTo(itemDto.getName())))
@@ -101,18 +101,14 @@ class ItemControllerTest {
 
         when(itemService.save(any(), anyLong())).thenReturn(item);
 
-        mvc
-                .perform(post("/items")
-                                 .content(mapper.writeValueAsString(itemDto))
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.APPLICATION_JSON)
-                                 .header("X-Sharer-User-Id", "1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", equalTo(itemDto.getName())));
+        mvc.perform(post("/items")
+                .content(mapper.writeValueAsString(itemDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", "1")).andDo(print()).andExpect(status().isOk()).andDo(print()).andExpect(
+                jsonPath("$.id", is(itemDto.getId()), Long.class)).andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                equalTo(itemDto.getName())));
 
     }
 
@@ -122,16 +118,14 @@ class ItemControllerTest {
         ItemDto itemDto = makeItemDto();
         when(itemService.save(any(), anyLong())).thenThrow(new EntityNotFoundException("foo"));
 
-        mvc
-                .perform(post("/items")
-                                 .content(mapper.writeValueAsString(itemDto))
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.APPLICATION_JSON)
-                                 .header("X-Sharer-User-Id", "1"))
+        mvc.perform(post("/items")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", "1"))
 
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().is(404));
+                .andDo(MockMvcResultHandlers.print()).andExpect(status().is(404));
 
     }
 
@@ -144,17 +138,14 @@ class ItemControllerTest {
 
         when(itemService.update(any(), anyLong())).thenReturn(itemDto);
 
-        mvc
-                .perform(patch("/items/{itemId}", 1L)
-                                 .content(mapper.writeValueAsString(itemPatchDto))
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.APPLICATION_JSON)
-                                 .header("X-Sharer-User-Id", "1"))
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", equalTo(itemDto.getName())));
+        mvc.perform(patch("/items/{itemId}", 1L)
+                .content(mapper.writeValueAsString(itemPatchDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", "1")).andExpect(status().isOk()).andDo(print()).andExpect(jsonPath("$.id",
+                is(itemDto.getId()),
+                Long.class)).andExpect(MockMvcResultMatchers.jsonPath("$.name", equalTo(itemDto.getName())));
 
     }
 
@@ -167,21 +158,16 @@ class ItemControllerTest {
 
         when(itemService.search(anyInt(), anyInt(), anyString())).thenReturn(expectedItems);
 
-        mvc
-                .perform(get("/items/search/")
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.APPLICATION_JSON)
-                                 .param("from", "5")
-                                 .param("size", "5")
-                                 .param("text", "отВертКа")
-                                 .header("X-Sharer-User-Id", "1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(itemDto.getId()), Long.class))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", equalTo(itemDto.getName())));
+        mvc.perform(get("/items/search/")
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .param("from", "5")
+                .param("size", "5")
+                .param("text", "отВертКа")
+                .header("X-Sharer-User-Id", "1")).andDo(print()).andExpect(status().isOk()).andDo(print()).andExpect(
+                jsonPath("$", hasSize(1))).andExpect(jsonPath("$[0].id", is(itemDto.getId()), Long.class)).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].name", equalTo(itemDto.getName())));
     }
 
     @Test
@@ -193,18 +179,14 @@ class ItemControllerTest {
 
         when(itemService.saveComment(any(), anyLong(), any())).thenReturn(comment);
 
-        mvc
-                .perform(post("/items/{itemId}/comment", 100L)
-                                 .content(mapper.writeValueAsString(commentDto))
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.APPLICATION_JSON)
-                                 .header("X-Sharer-User-Id", "1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(jsonPath("$.id", is(comment.getId()), Long.class))
-                .andExpect(jsonPath("$.text", equalTo(comment.getText())));
+        mvc.perform(post("/items/{itemId}/comment", 100L)
+                .content(mapper.writeValueAsString(commentDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", "1")).andDo(print()).andExpect(status().isOk()).andDo(print()).andExpect(
+                jsonPath("$.id", is(comment.getId()), Long.class)).andExpect(jsonPath("$.text",
+                equalTo(comment.getText())));
 
     }
 
@@ -219,9 +201,7 @@ class ItemControllerTest {
         itemDto.setLastBooking(new ItemLastBookingDto(100L, 100L));
         itemDto.setNextBooking(new ItemNextBookingDto(100L, 100L));
 
-        CommentDto commentDto = new CommentDto(100L, "good thing", 101L, "Artur", LocalDateTime
-                .now()
-                .minusDays(100));
+        CommentDto commentDto = new CommentDto(100L, "good thing", 101L, "Artur", LocalDateTime.now().minusDays(100));
 
         itemDto.setComments(Set.of(commentDto));
         itemDto.setOwner(new UserDto());
@@ -260,19 +240,10 @@ class ItemControllerTest {
         booking.setEnd(currentDate.plusDays(2));
         booking.setStatus(BookingStatus.WAITING);
         booking.setItem(new Item());
-        booking
-                .getBooker()
-                .setId(100L);
-        booking
-                .getItem()
-                .setId(100L);
-        booking
-                .getItem()
-                .setOwner(makeUser());
-        booking
-                .getItem()
-                .getOwner()
-                .setId(100L);
+        booking.getBooker().setId(100L);
+        booking.getItem().setId(100L);
+        booking.getItem().setOwner(makeUser());
+        booking.getItem().getOwner().setId(100L);
 
         return booking;
     }

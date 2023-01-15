@@ -8,7 +8,9 @@ class SearchAll implements BookingSearch {
 
     @Override
     public BooleanExpression getSearchExpression(long userId) {
+
         QBooking qBooking = QBooking.booking;
         return qBooking.id.isNotNull();
     }
+
 }

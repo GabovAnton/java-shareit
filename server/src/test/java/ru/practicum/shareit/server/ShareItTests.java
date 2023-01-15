@@ -38,11 +38,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 
-@Sql(scripts = {"classpath:/schema.sql", "classpath:/SampleData.sql"},
-     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:/schema.sql",
+        "classpath:/SampleData.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ShareItTests {
+
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;

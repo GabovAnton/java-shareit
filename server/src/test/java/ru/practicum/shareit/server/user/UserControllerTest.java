@@ -32,15 +32,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = UserController.class)
 class UserControllerTest {
+
     @Autowired
     ObjectMapper mapper;
 
     @MockBean
     UserService userService;
+
     @InjectMocks
     UserController userController;
-    LocalDateTime currentDate = LocalDateTime
-            .of(2022, 12, 10, 5, 5, 5, 5);
+
+    LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5);
+
     @Autowired
     private MockMvc mvc;
 
@@ -50,8 +53,7 @@ class UserControllerTest {
         ReflectionTestUtils.setField(userController, "userService", userService);
         User user = makeUser();
         UserDto userDto = makeUserDto();
-        when(userService.getUser(anyLong()))
-                .thenReturn(user);
+        when(userService.getUser(anyLong())).thenReturn(user);
 
         ResponseEntity<UserDto> response = userController.getUserById(100L);
 
@@ -64,14 +66,13 @@ class UserControllerTest {
 
         UserDto userDto = makeUserDto();
         List<UserDto> expectedItems = List.of(userDto);
-        when(userService.getAll())
-                .thenReturn(expectedItems);
-        mvc.perform(get("/users")
+        when(userService.getAll()).thenReturn(expectedItems);
+        mvc
+                .perform(get("/users")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL)
-                        .header("X-Sharer-User-Id", "1")
-                )
+                        .header("X-Sharer-User-Id", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", equalTo(userDto.getName())))
@@ -80,63 +81,59 @@ class UserControllerTest {
 
     @Test
     void createShouldReturnSameObject() throws Exception {
+
         UserDto userDto = makeUserDto();
         User user = makeUser();
 
-        when(userService.save(any()))
-                .thenReturn(user);
+        when(userService.save(any())).thenReturn(user);
 
         mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(userDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", "100L"))
-                .andDo(print())
-                .andExpect(status().isOk()).andDo(print())
-                .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", equalTo(userDto.getName())));
+                .content(mapper.writeValueAsString(userDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", "100L")).andDo(print()).andExpect(status().isOk()).andDo(print()).andExpect(
+                jsonPath("$.id", is(userDto.getId()), Long.class)).andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                equalTo(userDto.getName())));
     }
 
     @Test
     void updateShouldReturnUpdatedEntity() throws Exception {
+
         UserDto userDto = makeUserDto();
         UserUpdateDto userUpdateDto = makeUserUpdateDto();
 
-        when(userService.update(any(), anyLong()))
-                .thenReturn(userDto);
+        when(userService.update(any(), anyLong())).thenReturn(userDto);
 
-        mvc.perform(MockMvcRequestBuilders.patch("/users/{userToUpdateId}", 100L)
-                        .content(mapper.writeValueAsString(userUpdateDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", "100"))
-                .andExpect(status().isOk()).andDo(print())
-                .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", equalTo(userDto.getName())));
+        mvc.perform(MockMvcRequestBuilders
+                .patch("/users/{userToUpdateId}", 100L)
+                .content(mapper.writeValueAsString(userUpdateDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", "100")).andExpect(status().isOk()).andDo(print()).andExpect(jsonPath("$.id",
+                is(userDto.getId()),
+                Long.class)).andExpect(MockMvcResultMatchers.jsonPath("$.name", equalTo(userDto.getName())));
 
     }
 
     @Test
     void delete() throws Exception {
 
-        when(userService.delete(anyLong()))
-                .thenReturn(true);
+        when(userService.delete(anyLong())).thenReturn(true);
 
         mvc.perform(MockMvcRequestBuilders
-                        .delete("/users/{userToDeleteId}", 100L)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", "100"))
-                .andExpect(status().isOk()).andDo(print())
-                .andExpect(jsonPath("$", is(true)));
+                .delete("/users/{userToDeleteId}", 100L)
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", "100")).andExpect(status().isOk()).andDo(print()).andExpect(jsonPath("$",
+                is(true)));
 
     }
 
-
     private User makeUser() {
+
         User user = new User();
         user.setId(100L);
         user.setName("Artur");
@@ -146,6 +143,7 @@ class UserControllerTest {
     }
 
     private UserDto makeUserDto() {
+
         UserDto user = new UserDto();
         user.setId(100L);
         user.setName("Artur");
@@ -155,9 +153,11 @@ class UserControllerTest {
     }
 
     private UserUpdateDto makeUserUpdateDto() {
+
         UserUpdateDto userUpdateDto = new UserUpdateDto();
         userUpdateDto.setEmail("arturchik@gmail.com");
         userUpdateDto.setName("Arturchik");
         return userUpdateDto;
     }
+
 }

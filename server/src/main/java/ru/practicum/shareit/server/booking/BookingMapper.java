@@ -7,9 +7,9 @@ import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.server.item.ItemService;
 import ru.practicum.shareit.server.user.UserService;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = "spring",
-        uses = {ItemService.class, UserService.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {
+        ItemService.class,
+        UserService.class})
 public interface BookingMapper {
 
     BookingMapper INSTANCE = Mappers.getMapper(BookingMapper.class);

@@ -128,7 +128,7 @@ public class BookingServiceImpl implements BookingService {
 
             QBooking qBooking = QBooking.booking;
             JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-            long TotalItems = bookingRepository.count() + 1;
+            long totalItems = bookingRepository.count() + 1;
             int offset = from != null ? from : 0;
             List<BookingDto> collect = queryFactory
                     .selectFrom(qBooking)
@@ -136,7 +136,7 @@ public class BookingServiceImpl implements BookingService {
                             .eq(ownerId)
                             .and(bookingSearch.getSearchExpression(ownerId)))
                     .orderBy(qBooking.start.desc())
-                    .limit(size != null ? size : TotalItems)
+                    .limit(size != null ? size : totalItems)
                     .offset(offset)
                     .fetch()
                     .stream()

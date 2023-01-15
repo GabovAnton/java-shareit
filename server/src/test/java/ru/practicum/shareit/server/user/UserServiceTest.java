@@ -28,8 +28,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5);
-
     @Mock
     UserRepository userRepository;
 
@@ -42,7 +40,7 @@ class UserServiceTest {
     @Test
     void getUserWrongIdShouldThrowException() {
 
-        Long userId = 100l;
+        Long userId = 100L;
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -88,7 +86,7 @@ class UserServiceTest {
     @Test
     void updateWrongIdShouldThrowException() {
 
-        Long userId = 100l;
+        Long userId = 100L;
         ReflectionTestUtils.setField(userService, "userRepository", userRepository);
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         UserUpdateDto userUpdateDto = makeUserUpdateDto();

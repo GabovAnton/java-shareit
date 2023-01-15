@@ -13,7 +13,6 @@ import ru.practicum.shareit.server.user.*;
 import ru.practicum.shareit.server.booking.BookingRepository;
 import ru.practicum.shareit.server.booking.BookingSearchFactory;
 
-
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -30,8 +29,9 @@ import static org.hamcrest.Matchers.hasSize;
 @SpringBootTest(properties = "db.name=test", webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 
-@Sql(scripts = {"classpath:/schema.sql", "classpath:/SampleData.sql"},
-     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:/schema.sql",
+        "classpath:/SampleData.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class RequestIntegrationTest {
 
     LocalDateTime currentDate = LocalDateTime.of(2022, 9, 17, 5, 5, 5, 5);
@@ -62,9 +62,12 @@ public class RequestIntegrationTest {
     @Autowired
     private CommentMapper commentMapper;
 
-    private final ItemService itemService = new ItemServiceImpl(itemRepository, userService, itemMapper, commentMapper,
-                                                                commentRepository, bookingRepository
-    );
+    private final ItemService itemService = new ItemServiceImpl(itemRepository,
+            userService,
+            itemMapper,
+            commentMapper,
+            commentRepository,
+            bookingRepository);
 
     @Autowired
     private RequestMapper requestMapper;
@@ -183,7 +186,7 @@ public class RequestIntegrationTest {
 
         }
 
-        List<RequestWithProposalsDto> allFromOthers = requestService.getAll(null,null,6L);
+        List<RequestWithProposalsDto> allFromOthers = requestService.getAll(null, null, 6L);
         List<Long> collect = allFromOthers.stream().map(RequestWithProposalsDto::getId).collect(Collectors.toList());
 
         assertThat(collect, hasSize(31));

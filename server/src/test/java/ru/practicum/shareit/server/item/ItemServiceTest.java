@@ -56,21 +56,20 @@ class ItemServiceTest {
     @InjectMocks
     private ItemService itemService = new ItemServiceImpl(itemRepository, userService, itemMapper, commentMapper,
 
-                                                          commentRepository, bookingRepository
-    );
+            commentRepository, bookingRepository);
 
     @Test
     void getItemDtoWrongItemShouldThrowException() {
 
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
 
-        Long ItemId = 100L;
+        Long itemId = 100L;
         when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             itemService.getItemDto(100L, 100L);
         });
-        assertThat(entityNotFoundException.getMessage(), equalTo("item with id: " + ItemId + " doesn't exists"));
+        assertThat(entityNotFoundException.getMessage(), equalTo("item with id: " + itemId + " doesn't exists"));
     }
 
     @Test
@@ -79,8 +78,8 @@ class ItemServiceTest {
         ReflectionTestUtils.setField(itemService, "itemRepository", itemRepository);
 
         Long itemId = 100L;
-        when(itemRepository.findById(anyLong())).thenThrow(
-                new EntityNotFoundException("item with id: " + itemId + " doesn't exists"));
+        when(itemRepository.findById(anyLong())).thenThrow(new EntityNotFoundException(
+                "item with id: " + itemId + " doesn't exists"));
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             itemService.getItemDto(100L, 100L);
@@ -129,11 +128,11 @@ class ItemServiceTest {
         assertThat(comment.getText(), equalTo(commentDto.getText()));
         commentDto.setText("");
 
-        ForbiddenException ForbiddenException = assertThrows(ForbiddenException.class, () -> {
+        ForbiddenException forbiddenException = assertThrows(ForbiddenException.class, () -> {
             itemService.saveComment(100L, 100L, commentDto);
         });
 
-        assertThat(ForbiddenException.getMessage(), equalTo("Comment should not be empty"));
+        assertThat(forbiddenException.getMessage(), equalTo("Comment should not be empty"));
         verify(commentRepository, never()).save(comment);
 
     }
@@ -150,16 +149,17 @@ class ItemServiceTest {
         assertThat(comment.getText(), equalTo(commentDto.getText()));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(makeItem()));
         when(userService.getUser(anyLong())).thenReturn(makeUser());
-        when(bookingRepository.existsByItemIdAndBookerIdAndStatusAndEndIsBefore(
-                anyLong(), anyLong(), any(), any())).thenReturn(false);
+        when(bookingRepository.existsByItemIdAndBookerIdAndStatusAndEndIsBefore(anyLong(),
+                anyLong(),
+                any(),
+                any())).thenReturn(false);
 
         ForbiddenException forbiddenException = assertThrows(ForbiddenException.class, () -> {
             itemService.saveComment(100L, 100L, commentDto);
         });
 
         assertThat(forbiddenException.getMessage(),
-                   equalTo("error while trying to add comment to item which hasn't  finished booking by user")
-        );
+                equalTo("error while trying to add comment to item which hasn't  finished booking by user"));
         verify(commentRepository, never()).save(comment);
 
     }
@@ -184,8 +184,7 @@ class ItemServiceTest {
         });
 
         assertThat(entityNotFoundException.getMessage(),
-                   equalTo("error while trying to update item which belongs to another user")
-        );
+                equalTo("error while trying to update item which belongs to another user"));
 
         verify(itemRepository, never()).save(any());
 

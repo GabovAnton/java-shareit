@@ -23,8 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest(properties = "db.name=test", webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 
-@Sql(scripts = {"classpath:/schema.sql", "classpath:/SampleData.sql"},
-     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:/schema.sql",
+        "classpath:/SampleData.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 
 public class BookingIntegrationTest {
 
@@ -47,9 +48,10 @@ public class BookingIntegrationTest {
     @Autowired
     private BookingSearchFactory bookingSearchFactory;
 
-    private final BookingService bookingService = new BookingServiceImpl(bookingRepository, userService, itemService,
-                                                                         bookingSearchFactory
-    );
+    private final BookingService bookingService = new BookingServiceImpl(bookingRepository,
+            userService,
+            itemService,
+            bookingSearchFactory);
 
     @Test
     public void getBookingsAllShouldReturnList() {

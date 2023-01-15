@@ -55,13 +55,14 @@ class RequestControllerTest {
 
         mvc
                 .perform(get("/requests")
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.ALL)
-                                 .header("X-Sharer-User-Id", "1"))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL)
+                        .header("X-Sharer-User-Id", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description", equalTo(requestWithProposalsDto.getDescription())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description",
+                        equalTo(requestWithProposalsDto.getDescription())))
                 .andExpect(jsonPath("$[0].id", is(requestWithProposalsDto.getId()), Long.class));
 
     }
@@ -73,18 +74,14 @@ class RequestControllerTest {
 
         when(requestService.saveRequest(any(), anyLong())).thenReturn(requestDto);
 
-        mvc
-                .perform(post("/requests")
-                                 .content(mapper.writeValueAsString(requestDto))
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.APPLICATION_JSON)
-                                 .header("X-Sharer-User-Id", "1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(jsonPath("$.id", is(requestDto.getId()), Long.class))
-                .andExpect(jsonPath("$.description", equalTo(requestDto.getDescription())));
+        mvc.perform(post("/requests")
+                .content(mapper.writeValueAsString(requestDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", "1")).andDo(print()).andExpect(status().isOk()).andDo(print()).andExpect(
+                jsonPath("$.id", is(requestDto.getId()), Long.class)).andExpect(jsonPath("$.description",
+                equalTo(requestDto.getDescription())));
 
     }
 
@@ -99,15 +96,16 @@ class RequestControllerTest {
 
         mvc
                 .perform(get("/requests/all")
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.ALL)
-                                 .param("from", "5")
-                                 .param("size", "5")
-                                 .header("X-Sharer-User-Id", "1"))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL)
+                        .param("from", "5")
+                        .param("size", "5")
+                        .header("X-Sharer-User-Id", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description", equalTo(requestWithProposalsDto.getDescription())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description",
+                        equalTo(requestWithProposalsDto.getDescription())))
                 .andExpect(jsonPath("$[0].id", is(requestWithProposalsDto.getId()), Long.class));
     }
 
@@ -118,15 +116,15 @@ class RequestControllerTest {
 
         when(requestService.getRequest(anyLong(), anyLong())).thenReturn(requestWithProposalsDto);
 
-        mvc
-                .perform(get("/requests/{requestId}", 100L)
-                                 .characterEncoding(StandardCharsets.UTF_8)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .accept(MediaType.ALL)
-                                 .header("X-Sharer-User-Id", "1"))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", equalTo(requestWithProposalsDto.getDescription())))
-                .andExpect(jsonPath("$.id", is(requestWithProposalsDto.getId()), Long.class));
+        mvc.perform(get("/requests/{requestId}", 100L)
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .header("X-Sharer-User-Id", "1")).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath(
+                "$.description",
+                equalTo(requestWithProposalsDto.getDescription()))).andExpect(jsonPath("$.id",
+                is(requestWithProposalsDto.getId()),
+                Long.class));
 
     }
 
@@ -141,9 +139,7 @@ class RequestControllerTest {
         itemDto.setLastBooking(new ItemLastBookingDto(100L, 100L));
         itemDto.setNextBooking(new ItemNextBookingDto(100L, 100L));
 
-        CommentDto commentDto = new CommentDto(100L, "good thing", 101L, "Artur", LocalDateTime
-                .now()
-                .minusDays(100));
+        CommentDto commentDto = new CommentDto(100L, "good thing", 101L, "Artur", LocalDateTime.now().minusDays(100));
 
         itemDto.setComments(Set.of(commentDto));
         itemDto.setOwner(new UserDto());
@@ -171,10 +167,11 @@ class RequestControllerTest {
 
     private RequestWithProposalsDto makeRequestWithProposalsDto() {
 
-
-        return new RequestWithProposalsDto (100L, "some item", makeUserDto(), currentDate.minusDays(2),
-                                           List.of(makeItemDto())
-        );
+        return new RequestWithProposalsDto(100L,
+                "some item",
+                makeUserDto(),
+                currentDate.minusDays(2),
+                List.of(makeItemDto()));
     }
 
 }

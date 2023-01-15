@@ -20,4 +20,5 @@ public class BookingCreateDto {
     private Long itemId;
 
     private Long userId;
+
 }

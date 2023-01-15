@@ -20,39 +20,22 @@ public class RequestDtoJsonTest {
     private JacksonTester<RequestDto> json;
 
     @Autowired
-    private JacksonTester<UserDto> UserDtoJson;
+    private JacksonTester<UserDto> userDtoJson;
 
     @Test
     void testRequestDto() throws Exception {
 
         JsonContent<RequestDto> result = json.write(makeRequestDto());
-        JsonContent<UserDto> userDtoJsonContent = UserDtoJson.write(makeUserDto());
+        JsonContent<UserDto> userDtoJsonContent = userDtoJson.write(makeUserDto());
 
-        assertThat(result)
-                .extractingJsonPathNumberValue("$.id")
-                .isEqualTo(100);
-        assertThat(result)
-                .extractingJsonPathStringValue("$.description")
-                .isEqualTo("simple test description");
-        assertThat(result)
-                .extractingJsonPathValue("$.requester")
-                .extracting("name")
-                .isEqualTo("Artur");
-        assertThat(result)
-                .extractingJsonPathValue("$.requester")
-                .extracting("email")
-                .isEqualTo("artur@gmail.com");
-        assertThat(result)
-                .extractingJsonPathValue("$.requester")
-                .extracting("registrationDate")
-                .isEqualTo("2022-11-25T05:05:05");
-        assertThat(result)
-                .extractingJsonPathValue("$.requester")
-                .extracting("id")
-                .isEqualTo(100);
-        assertThat(result)
-                .extractingJsonPathStringValue("$.created")
-                .isEqualTo("2022-12-09T05:05:05");
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(100);
+        assertThat(result).extractingJsonPathStringValue("$.description").isEqualTo("simple test description");
+        assertThat(result).extractingJsonPathValue("$.requester").extracting("name").isEqualTo("Artur");
+        assertThat(result).extractingJsonPathValue("$.requester").extracting("email").isEqualTo("artur@gmail.com");
+        assertThat(result).extractingJsonPathValue("$.requester").extracting("registrationDate").isEqualTo(
+                "2022-11-25T05:05:05");
+        assertThat(result).extractingJsonPathValue("$.requester").extracting("id").isEqualTo(100);
+        assertThat(result).extractingJsonPathStringValue("$.created").isEqualTo("2022-12-09T05:05:05");
     }
 
     private UserDto makeUserDto() {

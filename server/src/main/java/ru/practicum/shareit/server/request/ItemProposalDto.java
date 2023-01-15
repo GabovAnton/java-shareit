@@ -12,4 +12,5 @@ public class ItemProposalDto {
     private final String itemName;
 
     private final Long requesterId;
+
 }

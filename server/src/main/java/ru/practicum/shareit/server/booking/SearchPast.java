@@ -8,6 +8,7 @@ class SearchPast implements BookingSearch {
 
     @Override
     public BooleanExpression getSearchExpression(long userId) {
+
         QBooking qBooking = QBooking.booking;
         BooleanExpression expressionOne = qBooking.start.before(LocalDateTime.now());
         BooleanExpression expressionTwo = qBooking.end.before(LocalDateTime.now());

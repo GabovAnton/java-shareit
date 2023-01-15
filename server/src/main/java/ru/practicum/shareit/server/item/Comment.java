@@ -37,4 +37,5 @@ public class Comment {
 
     @Column(name = "created_date", nullable = false)
     private LocalDateTime created;
+
 }

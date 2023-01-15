@@ -11,4 +11,5 @@ public interface RequestMapper {
     RequestWithProposalsDto requestToRequestWithProposalDto(Request request);
 
     RequestDto requestToRequestDto(Request request);
+
 }

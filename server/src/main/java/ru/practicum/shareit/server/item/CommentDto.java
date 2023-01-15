@@ -28,4 +28,5 @@ public class CommentDto implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss")
     private LocalDateTime created;
+
 }

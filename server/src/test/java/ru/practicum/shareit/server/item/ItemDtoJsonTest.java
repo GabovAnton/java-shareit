@@ -27,42 +27,20 @@ public class ItemDtoJsonTest {
 
         JsonContent<ItemDto> result = json.write(makeItemDto());
 
-        assertThat(result)
-                .extractingJsonPathNumberValue("$.id")
-                .isEqualTo(100);
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(100);
 
-        assertThat(result)
-                .extractingJsonPathStringValue("$.name")
-                .isEqualTo("thing");
+        assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("thing");
 
-        assertThat(result)
-                .extractingJsonPathStringValue("$.description")
-                .isEqualTo("just simple thing");
+        assertThat(result).extractingJsonPathStringValue("$.description").isEqualTo("just simple thing");
 
-        assertThat(result)
-                .extractingJsonPathBooleanValue("$.available")
-                .isEqualTo(true);
+        assertThat(result).extractingJsonPathBooleanValue("$.available").isEqualTo(true);
 
-        assertThat(result)
-                .extractingJsonPathNumberValue("$.requestId")
-                .isEqualTo(100);
-        assertThat(result)
-                .extractingJsonPathValue("$.lastBooking")
-                .extracting("id")
-                .isEqualTo(100);
-        assertThat(result)
-                .extractingJsonPathValue("$.lastBooking")
-                .extracting("bookerId")
-                .isEqualTo(100);
+        assertThat(result).extractingJsonPathNumberValue("$.requestId").isEqualTo(100);
+        assertThat(result).extractingJsonPathValue("$.lastBooking").extracting("id").isEqualTo(100);
+        assertThat(result).extractingJsonPathValue("$.lastBooking").extracting("bookerId").isEqualTo(100);
 
-        assertThat(result)
-                .extractingJsonPathValue("$.nextBooking")
-                .extracting("id")
-                .isEqualTo(100);
-        assertThat(result)
-                .extractingJsonPathValue("$.nextBooking")
-                .extracting("bookerId")
-                .isEqualTo(100);
+        assertThat(result).extractingJsonPathValue("$.nextBooking").extracting("id").isEqualTo(100);
+        assertThat(result).extractingJsonPathValue("$.nextBooking").extracting("bookerId").isEqualTo(100);
 
     }
 

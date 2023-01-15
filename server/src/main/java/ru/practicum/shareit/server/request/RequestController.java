@@ -13,8 +13,7 @@ public class RequestController {
     private final RequestService requestService;
 
     @GetMapping("")
-    public List<RequestWithProposalsDto> getAll(
-            @RequestParam(required = false) Integer from,
+    public List<RequestWithProposalsDto> getAll(@RequestParam(required = false) Integer from,
             @RequestParam(required = false) Integer size,
             @RequestHeader("X-Sharer-User-Id") Long userId) {
 
@@ -23,15 +22,13 @@ public class RequestController {
     }
 
     @PostMapping()
-    public RequestDto create(
-            @RequestBody RequestDto requestDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public RequestDto create(@RequestBody RequestDto requestDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
 
         return requestService.saveRequest(requestDto, userId);
     }
 
     @GetMapping("/all")
-    public List<RequestWithProposalsDto> getAllFromOthers(
-            @RequestParam(required = false) Integer from,
+    public List<RequestWithProposalsDto> getAllFromOthers(@RequestParam(required = false) Integer from,
             @RequestParam(required = false) Integer size,
             @RequestHeader("X-Sharer-User-Id") Long userId) {
 
@@ -39,8 +36,8 @@ public class RequestController {
     }
 
     @GetMapping("{requestId}")
-    public RequestWithProposalsDto getBookingById(
-            @PathVariable Long requestId, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public RequestWithProposalsDto getBookingById(@PathVariable Long requestId,
+            @RequestHeader("X-Sharer-User-Id") long userId) {
 
         return requestService.getRequest(requestId, userId);
     }

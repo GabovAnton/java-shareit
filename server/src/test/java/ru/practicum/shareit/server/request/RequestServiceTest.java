@@ -51,11 +51,11 @@ class RequestServiceTest {
         ReflectionTestUtils.setField(requestService, "userService", userService);
 
         Long userId = 100L;
-        when(userService.getUser(anyLong())).thenThrow(
-                new EntityNotFoundException("user with id: " + userId + " doesn't exists"));
+        when(userService.getUser(anyLong())).thenThrow(new EntityNotFoundException(
+                "user with id: " + userId + " doesn't exists"));
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
-            requestService.getAll(null,null,100L);
+            requestService.getAll(null, null, 100L);
         });
         assertThat(entityNotFoundException.getMessage(), equalTo("user with id: " + userId + " doesn't exists"));
 

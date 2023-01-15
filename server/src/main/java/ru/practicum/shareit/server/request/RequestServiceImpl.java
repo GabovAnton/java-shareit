@@ -44,7 +44,7 @@ public class RequestServiceImpl implements RequestService {
 
         JPAQuery<Request> query = new JPAQuery<>(entityManager);
 
-        long TotalItems = requestRepository.count() + 1;
+        long totalItems = requestRepository.count() + 1;
 
         int offset = from != null ? (from > 1 ? --from : from) : 0;
 
@@ -54,7 +54,7 @@ public class RequestServiceImpl implements RequestService {
                         .from(qRequest)
                         .where(qRequest.requester.id.eq(user.getId()))
                         .orderBy(qRequest.created.desc())
-                        .limit(size != null ? size : TotalItems)
+                        .limit(size != null ? size : totalItems)
                         .offset(offset)
                         .fetch()
                         .stream()
@@ -93,18 +93,16 @@ public class RequestServiceImpl implements RequestService {
 
         int offset = from != null ? (from > 1 ? --from : from) : 0;
 
-        List<RequestWithProposalsDto>
-                requests =
-                queryFactory
-                        .selectFrom(request)
-                        .where(request.requester.id.notIn(userId))
-                        .orderBy(request.created.desc())
-                        .limit(size != null ? size : TotalItems)
-                        .offset(offset)
-                        .fetch()
-                        .stream()
-                        .map(requestMapper::requestToRequestWithProposalDto)
-                        .collect(Collectors.toList());
+        List<RequestWithProposalsDto> requests = queryFactory
+                .selectFrom(request)
+                .where(request.requester.id.notIn(userId))
+                .orderBy(request.created.desc())
+                .limit(size != null ? size : TotalItems)
+                .offset(offset)
+                .fetch()
+                .stream()
+                .map(requestMapper::requestToRequestWithProposalDto)
+                .collect(Collectors.toList());
 
         return requests.stream().peek(x -> x.setItems(getItemsDto(x.getId()))).collect(Collectors.collectingAndThen(
                 Collectors.toList(),

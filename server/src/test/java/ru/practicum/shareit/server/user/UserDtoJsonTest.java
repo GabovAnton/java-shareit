@@ -23,18 +23,10 @@ public class UserDtoJsonTest {
 
         JsonContent<UserDto> result = json.write(makeUserDto());
 
-        assertThat(result)
-                .extractingJsonPathNumberValue("$.id")
-                .isEqualTo(100);
-        assertThat(result)
-                .extractingJsonPathStringValue("$.name")
-                .isEqualTo("Artur");
-        assertThat(result)
-                .extractingJsonPathStringValue("$.email")
-                .isEqualTo("artur@gmail.com");
-        assertThat(result)
-                .extractingJsonPathStringValue("$.registrationDate")
-                .isEqualTo("2022-11-25T05:05:05");
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(100);
+        assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("Artur");
+        assertThat(result).extractingJsonPathStringValue("$.email").isEqualTo("artur@gmail.com");
+        assertThat(result).extractingJsonPathStringValue("$.registrationDate").isEqualTo("2022-11-25T05:05:05");
     }
 
     private UserDto makeUserDto() {

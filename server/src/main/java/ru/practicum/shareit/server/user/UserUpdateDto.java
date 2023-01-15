@@ -20,7 +20,7 @@ public class UserUpdateDto implements Serializable {
 
     private Set<ItemDto> items;
 
-    private Set<CommentDto> Comments;
+    private Set<CommentDto> comments;
 
     private String name;
 

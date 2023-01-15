@@ -11,7 +11,6 @@ import ru.practicum.shareit.server.request.Request;
 import javax.persistence.*;
 import java.util.Set;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -29,7 +28,7 @@ public class User {
     private Set<Item> items;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL)
-    private Set<Comment> Comments;
+    private Set<Comment> comments;
 
     @OneToMany(mappedBy = "requester")
     private Set<Request> requesterRequests;
@@ -39,4 +38,5 @@ public class User {
 
     @Column(name = "email", nullable = false, length = 512, unique = true)
     private String email;
+
 }

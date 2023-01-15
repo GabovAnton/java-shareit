@@ -35,34 +35,47 @@ import static org.mockito.Mockito.*;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 
-@Sql(scripts = {"classpath:/schema.sql", "classpath:/SampleData.sql"},
-        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {
+        "classpath:/schema.sql",
+        "classpath:/SampleData.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
+
     @Mock
     private final EntityManager em;
-    LocalDateTime currentDate = LocalDateTime
-            .of(2022, 12, 10, 5, 5, 5, 5);
+
+    LocalDateTime currentDate = LocalDateTime.of(2022, 12, 10, 5, 5, 5, 5);
+
     @Mock
     BookingSearchFactory bookingSearchFactory;
+
     @Mock
     private BookingRepository bookingMockRepository;
+
     @Mock
     private UserService userMockService;
+
     @Mock
     private ItemService itemMockService;
+
     @InjectMocks
-    private BookingService bookingService = new BookingServiceImpl(bookingMockRepository, userMockService, itemMockService, bookingSearchFactory);
+    private BookingService bookingService = new BookingServiceImpl(bookingMockRepository,
+            userMockService,
+            itemMockService,
+            bookingSearchFactory);
+
     @Captor
     private ArgumentCaptor<Booking> bookingArgumentCaptor;
 
     @Test
     void getBookingWhenBookingNotFoundThenEntityNotFoundExceptionThrown() {
+
         long bookingId = 0L;
 
-        when(bookingMockRepository.findById(bookingId)).thenThrow(new EntityNotFoundException("Booking with id " + bookingId + " not found"));
+        when(bookingMockRepository.findById(bookingId)).thenThrow(new EntityNotFoundException(
+                "Booking with id " + bookingId + " not found"));
 
         assertThrows(EntityNotFoundException.class, () -> {
             bookingMockRepository.findById(bookingId);
@@ -72,6 +85,7 @@ class BookingServiceTest {
 
     @Test
     void getBookingWhenBookingAccessedByUnauthorizedPersonThenEntityNotFoundExceptionThrown() {
+
         Long requesterId = 10L;
 
         User owner = new User();
@@ -107,7 +121,8 @@ class BookingServiceTest {
 
         Mockito.verify(bookingMockRepository, never()).save(booking);
 
-        Mockito.verify(bookingMockRepository, never()).searchBookingsById(booking.getItem().getId(), booking.getBooker().getId());
+        Mockito.verify(bookingMockRepository, never()).searchBookingsById(booking.getItem().getId(),
+                booking.getBooker().getId());
 
         Mockito.verify(itemMockService, never()).isItemAvailable(booking.getItem().getId());
 
@@ -167,7 +182,8 @@ class BookingServiceTest {
 
         ReflectionTestUtils.setField(bookingService, "bookingRepository", bookingMockRepository);
 
-        when(bookingMockRepository.findById(anyLong())).thenThrow(new EntityNotFoundException("Booking with id " + bookingId + " not found"));
+        when(bookingMockRepository.findById(anyLong())).thenThrow(new EntityNotFoundException(
+                "Booking with id " + bookingId + " not found"));
 
         EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () -> {
             bookingService.changeBookingStatus(bookingId, true, 100L);
@@ -280,11 +296,11 @@ class BookingServiceTest {
 
         when(userMockService.existsById(anyLong())).thenReturn(true);
 
-        IllegalArgumentException IllegalArgumentException = assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.getBookingByState(1, 5, 100L, "UNKNOWN");
         });
 
-        assertThat(IllegalArgumentException.getMessage(), equalTo("Unknown state: UNSUPPORTED_STATUS"));
+        assertThat(illegalArgumentException.getMessage(), equalTo("Unknown state: UNSUPPORTED_STATUS"));
     }
 
     @Test
@@ -318,14 +334,15 @@ class BookingServiceTest {
 
         when(userMockService.existsById(anyLong())).thenReturn(true);
 
-        IllegalArgumentException IllegalArgumentException = assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.getBookingByStateAndOwner(1, 5, 100L, "UNKNOWN");
         });
 
-        assertThat(IllegalArgumentException.getMessage(), equalTo("Unknown state: UNSUPPORTED_STATUS"));
+        assertThat(illegalArgumentException.getMessage(), equalTo("Unknown state: UNSUPPORTED_STATUS"));
     }
 
     private Booking makeBooking() {
+
         Booking booking = new Booking();
         booking.setBooker(new User());
         booking.setStart(currentDate.minusDays(2));
@@ -339,4 +356,5 @@ class BookingServiceTest {
 
         return booking;
     }
+
 }
