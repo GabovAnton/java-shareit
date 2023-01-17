@@ -1,4 +1,4 @@
-package ru.practicum.shareit.gateway.config;
+package ru.practicum.shareit.gateway.user.config;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;

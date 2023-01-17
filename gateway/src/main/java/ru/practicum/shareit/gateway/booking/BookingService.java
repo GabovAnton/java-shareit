@@ -1,26 +1,29 @@
 package ru.practicum.shareit.gateway.booking;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.gateway.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.gateway.booking.dto.BookingDto;
 import ru.practicum.shareit.gateway.booking.dto.BookingState;
-import ru.practicum.shareit.gateway.item.TestServiceEvictCache;
+import ru.practicum.shareit.gateway.item.ServiceEvictCache;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class BookingService {
 
     private final BookingFeignClient bookingFeignClient;
 
-    @Autowired
-    private TestServiceEvictCache testServiceEvictCache;
+    private final ServiceEvictCache testServiceEvictCache;
 
-    public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
+    public BookingDto create(Long userId, @Valid BookingCreateDto bookingCreateDto) {
 
         testServiceEvictCache.evictSingleCacheValue("items",
                 userId.toString() + bookingCreateDto.getItemId().toString());
@@ -44,13 +47,19 @@ public class BookingService {
         return bookingFeignClient.getBookingById(bookingId, userId);
     }
 
-    public List<BookingDto> getBookingByState(Long userId, Integer from, Integer size, BookingState state) {
+    public List<BookingDto> getBookingByState(Long userId,
+            @PositiveOrZero Integer from,
+            @Positive Integer size,
+            BookingState state) {
 
         return bookingFeignClient.getBookingByState(userId, from.toString(), size.toString(), state.name());
 
     }
 
-    public List<BookingDto> getItemsByStateAndOwner(Long userId, Integer from, Integer size, BookingState state) {
+    public List<BookingDto> getItemsByStateAndOwner(Long userId,
+            @PositiveOrZero Integer from,
+            @Positive Integer size,
+            BookingState state) {
 
         return bookingFeignClient.getItemsByStateAndOwner(from.toString(), size.toString(), state.name(), userId);
 

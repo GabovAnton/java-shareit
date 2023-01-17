@@ -5,7 +5,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestServiceEvictCache {
+public class ServiceEvictCache {
 
     @Autowired
     CacheManager cacheManager;

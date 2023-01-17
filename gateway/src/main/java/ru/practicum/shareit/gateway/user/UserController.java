@@ -2,24 +2,19 @@ package ru.practicum.shareit.gateway.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.gateway.user.dto.UserDto;
 import ru.practicum.shareit.gateway.user.dto.UserUpdateDto;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 @Slf4j
-@Validated
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("{userId}")
     public UserDto getUserById(@PathVariable long userId) {
@@ -36,15 +31,14 @@ public class UserController {
     }
 
     @PostMapping()
-    public UserDto create(@Valid @RequestBody UserDto userDto) {
+    public UserDto create(@RequestBody UserDto userDto) {
 
         log.info("Create user {}", userDto);
         return userService.create(userDto);
     }
 
     @PatchMapping("{userToUpdateId}")
-    public UserDto update(
-            @PathVariable long userToUpdateId, @Valid @RequestBody UserUpdateDto userUpdateDto) {
+    public UserDto update(@PathVariable long userToUpdateId, @RequestBody UserUpdateDto userUpdateDto) {
 
         return userService.update(userToUpdateId, userUpdateDto);
     }

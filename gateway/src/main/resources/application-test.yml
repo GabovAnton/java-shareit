@@ -1,0 +1,24 @@
+logging:
+  level:
+    httpclient:
+      wire: INFO
+    org:
+      apache:
+        http: INFO
+      springframework:
+        web:
+          client:
+            RestTemplate: INFO
+    ru:
+      practicum:
+        shareit: INFO
+spring:
+  banner:
+    location: banner-test.txt
+server:
+  port: 8080
+shareit-server:
+  url: ${SHAREIT_SERVER_URL}
+
+
+SHAREIT_SERVER_URL: "http://localhost:8089"
