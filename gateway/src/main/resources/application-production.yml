@@ -1,0 +1,22 @@
+logging:
+  level:
+    httpclient:
+      wire: DEBUG
+    org:
+      apache:
+        http: DEBUG
+      springframework:
+        web:
+          client:
+            RestTemplate: INFO
+    ru:
+      practicum:
+        shareit: debug
+
+spring:
+  banner:
+    location: banner-production.txt
+server:
+  port: 8080
+shareit-server:
+  url: ${SHAREIT_SERVER_URL}

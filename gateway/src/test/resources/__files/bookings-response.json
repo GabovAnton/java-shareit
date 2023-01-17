@@ -1,0 +1,42 @@
+[{
+  "id": 100,
+  "start": "2022-12-08T05:05:05",
+  "end": "2022-12-12T05:05:05",
+  "status": "REJECTED",
+  "item": {
+    "id": 100,
+    "name": "thing",
+    "description": "just simple thing",
+    "available": true,
+    "requestId": 100,
+    "lastBooking": {
+      "id": 100,
+      "bookerId": 100
+    },
+    "nextBooking": {
+      "id": 100,
+      "bookerId": 100
+    },
+    "comments": [
+      {
+        "id": 100,
+        "text": "good thing",
+        "authorId": 101,
+        "authorName": "Artur",
+        "created": "2022-11-25T05:05:05"
+      }
+    ],
+    "owner": {
+      "id": null,
+      "name": null,
+      "email": null,
+      "registrationDate": null
+    }
+  },
+  "booker": {
+    "id": 100,
+    "name": "Artur",
+    "email": "artur@gmail.com",
+    "registrationDate": "2022-11-25T05:05:05"
+  }
+}]
